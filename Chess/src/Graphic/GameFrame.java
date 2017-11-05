@@ -12,25 +12,23 @@ import com.mommoo.util.ScreenManager;
 import Manager.Game;
 
 class GameFrame {
-	private static Images images = new Images();
-	private static Theme theme = new Theme();
-	
+
 	private static Game game = new Game();
-	
+
 	GameFrame() {
 		FlatFrame frame = createFrame();
 		FlatPanel board = new Board(game);
-		
+
 		frame.getContainer().add(createRelatedInfoPanel(), createCommonConstraints(2));
 		frame.getContainer().add(board, createCommonConstraints(10));
-		
+
 		frame.show();
 	}
-	
+
 	private LinearConstraints createCommonConstraints(int weight) {
 		return new LinearConstraints().setWeight(weight).setLinearSpace(LinearSpace.MATCH_PARENT);
 	}
-	
+
 	private FlatFrame createFrame() {
 		FlatFrame frame = new FlatFrame();
 		ScreenManager screenManager = ScreenManager.getInstance();
@@ -38,46 +36,46 @@ class GameFrame {
 		frame.setSize(screenManager.dip2px(500), screenManager.dip2px(530));
 		frame.getContainer().setLayout(new LinearLayout(Orientation.VERTICAL, 0));
 		frame.setLocationOnScreenCenter();
-		frame.setIconImage(images.getIconImage());
-		frame.setProcessIconImage(images.getIconImage());
-		frame.setTitleBarColor(theme.getTitleBarColor());
+		frame.setIconImage(Images.ICON);
+		frame.setProcessIconImage(Images.ICON);
+		frame.setTitleBarColor(Theme.TITLE_BAR_COLOR);
 		frame.setResizable(false);
 		frame.setWindowExit(true);
 		return frame;
 	}
-	
+
 	private FlatPanel createRelatedInfoPanel() {
 		FlatPanel relatedInfoView = new FlatPanel(new LinearLayout(5));
 		FlatPanel timerAndButtonPanel = new FlatPanel(new LinearLayout(Orientation.VERTICAL, 5));
-		relatedInfoView.setBackground(theme.getDarkBlueColor());
+		relatedInfoView.setBackground(Theme.DARK_BLUE);
 		relatedInfoView.setOpaque(true);
-		
+
 		relatedInfoView.add(new CurrentChessmanView(game), createCommonConstraints(4));
 		relatedInfoView.add(timerAndButtonPanel, createCommonConstraints(3));
 		timerAndButtonPanel.add(new TimerPanel(game), createCommonConstraints(2));
 		timerAndButtonPanel.add(createButtonPanel(), createCommonConstraints(1));
 		return relatedInfoView;
 	}
-	
+
 	private FlatPanel createButtonPanel() {
 		FlatPanel buttonPanel = new FlatPanel(new LinearLayout(0));
-		buttonPanel.setBackground(theme.getDarkBlueColor());
+		buttonPanel.setBackground(Theme.DARK_BLUE);
 		buttonPanel.setOpaque(true);
-		
+
 		buttonPanel.add(createRuleDescriptionButton(), createCommonConstraints(1));
 		buttonPanel.add(createGiveUpButton(), createCommonConstraints(1));
 		return buttonPanel;
 	}
-	
+
 	private FlatButton createRuleDescriptionButton() {
 		FlatButton ruleDescriptionButton = new FlatButton("규칙 설명");
-		ruleDescriptionButton.setBackground(theme.getLightBlueColor());
+		ruleDescriptionButton.setBackground(Theme.LIGHT_BLUE);
 		return ruleDescriptionButton;
 	}
-	
+
 	private FlatButton createGiveUpButton() {
 		FlatButton giveUpButton = new FlatButton("기 권");
-		giveUpButton.setBackground(theme.getYellowColor());
+		giveUpButton.setBackground(Theme.YELLOW);
 		return giveUpButton;
 	}
 }

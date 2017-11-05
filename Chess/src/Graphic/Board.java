@@ -14,7 +14,6 @@ import Manager.Game;
 
 @SuppressWarnings("serial")
 class Board extends FlatPanel {
-	private static Theme theme = new Theme();
 	private static Chessman chessman = new Chessman();
 	
 	private static FlatPanel[][] square = new FlatPanel[8][8];
@@ -22,7 +21,7 @@ class Board extends FlatPanel {
 	Board(Game game) {
 		setLayout(new GridLayout(8, 8));
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		setBackground(theme.getBoardBorderColor());
+		setBackground(Theme.BOARD_BORDER_COLOR);
 		setOpaque(true);
 		
 		createBoard();
@@ -47,9 +46,9 @@ class Board extends FlatPanel {
 		square[row][col].setOpaque(true);
 		
 		if(((row%2==0) && (col%2==0))||((row%2==1)&&(col%2==1))) {
-			square[row][col].setBackground(theme.getBoardDarkSquareColor());
+			square[row][col].setBackground(Theme.BOARD_DARK_SQUARE_COLOR);
 		} else {
-			square[row][col].setBackground(theme.getBoardLightSquareColor());
+			square[row][col].setBackground(Theme.BOARD_LIGHT_SQUARE_COLOR);
 		}	
 		return square[row][col];
 	}
