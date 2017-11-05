@@ -14,8 +14,6 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 import com.mommoo.util.ScreenManager;
 
 public class IntroFrame {
-	private static Images images = new Images();
-	private static Theme theme = new Theme();
 	
 	public IntroFrame() {
 		FlatFrame frame = createFrame();
@@ -41,27 +39,27 @@ public class IntroFrame {
 		frame.setSize(screenManager.dip2px(250), screenManager.dip2px(350));
 		frame.getContainer().setLayout(new LinearLayout(Orientation.VERTICAL, 0));
 		frame.setLocationOnScreenCenter();
-		frame.setIconImage(images.getIconImage());
-		frame.setProcessIconImage(images.getIconImage());
-		frame.setTitleBarColor(theme.getTitleBarColor());
+		frame.setIconImage(Images.ICON);
+		frame.setProcessIconImage(Images.ICON);
+		frame.setTitleBarColor(Theme.TITLE_BAR_COLOR);
 		frame.setResizable(false);
 		frame.setWindowExit(true);
 		return frame;
 	}
 	
 	private FlatImagePanel createImageView() {
-		return new FlatImagePanel(images.getIntroImage(), ImageOption.MATCH_PARENT);
+		return new FlatImagePanel(Images.INTRO, ImageOption.MATCH_PARENT);
 	}
 	
 	private FlatButton createSinglePlayButton() {
 		FlatButton singlePlayButton = new FlatButton("혼자하기");
-		singlePlayButton.setBackground(theme.getLightBlueColor());
+		singlePlayButton.setBackground(Theme.LIGHT_BLUE);
 		return singlePlayButton;
 	}
 	
 	private FlatButton createDoublePlayButton() {
 		FlatButton doublePlayButton = new FlatButton("둘이하기");
-		doublePlayButton.setBackground(theme.getDarkBlueColor());
+		doublePlayButton.setBackground(Theme.DARK_BLUE);
 		doublePlayButton.setOnClickListener(new OnClickListener() {
 
 			@Override
