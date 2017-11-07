@@ -30,7 +30,7 @@ public class Timer extends FlatPanel implements Runnable {
 	boolean stopped;
 	boolean whitePhase;
 
-	Timer() {
+	public Timer() {
 		thread = new Thread(this);
 		
 		setLayout(new LinearLayout(Orientation.VERTICAL, 0));
