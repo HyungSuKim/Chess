@@ -16,7 +16,7 @@ import Manager.Game;
 class Board extends FlatPanel {
 	private static Chessman chessman = new Chessman();
 	
-	private static FlatPanel[][] square = new FlatPanel[8][8];
+	private static final FlatPanel[][] square = new FlatPanel[8][8];
 	
 	Board(Game game) {
 		setLayout(new GridLayout(8, 8));
@@ -55,31 +55,31 @@ class Board extends FlatPanel {
 
 	
 	private void setChessmanOnBoard(Game game) {
+		final int BLACK_FRONT_ROW = 6;
+		final int BLACK_BACK_ROW = 7;
+		final int WHITE_FRONT_ROW = 1;
+		final int WHITE_BACK_ROW = 0;
 		for(int col = 0; col < 8; col++) { 
-			square[6][col].add(chessman.getBlackPawn(col, 6, game), createCommonConstraints(1));
-			square[1][col].add(chessman.getWhitePawn(col, 1, game), createCommonConstraints(1));
-			
-			if(col==0||col==7) {
-				square[7][col].add(chessman.getBlackRook(col, 7, game), createCommonConstraints(1));
-				square[0][col].add(chessman.getWhiteRook(col, 0, game), createCommonConstraints(1));
-				
-			} else if(col==1||col==6) {
-				square[7][col].add(chessman.getBlackKnight(col, 7, game), createCommonConstraints(1));
-				square[0][col].add(chessman.getWhiteKnight(col, 0, game), createCommonConstraints(1));
-				
-			} else if(col==2||col==5) {
-				square[7][col].add(chessman.getBlackBishop(col, 7, game), createCommonConstraints(1));
-				square[0][col].add(chessman.getWhiteBishop(col, 0, game), createCommonConstraints(1));
-				
-			} else if(col==3) {
-				square[7][col].add(chessman.getBlackQueen(col, 7, game), createCommonConstraints(1));
-				square[0][col].add(chessman.getWhiteQueen(col, 0, game), createCommonConstraints(1));
-				
-			} else {
-				square[7][col].add(chessman.getBlackKing(col, 7, game), createCommonConstraints(1));
-				square[0][col].add(chessman.getWhiteKing(col, 0, game), createCommonConstraints(1));
-			}
+			square[BLACK_FRONT_ROW][col].add(chessman.getBlackPawn(col, 6, game), createCommonConstraints(1));
+			square[WHITE_FRONT_ROW][col].add(chessman.getWhitePawn(col, 1, game), createCommonConstraints(1));
 		}
+			square[BLACK_BACK_ROW][0].add(chessman.getBlackRook(0, 7, game), createCommonConstraints(1));
+			square[BLACK_BACK_ROW][1].add(chessman.getBlackKnight(1, 7, game), createCommonConstraints(1));
+			square[BLACK_BACK_ROW][2].add(chessman.getBlackBishop(2, 7, game), createCommonConstraints(1));
+			square[BLACK_BACK_ROW][3].add(chessman.getBlackQueen(3, 7, game), createCommonConstraints(1));			
+			square[BLACK_BACK_ROW][4].add(chessman.getBlackKing(4, 7, game), createCommonConstraints(1));
+			square[BLACK_BACK_ROW][5].add(chessman.getBlackBishop(5, 7, game), createCommonConstraints(1));
+			square[BLACK_BACK_ROW][6].add(chessman.getBlackKnight(6, 7, game), createCommonConstraints(1));
+			square[BLACK_BACK_ROW][7].add(chessman.getBlackRook(7, 7, game), createCommonConstraints(1));
+
+			square[WHITE_BACK_ROW][0].add(chessman.getBlackRook(0, 0, game), createCommonConstraints(1));
+			square[WHITE_BACK_ROW][1].add(chessman.getWhiteKnight(1, 0, game), createCommonConstraints(1));
+			square[WHITE_BACK_ROW][2].add(chessman.getWhiteBishop(2, 0, game), createCommonConstraints(1));
+			square[WHITE_BACK_ROW][3].add(chessman.getWhiteQueen(3, 0, game), createCommonConstraints(1));
+			square[WHITE_BACK_ROW][4].add(chessman.getWhiteKing(4, 0, game), createCommonConstraints(1));
+			square[WHITE_BACK_ROW][5].add(chessman.getWhiteBishop(5, 0, game), createCommonConstraints(1));
+			square[WHITE_BACK_ROW][6].add(chessman.getWhiteKnight(6, 0, game), createCommonConstraints(1));
+			square[WHITE_BACK_ROW][7].add(chessman.getWhiteRook(7, 0, game), createCommonConstraints(1));			
 	}
-	
+
 }

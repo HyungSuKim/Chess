@@ -14,6 +14,7 @@ import com.mommoo.flat.text.textarea.alignment.FlatHorizontalAlignment;
 import com.mommoo.flat.text.textarea.alignment.FlatVerticalAlignment;
 
 import Manager.Game;
+import Manager.Chessman.Type;
 
 @SuppressWarnings("serial")
 class CurrentChessmanView extends FlatPanel {
@@ -58,19 +59,19 @@ class CurrentChessmanView extends FlatPanel {
 
 	private void initializeCount(Game game) {
 
-		blackKingCount.setText(Integer.toString(game.getBlackChessmanCount("King")));
-		blackQueenCount.setText(Integer.toString(game.getBlackChessmanCount("Queen")));
-		blackBishopCount.setText(Integer.toString(game.getBlackChessmanCount("Bishop")));
-		blackKnightCount.setText(Integer.toString(game.getBlackChessmanCount("Knight")));
-		blackRookCount.setText(Integer.toString(game.getBlackChessmanCount("Rook")));
-		blackPawnCount.setText(Integer.toString(game.getBlackChessmanCount("Pawn")));
+		blackKingCount.setText(Integer.toString(game.getBlackChessmanCount(Type.KING)));
+		blackQueenCount.setText(Integer.toString(game.getBlackChessmanCount(Type.QUEEN)));
+		blackBishopCount.setText(Integer.toString(game.getBlackChessmanCount(Type.BISHOP)));
+		blackKnightCount.setText(Integer.toString(game.getBlackChessmanCount(Type.KNIGHT)));
+		blackRookCount.setText(Integer.toString(game.getBlackChessmanCount(Type.ROOK)));
+		blackPawnCount.setText(Integer.toString(game.getBlackChessmanCount(Type.PAWN)));
 
-		whiteKingCount.setText(Integer.toString(game.getWhiteChessmanCount("King")));
-		whiteQueenCount.setText(Integer.toString(game.getWhiteChessmanCount("Queen")));
-		whiteBishopCount.setText(Integer.toString(game.getWhiteChessmanCount("Bishop")));
-		whiteKnightCount.setText(Integer.toString(game.getWhiteChessmanCount("Knight")));
-		whiteRookCount.setText(Integer.toString(game.getWhiteChessmanCount("Rook")));
-		whitePawnCount.setText(Integer.toString(game.getWhiteChessmanCount("Pawn")));
+		whiteKingCount.setText(Integer.toString(game.getWhiteChessmanCount(Type.KING)));
+		whiteQueenCount.setText(Integer.toString(game.getWhiteChessmanCount(Type.QUEEN)));
+		whiteBishopCount.setText(Integer.toString(game.getWhiteChessmanCount(Type.BISHOP)));
+		whiteKnightCount.setText(Integer.toString(game.getWhiteChessmanCount(Type.KNIGHT)));
+		whiteRookCount.setText(Integer.toString(game.getWhiteChessmanCount(Type.ROOK)));
+		whitePawnCount.setText(Integer.toString(game.getWhiteChessmanCount(Type.PAWN)));
 
 	}
 
