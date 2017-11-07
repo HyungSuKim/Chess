@@ -1,19 +1,22 @@
-package Manager;
+package com.bfpaul.chess.timer;
 
 import java.time.LocalTime;
 
-public class Timer {
-//	LocalTime time = LocalTime.now();
+class Properties {
 	LocalTime timer;
 //	boolean timerRemain;
-	Timer() {
+	Properties() {
 		timer = LocalTime.of(00, 30, 00);
-//		timerRemain = true;
 		
-		System.out.println(timer.getMinute()+":"+timer.getSecond());
 	}
 	
 	public void timeGoes() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		timer = timer.minusSeconds(1);
 	}
 	

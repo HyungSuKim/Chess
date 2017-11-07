@@ -1,7 +1,8 @@
-package Graphic;
+package com.bfpaul.chess.timer;
 
 import java.awt.Component;
 
+import com.bfpaul.chess.Theme;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
@@ -13,31 +14,31 @@ import com.mommoo.flat.text.label.FlatLabel;
 import com.mommoo.flat.text.textarea.alignment.FlatHorizontalAlignment;
 import com.mommoo.flat.text.textarea.alignment.FlatVerticalAlignment;
 
-import Manager.Game;
 
 @SuppressWarnings("serial")
-class TimerPanel extends FlatPanel {
+public class Timer extends FlatPanel implements Runnable {
+	private FlatLabel whiteTimerLabel = createWhiteTimerLabel();
 
-	private static FlatLabel whiteTimerLabel = createWhiteTimerLabel();
+	private FlatLabel blackTimerLabel = createBlackTimerLabel();
 
-	private static FlatLabel blackTimerLabel = createBlackTimerLabel();
+	private static Properties whiteTimer = new Properties();
+	private static Properties blackTimer = new Properties();
 
 	private FlatButton phaseEndButton = createPhaseEndButton();
+	
+	Thread thread;
+	boolean stopped;
+	boolean whitePhase;
 
-	private Game game;
-
-	TimerPanel(Game game) {
-		this.game = game;
+	Timer() {
+		thread = new Thread(this);
+		
 		setLayout(new LinearLayout(Orientation.VERTICAL, 0));
+		setBackground(Theme.DARK_BLUE_COLOR);
+		setOpaque(true);
 
 		add(createTimerInfoView(), createCommonConstraints(8));
 		add(createTimerPanel(), createCommonConstraints(15));
-		setWhiteTimer();
-		setBlackTimer();
-		// while(game.getWhitePlayer().getPhase()) {
-		// game.getWhitePlayer().getTimer().timeGoes();
-		// setWhiteTimer();
-		// }
 	}
 
 	private LinearConstraints createCommonConstraints(int weight) {
@@ -46,8 +47,6 @@ class TimerPanel extends FlatPanel {
 
 	private FlatPanel createTimerInfoView() {
 		FlatPanel timerInfoView = new FlatPanel(new LinearLayout(10));
-		timerInfoView.setBackground(Theme.DARK_BLUE);
-		timerInfoView.setOpaque(true);
 
 		timerInfoView.add(createWhiteTimerInfo(), createCommonConstraints(3));
 
@@ -60,8 +59,6 @@ class TimerPanel extends FlatPanel {
 
 	private FlatPanel createTimerPanel() {
 		FlatPanel timerPanel = new FlatPanel(new LinearLayout(10));
-		timerPanel.setBackground(Theme.DARK_BLUE);
-		timerPanel.setOpaque(true);
 
 		timerPanel.add(whiteTimerLabel, createCommonConstraints(3));
 
@@ -70,15 +67,6 @@ class TimerPanel extends FlatPanel {
 		timerPanel.add(phaseEndButton, createCommonConstraints(1));
 
 		return timerPanel;
-	}
-
-	private void setWhiteTimer() {
-		whiteTimerLabel.setText(game.getWhitePlayer().getTimer().toString());
-
-	}
-
-	private void setBlackTimer() {
-		blackTimerLabel.setText(game.getBlackPlayer().getTimer().toString());
 	}
 
 	private FlatLabel createWhiteTimerInfo() {
@@ -108,32 +96,60 @@ class TimerPanel extends FlatPanel {
 		return phaseEndButtonInfo;
 	}
 
-	private static FlatLabel createBlackTimerLabel() {
-		FlatLabel blackTimerLabel = new FlatLabel();
+	private FlatLabel createBlackTimerLabel() {
+		FlatLabel blackTimerLabel = new FlatLabel(blackTimer.toString());
 		blackTimerLabel.setHorizontalAlignment(FlatHorizontalAlignment.CENTER);
 		blackTimerLabel.setVerticalAlignment(FlatVerticalAlignment.CENTER);
-		blackTimerLabel.setBackground(Theme.LIGHT_BLUE);
+		blackTimerLabel.setBackground(Theme.LIGHT_BLUE_COLOR);
+		blackTimerLabel.setFont(Theme.BOLD_FONT_30PT);
 		return blackTimerLabel;
 	}
 
-	private static FlatLabel createWhiteTimerLabel() {
-		FlatLabel whiteTimerLabel = new FlatLabel();
+	private FlatLabel createWhiteTimerLabel() {
+		FlatLabel whiteTimerLabel = new FlatLabel(whiteTimer.toString());
 		whiteTimerLabel.setHorizontalAlignment(FlatHorizontalAlignment.CENTER);
 		whiteTimerLabel.setVerticalAlignment(FlatVerticalAlignment.CENTER);
-		whiteTimerLabel.setBackground(Theme.LIGHT_BLUE);
+		whiteTimerLabel.setBackground(Theme.LIGHT_BLUE_COLOR);
+		whiteTimerLabel.setFont(Theme.BOLD_FONT_30PT);
 		return whiteTimerLabel;
 	}
+	
+//	private void setWhiteTimer() {
+//		whiteTimer.run();
+//		whiteTimerLabel.setText(whiteTimer.toString());
+//	}
+//
+//	private void setBlackTimer() {
+////		blackTimerLabel.setText(game.getBlackPlayer().getTimer().toString());
+//	}
 
 	private FlatButton createPhaseEndButton() {
 		FlatButton phaseEndButton = new FlatButton("Á¾·á");
-		phaseEndButton.setBackground(Theme.YELLOW);
+		phaseEndButton.setBackground(Theme.YELLOW_COLOR);
 		phaseEndButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(Component component) {
 				// TODO Auto-generated method stub
-				game.phaseEnd();
+				whitePhase = !whitePhase;
 			}
 		});
 		return phaseEndButton;
 	}
+
+	@Override
+	public void run() {
+		while(!stopped) {
+			if(!whitePhase) {
+				whiteTimer.timeGoes();
+				whiteTimerLabel.setText(whiteTimer.toString());
+			} else {
+				blackTimer.timeGoes();
+				blackTimerLabel.setText(blackTimer.toString());
+			}
+		}
+	}
+	
+//	public void suspend() { whitePhase = true; }
+//	public void resume() { whitePhase = false; }
+	public void start() { thread.start(); }
 }

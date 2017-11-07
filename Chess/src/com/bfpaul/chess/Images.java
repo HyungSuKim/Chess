@@ -1,10 +1,10 @@
-package Graphic;
+package com.bfpaul.chess;
 
 import java.awt.Image;
 import java.awt.Toolkit;
 
 /*images use in program*/
-class Images {
+public class Images {
 	/*Image for Intro and Icons*/
 	public static final Image INTRO =  Toolkit.getDefaultToolkit().getImage("..\\Chess\\lib\\Image\\Intro\\Intro.png");
 	public static final Image ICON = Toolkit.getDefaultToolkit().getImage("..\\Chess\\lib\\Image\\Icon\\Icon.png");

@@ -1,7 +1,9 @@
-package Graphic;
+package com.bfpaul.chess.main;
 
 import java.awt.Component;
 
+import com.bfpaul.chess.Images;
+import com.bfpaul.chess.Theme;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.frame.FlatFrame;
@@ -13,9 +15,10 @@ import com.mommoo.flat.layout.linear.constraints.LinearConstraints;
 import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 import com.mommoo.util.ScreenManager;
 
-public class IntroFrame {
+
+class Intro {
 	
-	public IntroFrame() {
+	Intro() {
 		FlatFrame frame = createFrame();
 		
 		frame.getContainer().add(createImageView(), createCommonConstraints(3));
@@ -53,19 +56,19 @@ public class IntroFrame {
 	
 	private FlatButton createSinglePlayButton() {
 		FlatButton singlePlayButton = new FlatButton("혼자하기");
-		singlePlayButton.setBackground(Theme.LIGHT_BLUE);
+		singlePlayButton.setBackground(Theme.LIGHT_BLUE_COLOR);
 		return singlePlayButton;
 	}
 	
 	private FlatButton createDoublePlayButton() {
 		FlatButton doublePlayButton = new FlatButton("둘이하기");
-		doublePlayButton.setBackground(Theme.DARK_BLUE);
+		doublePlayButton.setBackground(Theme.DARK_BLUE_COLOR);
 		doublePlayButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(Component component) {
 				// TODO Auto-generated method stub
-				new GameFrame();
+//				new GameFrame();
 			}
 			
 		});
