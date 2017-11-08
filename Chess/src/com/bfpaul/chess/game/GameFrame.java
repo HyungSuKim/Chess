@@ -2,8 +2,6 @@ package com.bfpaul.chess.game;
 
 import com.bfpaul.chess.Images;
 import com.bfpaul.chess.Theme;
-import com.bfpaul.chess.board.Board;
-import com.bfpaul.chess.timer.Timer;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.frame.FlatFrame;
@@ -14,14 +12,17 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 import com.mommoo.util.ScreenManager;
 
 public class GameFrame {
+	
+	private static Manager manager = new Manager();
+	
 	public GameFrame() {
 		FlatFrame frame = createFrame();
-		FlatPanel board = new Board();
 		
 		frame.getContainer().add(createRelatedInfoPanel(), createCommonConstraints(2));
-		frame.getContainer().add(board, createCommonConstraints(10));
+		frame.getContainer().add(manager.board, createCommonConstraints(10));
 		
 		frame.show();
+		
 	}
 	
 	private LinearConstraints createCommonConstraints(int weight) {
@@ -46,14 +47,14 @@ public class GameFrame {
 	private FlatPanel createRelatedInfoPanel() {
 		FlatPanel relatedInfoView = new FlatPanel(new LinearLayout(5));
 		FlatPanel timerAndButtonPanel = new FlatPanel(new LinearLayout(Orientation.VERTICAL, 5));
-		Timer timer = new Timer();
-		timer.start();
+		
+		manager.timer.start();
 		relatedInfoView.setBackground(Theme.DARK_BLUE_COLOR);
 		relatedInfoView.setOpaque(true);
 		
 		relatedInfoView.add(new CurrentChessmanView(), createCommonConstraints(4));
 		relatedInfoView.add(timerAndButtonPanel, createCommonConstraints(3));
-		timerAndButtonPanel.add(timer, createCommonConstraints(2));
+		timerAndButtonPanel.add(manager.timer, createCommonConstraints(2));
 		timerAndButtonPanel.add(createButtonPanel(), createCommonConstraints(1));
 		return relatedInfoView;
 	}

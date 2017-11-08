@@ -1,11 +1,13 @@
 package com.bfpaul.chess.board;
 
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
 
 import com.bfpaul.chess.Theme;
 import com.mommoo.flat.component.FlatPanel;
+import com.mommoo.flat.image.FlatImagePanel;
 import com.mommoo.flat.layout.linear.LinearLayout;
 import com.mommoo.flat.layout.linear.Orientation;
 import com.mommoo.flat.layout.linear.constraints.LinearConstraints;
@@ -15,44 +17,63 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 @SuppressWarnings("serial")
 public class Board extends FlatPanel {
 	
-	private static FlatPanel[][] square = new FlatPanel[8][8];
+	private FlatPanel board;
+	private FlatPanel[][] square;
 	
-	private static Properties properties = new Properties();
+	private Properties properties = new Properties();
+	private EventViewer eventViewer;
 	
 	public Board() {
-		setLayout(new GridLayout(8, 8));
-		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		setBackground(Theme.BOARD_BORDER_COLOR);
-		setOpaque(true);
+		square = new FlatPanel[8][8];
+		board = createBoard();
+		eventViewer = new EventViewer(); 
 		
-		createBoard();
+		setLayout(new BorderLayout());
+		
+		add(board);
+		board.setSize(958, 805);
+		add(eventViewer);
 	}
 	
 	private LinearConstraints createCommonConstraints(int weight) {
 		return new LinearConstraints().setWeight(weight).setLinearSpace(LinearSpace.MATCH_PARENT);
 	}
 	
-	private void createBoard() {
-		for(int row = 8; row > 0; row--) {
-			for(int col = 0; col < 8; col++) {
-				this.add(createSquare(row-1, col), createCommonConstraints(1));
+	private FlatPanel createBoard() {
+		
+		FlatPanel board = new FlatPanel(new GridLayout(8, 8));
+		board.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		board.setBackground(Theme.BOARD_BORDER_COLOR);
+		board.setOpaque(true);
+		
+		for(int y = 8; y > 0; y--) {
+			for(int x = 0; x < 8; x++) {
+				board.add(createSquare(x, y-1), createCommonConstraints(1));
 			}
 		}	
-	}
-	
-	private FlatPanel createSquare(int row, int col) {
-		square[row][col] = new FlatPanel(new LinearLayout(Orientation.HORIZONTAL));
-		square[row][col].setOpaque(true);
 		
-		if(((row%2==0) && (col%2==0))||((row%2==1)&&(col%2==1))) {
-			square[row][col].setBackground(Theme.BOARD_DARK_SQUARE_COLOR);
-		} else {
-			square[row][col].setBackground(Theme.BOARD_LIGHT_SQUARE_COLOR);
-		}	
-		return square[row][col];
+		return board;
 	}
 	
-	public Properties getProperties() {
-		return properties;
+	private FlatPanel createSquare(int x, int y) {
+		square[y][x] = new FlatPanel(new LinearLayout(Orientation.HORIZONTAL));
+		square[y][x].setOpaque(true);
+		
+		if(((y%2==0) && (x%2==0))||((y%2==1)&&(x%2==1))) {
+			square[y][x].setBackground(Theme.BOARD_DARK_SQUARE_COLOR);
+		} else {
+			square[y][x].setBackground(Theme.BOARD_LIGHT_SQUARE_COLOR);
+		}	
+		return square[y][x];
+	}
+	
+	public FlatPanel getBoard() {
+		return board;
+	}
+	
+	public void setChessman(FlatImagePanel chessman, int x, int y) {
+		square[y][x].add(chessman, createCommonConstraints(1));
+		properties.setOnSquare(x, y);
+//		eventViewer.setChessman(chessman, x, y);
 	}
 }
