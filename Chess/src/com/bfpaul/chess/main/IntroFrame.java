@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import com.bfpaul.chess.Images;
 import com.bfpaul.chess.Theme;
+import com.bfpaul.chess.game.GameFrame;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.frame.FlatFrame;
@@ -16,9 +17,9 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 import com.mommoo.util.ScreenManager;
 
 
-class Intro {
+class IntroFrame {
 	
-	Intro() {
+	IntroFrame() {
 		FlatFrame frame = createFrame();
 		
 		frame.getContainer().add(createImageView(), createCommonConstraints(3));
@@ -68,7 +69,7 @@ class Intro {
 			@Override
 			public void onClick(Component component) {
 				// TODO Auto-generated method stub
-//				new GameFrame();
+				new GameFrame();
 			}
 			
 		});

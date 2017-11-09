@@ -25,7 +25,7 @@ public class BoardTest {
 		
 //		System.out.println("뷰어" + eventViewer.getSize());
 		
-		System.out.println("보드안의 보드" + board.getBoard().getSize());
+//		System.out.println("보드안의 보드" + board.getBoard().getSize());
 		
 	}
 }

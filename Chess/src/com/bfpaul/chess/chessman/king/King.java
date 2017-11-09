@@ -8,13 +8,17 @@ import com.mommoo.flat.image.ImageOption;
 
 @SuppressWarnings("serial")
 public class King extends FlatImagePanel {
-	private Properties properties;
+	
+	final int MOVEABLE = 1;
+	private boolean isWhite;
+	private boolean isMoved;
 	
 	public King(boolean isWhite) {
 		
-		properties = new Properties(isWhite);
+		this.isWhite = isWhite;
 		
-		if(properties.getIsWhite()) {
+		// image panel setting
+		if(isWhite) {
 			setImage(Images.WHITE_KING, ImageOption.MATCH_PARENT);
 		} else {
 			setImage(Images.BLACK_KING, ImageOption.MATCH_PARENT);
@@ -23,7 +27,19 @@ public class King extends FlatImagePanel {
 		setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 	}
 	
-	public Properties getProperties() {
-		return properties;
+	public int getMoveable() {
+		return MOVEABLE;
+	}
+	
+	public boolean getIsWhite() {
+		return isWhite;
+	}
+	
+	public void setIsMoved() {
+		isMoved = true;
+	}
+	
+	public boolean getIsMoved() {
+		return isMoved;
 	}
 }

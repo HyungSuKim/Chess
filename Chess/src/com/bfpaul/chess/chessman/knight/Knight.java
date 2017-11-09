@@ -8,13 +8,17 @@ import com.mommoo.flat.image.ImageOption;
 
 @SuppressWarnings("serial")
 public class Knight extends FlatImagePanel {
-	private Properties properties;
+	
+	private final int MOVEABLE = 3;
+	
+	private boolean isWhite;
 	
 	public Knight(boolean isWhite) {
 		
-		properties = new Properties(isWhite);
+		this.isWhite = isWhite;
 		
-		if(properties.getIsWhite()) {
+		// image panel setting
+		if(isWhite) {
 			setImage(Images.WHITE_KNIGHT, ImageOption.MATCH_PARENT);
 		} else {
 			setImage(Images.BLACK_KNIGHT, ImageOption.MATCH_PARENT);
@@ -23,7 +27,11 @@ public class Knight extends FlatImagePanel {
 		setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 	}
 	
-	public Properties getProperties() {
-		return properties;
+	public int getMoveable() {
+		return MOVEABLE;
+	}
+	
+	public boolean getIsWhite() {
+		return isWhite;
 	}
 }

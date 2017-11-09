@@ -17,22 +17,15 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 @SuppressWarnings("serial")
 public class Board extends FlatPanel {
 	
-	private FlatPanel board;
-	private FlatPanel[][] square;
+	private FlatPanel[][] square = new FlatPanel[8][8];
+	private FlatPanel board = createBoard();
 	
-	private Properties properties = new Properties();
-	private EventViewer eventViewer;
-	
-	public Board() {
-		square = new FlatPanel[8][8];
-		board = createBoard();
-		eventViewer = new EventViewer(); 
+	public Board() { 
 		
 		setLayout(new BorderLayout());
 		
 		add(board);
-		board.setSize(958, 805);
-		add(eventViewer);
+
 	}
 	
 	private LinearConstraints createCommonConstraints(int weight) {
@@ -40,15 +33,16 @@ public class Board extends FlatPanel {
 	}
 	
 	private FlatPanel createBoard() {
-		
 		FlatPanel board = new FlatPanel(new GridLayout(8, 8));
+		
 		board.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		board.setBackground(Theme.BOARD_BORDER_COLOR);
+		
 		board.setOpaque(true);
 		
 		for(int y = 8; y > 0; y--) {
 			for(int x = 0; x < 8; x++) {
-				board.add(createSquare(x, y-1), createCommonConstraints(1));
+				board.add(createSquare(x, (y-1)), createCommonConstraints(1));
 			}
 		}	
 		
@@ -63,17 +57,14 @@ public class Board extends FlatPanel {
 			square[y][x].setBackground(Theme.BOARD_DARK_SQUARE_COLOR);
 		} else {
 			square[y][x].setBackground(Theme.BOARD_LIGHT_SQUARE_COLOR);
-		}	
+		}
+		
 		return square[y][x];
 	}
 	
-	public FlatPanel getBoard() {
-		return board;
-	}
-	
-	public void setChessman(FlatImagePanel chessman, int x, int y) {
+	public void setChessmanOnSquare(FlatImagePanel chessman, int x, int y) {
+		
 		square[y][x].add(chessman, createCommonConstraints(1));
-		properties.setOnSquare(x, y);
-//		eventViewer.setChessman(chessman, x, y);
+		
 	}
 }

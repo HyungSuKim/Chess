@@ -9,13 +9,15 @@ import com.mommoo.flat.image.ImageOption;
 @SuppressWarnings("serial")
 public class Bishop extends FlatImagePanel {
 	
-	private Properties properties;
+	private final int MOVEABLE = 7;
+	
+	private boolean isWhite;
 	
 	public Bishop(boolean isWhite) {
 		
-		properties = new Properties(isWhite);
+		this.isWhite = isWhite;
 		
-		if(properties.getIsWhite()) {
+		if(isWhite) {
 			setImage(Images.WHITE_BISHOP, ImageOption.MATCH_PARENT);
 		} else {
 			setImage(Images.BLACK_BISHOP, ImageOption.MATCH_PARENT);
@@ -24,7 +26,12 @@ public class Bishop extends FlatImagePanel {
 		setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 	}
 	
-	public Properties getProperties() {
-		return properties;
+	public int getMoveable() {
+		return MOVEABLE;
 	}
+	
+	public boolean getIsWhite() {
+		return isWhite;
+	}
+	
 }

@@ -2,6 +2,8 @@ package com.bfpaul.chess.game;
 
 import com.bfpaul.chess.Images;
 import com.bfpaul.chess.Theme;
+import com.bfpaul.chess.board.Board;
+import com.bfpaul.chess.game.manager.Manager;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.frame.FlatFrame;
@@ -13,13 +15,14 @@ import com.mommoo.util.ScreenManager;
 
 public class GameFrame {
 	
-	private static Manager manager = new Manager();
+	public static Manager manager = new Manager();
 	
 	public GameFrame() {
 		FlatFrame frame = createFrame();
 		
 		frame.getContainer().add(createRelatedInfoPanel(), createCommonConstraints(2));
-		frame.getContainer().add(manager.board, createCommonConstraints(10));
+//		frame.getContainer().add(manager.board, createCommonConstraints(10));
+		frame.getContainer().add(new Board(), createCommonConstraints(10));
 		
 		frame.show();
 		

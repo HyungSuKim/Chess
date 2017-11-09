@@ -8,14 +8,16 @@ import com.mommoo.flat.image.ImageOption;
 
 @SuppressWarnings("serial")
 public class Queen extends FlatImagePanel {
-
-	private Properties properties;
+	private final int MOVEABLE = 7;
+	
+	private boolean isWhite;
 	
 	public Queen(boolean isWhite) {
-	
-		properties = new Properties(isWhite);
 		
-		if(properties.getIsWhite()) {
+		this.isWhite = isWhite;
+		
+		// image panel setting
+		if(isWhite) {
 			setImage(Images.WHITE_QUEEN, ImageOption.MATCH_PARENT);
 		} else {
 			setImage(Images.BLACK_QUEEN, ImageOption.MATCH_PARENT);
@@ -24,7 +26,11 @@ public class Queen extends FlatImagePanel {
 		setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 	}
 	
-	public Properties getProperties() {
-		return properties;
+	public int getMoveable() {
+		return MOVEABLE;
+	}
+	
+	public boolean getIsWhite() {
+		return isWhite;
 	}
 }
