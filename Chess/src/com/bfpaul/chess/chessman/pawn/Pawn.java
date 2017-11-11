@@ -3,25 +3,22 @@ package com.bfpaul.chess.chessman.pawn;
 import javax.swing.BorderFactory;
 
 import com.bfpaul.chess.Images;
-import com.mommoo.flat.image.FlatImagePanel;
+import com.bfpaul.chess.chessman.Chessman;
 import com.mommoo.flat.image.ImageOption;
 // chessman 패키지 내에서 pawn을 ImagePanel로써 생성하고 폰의 고유 속성을 가지고있는 클래스
 @SuppressWarnings("serial")
-public class Pawn extends FlatImagePanel {
+public class Pawn extends Chessman {
 //	첫 움직임을 수행하고 나서 움직일수 있는 칸수를 나타내는 상수, 이는 공격도 대각선 1칸 이동으로 생각해서 1로 선언해주었다. 
 	private final int MOVEABLE_SQUARE = 1;
 //	첫 움직임에서 움직일수 있는 칸수는 2칸이므로 이를 나타내기위하여 선언한 상수
 	private final int FIRST_MOVEABLE_SQUARE = 2;
-	
-//	말이 흰색인지 아닌지 정보를 가지고있는 변수
-	private boolean isWhite;
 //	말이 움직였는지 아닌지 정보를 가지고있는 변수
 	private boolean isMoved;
 	
 //	폰의 생성자로써 흰색이면 흰색 폰 이미지를 가진 폰을 생성하고 아니면 검정 폰 이미지를 가진 폰을 생성한다.
 	public Pawn(boolean isWhite) {
-		
-		this.isWhite = isWhite;
+//		부모클래스 Chessman의 생성자 호출을 통한 색상정보 저장
+		super(isWhite);
 		
 		// image panel setting
 		if(isWhite) {
@@ -41,11 +38,6 @@ public class Pawn extends FlatImagePanel {
 		} else {
 			return MOVEABLE_SQUARE;
 		}
-	}
-	
-//	흰색인지 아닌지 반환하는 메서드
-	public boolean getIsWhite() {
-		return isWhite;
 	}
 	
 //	첫 움직임 이후 움직였음을 설정해주기위한 메서드
