@@ -10,10 +10,14 @@ import com.mommoo.flat.image.FlatImagePanel;
 public class Chessman extends FlatImagePanel {
 //	자손 클래스의 인스턴스 생성시 흰색인지 아닌지(색상) 정보를 받아서 저장하기 위한 멤버변수이다.	
 	private boolean isWhite;
+//	체스말의 이동가능한 square의 갯수를 나타낸 상수이다. 자손의 인스턴스가 생성될 때 입력된 값으로 초기화해준다.
+	private final int MOVEABLE_SQUARE;
 	
 //	자손 클래스의 인스턴스 생성시 흰색인지 아닌지(색상) 정보를 받아서 멤버변수에 저장한다.
-	protected Chessman(boolean isWhite) {
+	protected Chessman(boolean isWhite, int moveableSquare) {
 		this.isWhite = isWhite;
+		MOVEABLE_SQUARE = moveableSquare;
+		
 		setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 	}
 	
@@ -22,4 +26,8 @@ public class Chessman extends FlatImagePanel {
 		return isWhite;
 	}
 
+//	체스말의 이동가능한 square의 갯수를 반환한다
+	public int getMoveableSquare() {
+		return MOVEABLE_SQUARE;
+	}
 }
