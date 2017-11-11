@@ -85,14 +85,19 @@ class CurrentChessmanView extends FlatPanel {
 		
 		blackChessmanView.add(createSingleChessmanView(Images.BLACK_KING), createCommonConstraints(3));
 		blackChessmanView.add(blackKingCount, createCommonConstraints(1));
+		
 		blackChessmanView.add(createSingleChessmanView(Images.BLACK_QUEEN), createCommonConstraints(3));
 		blackChessmanView.add(blackQueenCount, createCommonConstraints(1));
+		
 		blackChessmanView.add(createSingleChessmanView(Images.BLACK_BISHOP), createCommonConstraints(3));
 		blackChessmanView.add(blackBishopCount, createCommonConstraints(1));
+		
 		blackChessmanView.add(createSingleChessmanView(Images.BLACK_KNIGHT), createCommonConstraints(3));
 		blackChessmanView.add(blackKnightCount, createCommonConstraints(1));
+		
 		blackChessmanView.add(createSingleChessmanView(Images.BLACK_ROOK), createCommonConstraints(3));
 		blackChessmanView.add(blackRookCount, createCommonConstraints(1));
+		
 		blackChessmanView.add(createSingleChessmanView(Images.BLACK_PAWN), createCommonConstraints(3));
 		blackChessmanView.add(blackPawnCount, createCommonConstraints(1));
 		

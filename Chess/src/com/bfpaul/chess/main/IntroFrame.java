@@ -39,7 +39,6 @@ class IntroFrame {
 		FlatFrame frame = new FlatFrame();
 		ScreenManager screenManager = ScreenManager.getInstance();
 		frame.setTitle("Chess Intro");
-//		frame.setSize(screenManager.dip2px(400), screenManager.dip2px(500));
 		frame.setSize(screenManager.dip2px(250), screenManager.dip2px(350));
 		frame.getContainer().setLayout(new LinearLayout(Orientation.VERTICAL, 0));
 		frame.setLocationOnScreenCenter();
@@ -68,7 +67,6 @@ class IntroFrame {
 
 			@Override
 			public void onClick(Component component) {
-				// TODO Auto-generated method stub
 				new GameFrame();
 			}
 			

@@ -8,7 +8,7 @@ import com.mommoo.flat.image.FlatImagePanel;
 
 public class Manager {
 	
-//	public Board board = new Board();
+	public Board board = new Board();
 	public Timer timer = new Timer();
 	
 //	CoordinateBoard corrdinateBoard = new CoordinateBoard();
