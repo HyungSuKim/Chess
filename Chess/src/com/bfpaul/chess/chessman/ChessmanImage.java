@@ -4,10 +4,12 @@ import java.awt.Image;
 
 import com.bfpaul.chess.Images;
 
+// 체스말의 이미지를 메서드를 이용해서 가져오기 위한 클래스로써 따라서 생성자는 막아놓고
+// 메서드만 static으로 선언해서 타 클래스에서 인스턴스를 생성하지 않고 메서드를 사용해서 이미지를 가져올수있다.
 public class ChessmanImage {
 	private ChessmanImage() {
 	}
-
+// 흰색인지 아닌지 그리고 ChessmanType형태의 type을 받아서 두가지 조건에 부합하는 이미지를 반환해준다
 	public static Image getChessmanImage(boolean isWhite, ChessmanType type) {
 		if (isWhite) {
 			switch (type) {
