@@ -1,7 +1,8 @@
 package com.bfpaul.chess.chessman.rook;
 
-import com.bfpaul.chess.Images;
 import com.bfpaul.chess.chessman.Chessman;
+import com.bfpaul.chess.chessman.ChessmanImage;
+import com.bfpaul.chess.chessman.ChessmanType;
 import com.mommoo.flat.image.ImageOption;
 //chessman 패키지 내에서 Rook을 ImagePanel로써 생성하고 룩의 고유 속성을 가지고있는 클래스
 @SuppressWarnings("serial")
@@ -14,13 +15,7 @@ public class Rook extends Chessman {
 //		룩은 어떻게 움직여도(상하좌우) 최대 7칸을 움직일수 있다는 생각에서 조상의 MOVEABLE_SQUARE을 7로 초기화해주었다.
 		super(isWhite, 7);
 		
-		// image panel setting
-		if(isWhite) {
-			setImage(Images.WHITE_ROOK, ImageOption.MATCH_PARENT);
-		} else {
-			setImage(Images.BLACK_ROOK, ImageOption.MATCH_PARENT);
-		}
-
+		setImage(ChessmanImage.getChessmanImage(isWhite, ChessmanType.ROOK), ImageOption.MATCH_PARENT);
 	}
 
 //	움직임이 발생했을때 움직였음을 표시하기위한 메서드

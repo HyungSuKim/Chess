@@ -1,7 +1,8 @@
 package com.bfpaul.chess.chessman.king;
 
-import com.bfpaul.chess.Images;
 import com.bfpaul.chess.chessman.Chessman;
+import com.bfpaul.chess.chessman.ChessmanImage;
+import com.bfpaul.chess.chessman.ChessmanType;
 import com.mommoo.flat.image.ImageOption;
 //chessman(체스말) 패키지에 포함된 King을 생성 해주고 그 King의 속성을 가지고있는 클래스이다.
 @SuppressWarnings("serial")
@@ -16,12 +17,8 @@ public class King extends Chessman {
 //		1칸만 움직일수 있다는 생각에서 조상의 MOVEABLE_SQUARE 상수를 1로 초기화해준다.
 		super(isWhite, 1);
 		
-		// image panel setting
-		if(isWhite) {
-			setImage(Images.WHITE_KING, ImageOption.MATCH_PARENT);
-		} else {
-			setImage(Images.BLACK_KING, ImageOption.MATCH_PARENT);
-		}
+		setImage(ChessmanImage.getChessmanImage(isWhite, ChessmanType.KING), ImageOption.MATCH_PARENT);
+		
 	}
 	
 //	움직임이 발생했을때 움직였음을 표시하기위한 메서드

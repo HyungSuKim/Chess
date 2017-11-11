@@ -1,7 +1,8 @@
 package com.bfpaul.chess.chessman.bishop;
 
-import com.bfpaul.chess.Images;
 import com.bfpaul.chess.chessman.Chessman;
+import com.bfpaul.chess.chessman.ChessmanImage;
+import com.bfpaul.chess.chessman.ChessmanType;
 import com.mommoo.flat.image.ImageOption;
 //chessman(체스말) 패키지에 포함된 bishop을 해주고 그 bishop의 속성을 가지고있는 클래스이다.
 @SuppressWarnings("serial")
@@ -13,10 +14,7 @@ public class Bishop extends Chessman {
 //	비숍은 대각선으로 이동하기는 하지만 최대로 무조건 7칸을 움직일 수 있다는 생각에서 7을 조상의 생성자에 파라미터로 전달하였다.
 		super(isWhite, 7);
 		
-		if(isWhite) {
-			setImage(Images.WHITE_BISHOP, ImageOption.MATCH_PARENT);
-		} else {
-			setImage(Images.BLACK_BISHOP, ImageOption.MATCH_PARENT);
-		}
+		setImage(ChessmanImage.getChessmanImage(isWhite, ChessmanType.BISHOP), ImageOption.MATCH_PARENT);
+		
 	}
 }

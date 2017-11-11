@@ -1,7 +1,8 @@
 package com.bfpaul.chess.chessman.pawn;
 
-import com.bfpaul.chess.Images;
 import com.bfpaul.chess.chessman.Chessman;
+import com.bfpaul.chess.chessman.ChessmanImage;
+import com.bfpaul.chess.chessman.ChessmanType;
 import com.mommoo.flat.image.ImageOption;
 // chessman 패키지 내에서 pawn을 ImagePanel로써 생성하고 폰의 고유 속성을 가지고있는 클래스
 @SuppressWarnings("serial")
@@ -16,12 +17,7 @@ public class Pawn extends Chessman {
 //		폰은 첫번째 움직임을 제외하고 1씩 움직일수 있으므로 조상클래스의 MOVEABLE_SQUARE을 1로 초기화해주었다.
 		super(isWhite, 1);
 		
-		// image panel setting
-		if(isWhite) {
-			setImage(Images.WHITE_PAWN, ImageOption.MATCH_PARENT);
-		} else {
-			setImage(Images.BLACK_PAWN, ImageOption.MATCH_PARENT);
-		}
+		setImage(ChessmanImage.getChessmanImage(isWhite, ChessmanType.PAWN), ImageOption.MATCH_PARENT);	
 	}
 
 //	폰이 움직일 수 있는 square의 수를 반환하는 메서드로써 조상클래스의 getMoveableSquare 메서드를 오버라이드해서 구현했다. 

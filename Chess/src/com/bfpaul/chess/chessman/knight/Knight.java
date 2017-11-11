@@ -1,7 +1,8 @@
 package com.bfpaul.chess.chessman.knight;
 
-import com.bfpaul.chess.Images;
 import com.bfpaul.chess.chessman.Chessman;
+import com.bfpaul.chess.chessman.ChessmanImage;
+import com.bfpaul.chess.chessman.ChessmanType;
 import com.mommoo.flat.image.ImageOption;
 //chessman(체스말) 패키지에 포함된 Knight을 생성 해주고 그 Knight의 속성을 가지고있는 클래스이다.
 @SuppressWarnings("serial")
@@ -13,12 +14,8 @@ public class Knight extends Chessman {
 //	생각에서 3칸을 움직일수 있음을 조상클래스의 MOVEABLE_SQUARE을 3으로 초기화 해주었다.
 		super(isWhite, 3);
 		
-		// image panel setting
-		if(isWhite) {
-			setImage(Images.WHITE_KNIGHT, ImageOption.MATCH_PARENT);
-		} else {
-			setImage(Images.BLACK_KNIGHT, ImageOption.MATCH_PARENT);
-		}
+		setImage(ChessmanImage.getChessmanImage(isWhite, ChessmanType.KNIGHT), ImageOption.MATCH_PARENT);
+		
 	}
 
 }

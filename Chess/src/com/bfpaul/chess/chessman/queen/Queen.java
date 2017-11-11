@@ -1,7 +1,8 @@
 package com.bfpaul.chess.chessman.queen;
 
-import com.bfpaul.chess.Images;
 import com.bfpaul.chess.chessman.Chessman;
+import com.bfpaul.chess.chessman.ChessmanImage;
+import com.bfpaul.chess.chessman.ChessmanType;
 import com.mommoo.flat.image.ImageOption;
 //chessman 패키지 내에서 Queen을 ImagePanel로써 생성하고 퀸의 고유 속성을 가지고있는 클래스
 @SuppressWarnings("serial")
@@ -13,11 +14,6 @@ public class Queen extends Chessman {
 //		이때 퀸이 최대로 이동가능한 칸수가 7이라 판단해서 조상의 MOVEABLE_SQUARE을 7로 초기화해주었다.
 		super(isWhite, 7);
 		
-		// image panel setting
-		if(isWhite) {
-			setImage(Images.WHITE_QUEEN, ImageOption.MATCH_PARENT);
-		} else {
-			setImage(Images.BLACK_QUEEN, ImageOption.MATCH_PARENT);
-		}
+		setImage(ChessmanImage.getChessmanImage(isWhite, ChessmanType.QUEEN), ImageOption.MATCH_PARENT);
 	}
 }
