@@ -48,13 +48,12 @@ public class GameFrame {
 		FlatPanel relatedInfoView = new FlatPanel(new LinearLayout(5));
 		FlatPanel timerAndButtonPanel = new FlatPanel(new LinearLayout(Orientation.VERTICAL, 5));
 		
-		manager.timer.start();
 		relatedInfoView.setBackground(Theme.DARK_BLUE_COLOR);
 		relatedInfoView.setOpaque(true);
 		
 		relatedInfoView.add(new CurrentChessmanView(), createCommonConstraints(4));
 		relatedInfoView.add(timerAndButtonPanel, createCommonConstraints(3));
-		timerAndButtonPanel.add(manager.timer, createCommonConstraints(2));
+		timerAndButtonPanel.add(manager.gameTimer, createCommonConstraints(2));
 		timerAndButtonPanel.add(createButtonPanel(), createCommonConstraints(1));
 		return relatedInfoView;
 	}

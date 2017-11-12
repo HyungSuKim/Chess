@@ -3,13 +3,13 @@ package com.bfpaul.chess.game.manager;
 import java.util.ArrayList;
 
 import com.bfpaul.chess.board.BoardView;
-import com.bfpaul.chess.timer.Timer;
+import com.bfpaul.chess.timer.GameTimerPanel;
 import com.mommoo.flat.image.FlatImagePanel;
 
 public class Manager {
 	
 	public BoardView board = new BoardView();
-	public Timer timer = new Timer();
+	public GameTimerPanel gameTimer = new GameTimerPanel();
 	
 //	CoordinateBoard corrdinateBoard = new CoordinateBoard();
 	
