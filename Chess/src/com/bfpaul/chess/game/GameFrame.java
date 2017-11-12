@@ -2,7 +2,6 @@ package com.bfpaul.chess.game;
 
 import com.bfpaul.chess.Images;
 import com.bfpaul.chess.Theme;
-import com.bfpaul.chess.board.EventViewerOnBoard;
 import com.bfpaul.chess.game.manager.Manager;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
