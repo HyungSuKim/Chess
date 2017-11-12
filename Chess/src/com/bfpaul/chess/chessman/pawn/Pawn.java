@@ -3,7 +3,7 @@ package com.bfpaul.chess.chessman.pawn;
 import com.bfpaul.chess.chessman.Chessman;
 import com.bfpaul.chess.chessman.ChessmanType;
 // 폰의 속성을 가지고있다.
-// 폰의 특수 속성인 첫 움직임이 있었는지 아닌지의 속성이 있다.
+// 폰의 움직일 수 있는 칸수와 첫 움직임이 있었는지 아닌지의 속성이 있다.
 @SuppressWarnings("serial")
 public class Pawn extends Chessman {
 //	폰의 움직일 수 있는 칸 수로 모든 폰에게 적용되는 동일 속성이다.
