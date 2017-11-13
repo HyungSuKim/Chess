@@ -1,8 +1,11 @@
 package com.bfpaul.chess.timer;
 
+import java.awt.Component;
+
 import com.bfpaul.chess.Theme;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
+import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.layout.linear.LinearLayout;
 import com.mommoo.flat.layout.linear.Orientation;
 import com.mommoo.flat.layout.linear.constraints.LinearConstraints;
@@ -12,14 +15,14 @@ import com.mommoo.flat.text.textarea.alignment.FlatHorizontalAlignment;
 import com.mommoo.flat.text.textarea.alignment.FlatVerticalAlignment;
 
 @SuppressWarnings("serial")
-public class GameTimerPanel extends FlatPanel {
+public class GameTimerView extends FlatPanel {
 	
 	private FlatButton phaseEndButton = createPhaseEndButton();
 	
-	private TimerView whiteTimer = new TimerView(true);
-	private TimerView blackTimer = new TimerView(false);
+	private TimerPanel whiteTimer = new TimerPanel(true);
+	private TimerPanel blackTimer = new TimerPanel(false);
 	
-	public GameTimerPanel() {
+	public GameTimerView() {
 		setLayout(new LinearLayout(10));
 		setBackground(Theme.DARK_BLUE_COLOR);
 		setOpaque(true);
@@ -51,6 +54,15 @@ public class GameTimerPanel extends FlatPanel {
 	private FlatButton createPhaseEndButton() {
 		FlatButton phaseEndButton = new FlatButton("Á¾·á");
 		phaseEndButton.setBackground(Theme.YELLOW_COLOR);
+		phaseEndButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(Component component) {
+				whiteTimer.getTimer().timerOperateSwitch();
+				blackTimer.getTimer().timerOperateSwitch();
+			}
+			
+		});
 		return phaseEndButton;
 	}
 }

@@ -12,14 +12,20 @@ import com.mommoo.flat.text.textarea.alignment.FlatVerticalAlignment;
 
 
 @SuppressWarnings("serial")
-public class TimerView extends FlatPanel {
+class TimerPanel extends FlatPanel {
+
+	private boolean isWhite;
+	
 	private FlatLabel timerLabel = createTimerLabel();
+	
+	private Timer timer;
 
-	boolean isWhite;
-
-	public TimerView(boolean isWhite) {
+	TimerPanel(boolean isWhite) {
+//		System.out.println(isWhite);
 		this.isWhite = isWhite;
+		timer = new Timer(this);
 		setLayout(new LinearLayout(Orientation.VERTICAL, 0));
+		
 		add(createTimerInfo(), createMatchParentConstraints(8));
 		add(timerLabel, createMatchParentConstraints(15));
 	}
@@ -43,7 +49,7 @@ public class TimerView extends FlatPanel {
 		timerInfo.setFont(Theme.BOLD_FONT_15PT);
 		return timerInfo;
 	}
-
+	
 	private FlatLabel createTimerLabel() {
 		FlatLabel timerLabel = new FlatLabel();
 		timerLabel.setHorizontalAlignment(FlatHorizontalAlignment.CENTER);
@@ -51,5 +57,17 @@ public class TimerView extends FlatPanel {
 		timerLabel.setBackground(Theme.LIGHT_BLUE_COLOR);
 		timerLabel.setFont(Theme.BOLD_FONT_30PT);
 		return timerLabel;
+	}
+	
+	FlatLabel getTimerLabel() {
+		return timerLabel;
+	}
+	
+	boolean getIsWhite() {
+		return isWhite;
+	}
+	
+	Timer getTimer() {
+		return timer;
 	}
 }
