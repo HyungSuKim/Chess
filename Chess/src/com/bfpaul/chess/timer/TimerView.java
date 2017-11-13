@@ -9,31 +9,30 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 import com.mommoo.flat.text.label.FlatLabel;
 import com.mommoo.flat.text.textarea.alignment.FlatHorizontalAlignment;
 import com.mommoo.flat.text.textarea.alignment.FlatVerticalAlignment;
-
-
+// 하나의 타이머를 보여주며 하나의 타이머의 시간정보를 가지고있다.
 @SuppressWarnings("serial")
-class TimerPanel extends FlatPanel {
-
+class TimerView extends FlatPanel {
+//  타이머가 흰색의 타이머인지 아닌지
 	private boolean isWhite;
-	
-	private FlatLabel timerLabel = createTimerLabel();
-	
-	private Timer timer;
+//	타이머에 시간정보를 갖게 하기위해서 선언했다
+	private Time time = new Time(this);
 
-	TimerPanel(boolean isWhite) {
-//		System.out.println(isWhite);
+	TimerView(boolean isWhite) {
 		this.isWhite = isWhite;
-		timer = new Timer(this);
+		
 		setLayout(new LinearLayout(Orientation.VERTICAL, 0));
 		
 		add(createTimerInfo(), createMatchParentConstraints(8));
-		add(timerLabel, createMatchParentConstraints(15));
-	}
+		add(createTimerLabel(), createMatchParentConstraints(15));
+		time.setOnTimerLabel();
 
+	}
+//	정해진 무게만큼의 영역을 차지하고 부모의 영역에 영역을 맞춰주는 제약조건을 반환한다.
 	private LinearConstraints createMatchParentConstraints(int weight) {
 		return new LinearConstraints().setWeight(weight).setLinearSpace(LinearSpace.MATCH_PARENT);
 	}
 	
+//	타이머의 정보를 흰색인지 아닌지 파악해서 다르게 만들어준다
 	private FlatLabel createTimerInfo() {
 		FlatLabel timerInfo = new FlatLabel();
 		
@@ -49,7 +48,7 @@ class TimerPanel extends FlatPanel {
 		timerInfo.setFont(Theme.BOLD_FONT_15PT);
 		return timerInfo;
 	}
-	
+//	시간이 보여질 타이머라벨을 만들어준다
 	private FlatLabel createTimerLabel() {
 		FlatLabel timerLabel = new FlatLabel();
 		timerLabel.setHorizontalAlignment(FlatHorizontalAlignment.CENTER);
@@ -59,15 +58,16 @@ class TimerPanel extends FlatPanel {
 		return timerLabel;
 	}
 	
-	FlatLabel getTimerLabel() {
-		return timerLabel;
-	}
-	
+//	흰색의 타이머인지 아닌지를 반환한다.
 	boolean getIsWhite() {
 		return isWhite;
 	}
-	
-	Timer getTimer() {
-		return timer;
+//	타이머의 스위치를 작동시킨다.
+	void timerOperateSwitch() {
+		time.timerOperateSwitch();
+	}
+//	시간을 타이머라벨에 설정해준다
+	void setTimeOnTimerLabel(String time) {
+		((FlatLabel)getComponent(1)).setText(time);
 	}
 }
