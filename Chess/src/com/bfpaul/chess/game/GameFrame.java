@@ -3,6 +3,7 @@ package com.bfpaul.chess.game;
 import com.bfpaul.chess.Images;
 import com.bfpaul.chess.Theme;
 import com.bfpaul.chess.game.manager.Manager;
+import com.bfpaul.chess.timer.GameTimerView;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.frame.FlatFrame;
@@ -53,7 +54,7 @@ public class GameFrame {
 		
 		relatedInfoView.add(new CurrentChessmanView(), createCommonConstraints(4));
 		relatedInfoView.add(timerAndButtonPanel, createCommonConstraints(3));
-		timerAndButtonPanel.add(manager.gameTimer, createCommonConstraints(2));
+		timerAndButtonPanel.add(new GameTimerView(), createCommonConstraints(2));
 		timerAndButtonPanel.add(createButtonPanel(), createCommonConstraints(1));
 		return relatedInfoView;
 	}

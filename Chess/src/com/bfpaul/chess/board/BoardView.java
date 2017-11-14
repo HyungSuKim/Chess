@@ -66,8 +66,6 @@ public class BoardView extends FlatPanel {
 	
 //	chessman(King, Queen, Bishop, Knight, Rook, Pawn)을 원하는 좌표값(x,y)의 square에 올려준다.
 	public void setChessmanOnSquare(FlatImagePanel chessman, int x, int y) {
-		
 		square[y][x].add(chessman, createMatchParentConstraints(1));
-		
 	}
 }
