@@ -19,6 +19,8 @@ class TimerView extends FlatPanel {
 
 	TimerView(boolean isWhite) {
 		this.isWhite = isWhite;
+//		추후 수정예정인 부분 -> timer에서 isWhite의 정보를 통해 흰색타이머는 시작하고 검정색 타이머는 시작 후 기다리게 구현을 하다보니
+//		멤버변수로 timer를 생성하고 초기화해을때 isWhite의 정보를 가져 올 수 없는 문제가 생겨서 우선 임시조치 해놓은 부분이다.
 		timer = new Timer(this);
 		
 		setLayout(new LinearLayout(Orientation.VERTICAL, 0));
