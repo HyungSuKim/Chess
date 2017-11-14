@@ -15,16 +15,17 @@ class TimerView extends FlatPanel {
 //  타이머가 흰색의 타이머인지 아닌지
 	private boolean isWhite;
 //	타이머에 시간정보를 갖게 하기위해서 선언했다
-	private Time time = new Time(this);
+	private Timer timer;
 
 	TimerView(boolean isWhite) {
 		this.isWhite = isWhite;
+		timer = new Timer(this);
 		
 		setLayout(new LinearLayout(Orientation.VERTICAL, 0));
 		
 		add(createTimerInfo(), createMatchParentConstraints(8));
 		add(createTimerLabel(), createMatchParentConstraints(15));
-		time.setOnTimerLabel();
+		timer.setOnTimerView();
 
 	}
 //	정해진 무게만큼의 영역을 차지하고 부모의 영역에 영역을 맞춰주는 제약조건을 반환한다.
@@ -64,7 +65,7 @@ class TimerView extends FlatPanel {
 	}
 //	타이머의 스위치를 작동시킨다.
 	void timerOperateSwitch() {
-		time.timerOperateSwitch();
+		timer.timerOperateSwitch();
 	}
 //	시간을 타이머라벨에 설정해준다
 	void setTimeOnTimerLabel(String time) {
