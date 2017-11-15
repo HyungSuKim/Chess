@@ -1,5 +1,7 @@
 package com.bfpaul.chess.game;
 
+import javax.swing.border.EmptyBorder;
+
 import com.bfpaul.chess.Images;
 import com.bfpaul.chess.Theme;
 import com.bfpaul.chess.game.manager.Manager;
@@ -72,12 +74,14 @@ public class GameFrame {
 	private FlatButton createRuleDescriptionButton() {
 		FlatButton ruleDescriptionButton = new FlatButton("규칙 설명");
 		ruleDescriptionButton.setBackground(Theme.LIGHT_BLUE_COLOR);
+		ruleDescriptionButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		return ruleDescriptionButton;
 	}
 	
 	private FlatButton createGiveUpButton() {
 		FlatButton giveUpButton = new FlatButton("기 권");
 		giveUpButton.setBackground(Theme.YELLOW_COLOR);
+		giveUpButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		return giveUpButton;
 	}
 }

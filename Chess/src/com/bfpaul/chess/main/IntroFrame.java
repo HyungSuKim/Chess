@@ -2,6 +2,8 @@ package com.bfpaul.chess.main;
 
 import java.awt.Component;
 
+import javax.swing.border.EmptyBorder;
+
 import com.bfpaul.chess.Images;
 import com.bfpaul.chess.Theme;
 import com.bfpaul.chess.game.GameFrame;
@@ -57,14 +59,16 @@ class IntroFrame {
 	private FlatButton createSinglePlayButton() {
 		FlatButton singlePlayButton = new FlatButton("혼자하기");
 		singlePlayButton.setBackground(Theme.LIGHT_BLUE_COLOR);
+		singlePlayButton.setBorder(new EmptyBorder(0,0,0,0));
+		
 		return singlePlayButton;
 	}
 //	둘이서 할 수 있는 게임을 생성하게 하는 버튼이다. 
 	private FlatButton createDoublePlayButton() {
 		FlatButton doublePlayButton = new FlatButton("둘이하기");
 		doublePlayButton.setBackground(Theme.DARK_BLUE_COLOR);
+		doublePlayButton.setBorder(new EmptyBorder(0,0,0,0));
 		doublePlayButton.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(Component component) {
 				new GameFrame();

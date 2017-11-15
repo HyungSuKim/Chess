@@ -2,6 +2,8 @@ package com.bfpaul.chess.timer;
 
 import java.awt.Component;
 
+import javax.swing.border.EmptyBorder;
+
 import com.bfpaul.chess.Theme;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
@@ -54,6 +56,7 @@ public class GameTimerView extends FlatPanel {
 	private FlatButton createPhaseEndButton() {
 		FlatButton phaseEndButton = new FlatButton("종료");
 		phaseEndButton.setBackground(Theme.YELLOW_COLOR);
+		phaseEndButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		phaseEndButton.setOnClickListener(new OnClickListener() {
 //	턴종료 버튼을 클릭하면 타이머의 작동 스위치의 상태를 바꿔주어서 시간이 흐르고 안흐르게 하려고 했다.
 			@Override
