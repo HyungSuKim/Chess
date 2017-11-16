@@ -8,8 +8,6 @@ import javax.swing.BorderFactory;
 import com.bfpaul.chess.Theme;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.image.FlatImagePanel;
-import com.mommoo.flat.layout.linear.LinearLayout;
-import com.mommoo.flat.layout.linear.Orientation;
 import com.mommoo.flat.layout.linear.constraints.LinearConstraints;
 import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 
@@ -17,7 +15,7 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 @SuppressWarnings("serial")
 public class BoardView extends FlatPanel {
 //	체스 판의 하나하나의 square 
-	private FlatPanel[][] square = new FlatPanel[8][8];
+	private Square[][] square = new Square[8][8];
 	
 // 보드를 생성하여 중앙에 꽉차게 붙여준다.
 	public BoardView() { 
@@ -50,22 +48,13 @@ public class BoardView extends FlatPanel {
 		return board;
 	}
 	
-//	입력된 x, y를 이용해서 특정 색을 가진 체스판의 square을 만들어 반환한다. 
-	private FlatPanel createSquare(int x, int y) {
-		square[y][x] = new FlatPanel(new LinearLayout(Orientation.HORIZONTAL));
-		square[y][x].setOpaque(true);
-		
-		if(((y%2==0) && (x%2==0))||((y%2==1)&&(x%2==1))) {
-			square[y][x].setBackground(Theme.BOARD_DARK_SQUARE_COLOR);
-		} else {
-			square[y][x].setBackground(Theme.BOARD_LIGHT_SQUARE_COLOR);
-		}
-		
-		return square[y][x];
+//	입력된 좌표 x, y를 갖는 square를 생성해서 환한다. 
+	private Square createSquare(int x, int y) {
+		return square[y][x] = new Square(x, y);
 	}
 	
 //	chessman(King, Queen, Bishop, Knight, Rook, Pawn)을 원하는 좌표값(x,y)의 square에 올려준다.
 	public void setChessmanOnSquare(FlatImagePanel chessman, int x, int y) {
-		square[y][x].add(chessman, createMatchParentConstraints(1));
+		square[y][x].setChessmanOnSquare(chessman);
 	}
 }
