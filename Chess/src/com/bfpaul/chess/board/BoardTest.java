@@ -9,7 +9,7 @@ public class BoardTest {
 	public static void main(String[] args) {
 		FlatFrame frame = new FlatFrame();
 		ScreenManager screenManager = ScreenManager.getInstance();
-		BoardView board = new BoardView();
+		BoardPanel board = new BoardPanel();
 //		EventViewer eventViewer = new EventViewer();
 		
 		frame.setSize(screenManager.dip2px(500), screenManager.dip2px(500));
