@@ -1,5 +1,6 @@
 package com.bfpaul.chess.board;
 
+import java.awt.Component;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
@@ -8,6 +9,7 @@ import com.bfpaul.chess.Theme;
 import com.bfpaul.chess.chessman.Chessman;
 import com.bfpaul.chess.chessman.ChessmanType;
 import com.mommoo.flat.component.FlatPanel;
+import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.layout.linear.LinearLayout;
 import com.mommoo.flat.layout.linear.constraints.LinearConstraints;
 import com.mommoo.flat.layout.linear.constraints.LinearSpace;
@@ -18,6 +20,8 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 public class BoardPanel extends FlatPanel {
 //	체스 판의 하나하나의 square로써 체스말을 놓아준다던가 체스말을 제외해준다거나 이동가능범위를 표현해줄 최소단위의 칸이다. 
 	private BoardSquare[][] boardSquare = new BoardSquare[8][8];
+	private BoardSquare tempSquare = null;
+	boolean once = true;
 	
 // 8 X 8의 square를 가진 체스판을 만들어준다.
 	public BoardPanel() { 
@@ -31,6 +35,7 @@ public class BoardPanel extends FlatPanel {
 				add(createBoardSquare(x, (y-1)), createMatchParentConstraints(1));
 			}
 		}
+		
 		setWholeChessmanOnBoard();
 	}
 	
@@ -51,6 +56,31 @@ public class BoardPanel extends FlatPanel {
 		} else {
 			boardSquare[y][x].setBackground(Theme.BOARD_LIGHT_SQUARE_COLOR);
 		}
+		boardSquare[y][x].setOriginalColor();
+		boardSquare[y][x].setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(Component component) {
+				if(once) {
+					if(tempSquare!=null) {
+						tempSquare.setSquareOriginalColor();
+					}
+					
+					tempSquare = boardSquare[y][x];
+					tempSquare.setSquareEventColor();
+					
+					once = false;
+				} else {
+					tempSquare.setSquareOriginalColor();
+					
+					tempSquare = boardSquare[y][x];
+					tempSquare.setSquareEventColor();
+					
+					once = true;
+				}
+				
+			}
+		});
+		
 		return boardSquare[y][x];
 	}
 	
