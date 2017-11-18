@@ -2,12 +2,14 @@ package com.bfpaul.chess.board;
 
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 
 import com.bfpaul.chess.Theme;
 import com.bfpaul.chess.chessman.Chessman;
 import com.bfpaul.chess.chessman.ChessmanType;
+import com.bfpaul.chess.chessman.pawn.Pawn;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.layout.linear.LinearLayout;
@@ -60,24 +62,36 @@ public class BoardPanel extends FlatPanel {
 		boardSquare[y][x].setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(Component component) {
-				if(once) {
-					if(tempSquare!=null) {
-						tempSquare.setSquareOriginalColor();
-					}
-					
-					tempSquare = boardSquare[y][x];
-					tempSquare.setSquareEventColor();
-					
-					once = false;
-				} else {
-					tempSquare.setSquareOriginalColor();
-					
-					tempSquare = boardSquare[y][x];
-					tempSquare.setSquareEventColor();
-					
-					once = true;
+				boardSquare[y][x].getChessman().setMoveableSquareCoordinate(x, y);
+				ArrayList<Coordinate> listTest = boardSquare[y][x].getChessman().getMoveableSquareCoordinate();
+//				System.out.println(listTest.size());
+				for(Coordinate test : listTest) {
+//					System.out.println("("+test.getX()+","+test.getY()+")");
+//					System.out.println(test.getY());
+					boardSquare[test.getY()][test.getX()].setSquareEventColor();
 				}
-				
+				boardSquare[y][x].getChessman().refreshMoveableSquareCoordinate();
+//				int moveableCount = MoveAbleTest.moveableTest(x, y, boardSquare[y][x].getSquareContains());
+//				for(int count = 0; count < moveableCount; count++) {
+//					boardSquare[y+count][x].setSquareEventColor();
+//				}
+//				if(once) {
+//					if(tempSquare!=null) {
+//						tempSquare.setSquareOriginalColor();
+//						System.out.println("0000");
+//					}
+//					tempSquare = boardSquare[y][x];
+//					tempSquare.setSquareEventColor();
+//					
+//					once = false;
+//				} else {
+//					System.out.println("2222");
+//					tempSquare.setSquareOriginalColor();
+//					tempSquare = boardSquare[y][x];
+//					tempSquare.setSquareEventColor();
+//					
+//					once = true;
+//				}
 			}
 		});
 		
@@ -145,5 +159,16 @@ public class BoardPanel extends FlatPanel {
 			setChessmanOnSquare(type.createChessman(true), count, 1);
 			setChessmanOnSquare(type.createChessman(false), count, 6);
 		}
+	}
+}
+
+class MoveAbleTest {
+	private MoveAbleTest() {	}
+	
+	static int moveableTest(int x, int y, Chessman chessman) {
+		if( chessman instanceof Pawn) {
+			return 2;
+		}
+		return 0;
 	}
 }

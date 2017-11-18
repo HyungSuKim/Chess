@@ -36,4 +36,17 @@ public class Pawn extends Chessman {
 	public boolean getIsMoved() {
 		return isMoved;
 	}
+	
+	public void setMoveableSquareCoordinate(int x, int y) {
+		if(!isMoved) {
+			super.setMoveableSquareCoordinate(x, y+1);
+			super.setMoveableSquareCoordinate(x, y+2);
+		} else {
+			super.setMoveableSquareCoordinate(x-1, y);
+			super.setMoveableSquareCoordinate(x+1, y);
+			super.setMoveableSquareCoordinate(x,   y+1);
+			super.setMoveableSquareCoordinate(x-1, y+1);
+			super.setMoveableSquareCoordinate(x+1, y+1);
+		}
+	}
 }

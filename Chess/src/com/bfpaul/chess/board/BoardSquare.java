@@ -31,6 +31,14 @@ public class BoardSquare extends FlatPanel {
 		setEnabled(isContain);
 	}
 	
+	Chessman getChessman() {
+		return (Chessman)getComponent(0);
+	}
+	
+	boolean isWhite() {
+		return ((Chessman)getComponent(0)).getIsWhite();
+	}
+	
 	void setSquareOriginalColor() {
 		setBackground(originalColor);
 		setAlpha(1.0f);

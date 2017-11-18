@@ -12,4 +12,17 @@ public class Queen extends Chessman {
 	public Queen(boolean isWhite) {
 		super(isWhite, MOVEABLE_SQUARE_COUNT, ChessmanType.QUEEN);
 	}
+	
+	public void setMoveableSquareCoordinate(int x, int y) {
+		for(int count = 0; count <= MOVEABLE_SQUARE_COUNT; count++) {
+			super.setMoveableSquareCoordinate(x - count, y + count);
+			super.setMoveableSquareCoordinate(x   	   , y + count);
+			super.setMoveableSquareCoordinate(x + count, y + count);
+			super.setMoveableSquareCoordinate(x - count, y);
+			super.setMoveableSquareCoordinate(x + count, y);
+			super.setMoveableSquareCoordinate(x - count, y - count);
+			super.setMoveableSquareCoordinate(x        , y - count);
+			super.setMoveableSquareCoordinate(x + count, y - count);
+		}
+	}
 }
