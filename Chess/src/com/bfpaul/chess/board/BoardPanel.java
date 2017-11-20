@@ -22,8 +22,7 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 public class BoardPanel extends FlatPanel {
 //	체스 판의 하나하나의 square로써 체스말을 놓아준다던가 체스말을 제외해준다거나 이동가능범위를 표현해줄 최소단위의 칸이다. 
 	private BoardSquare[][] boardSquare = new BoardSquare[8][8];
-	private BoardSquare tempSquare = null;
-	boolean once = true;
+	private ArrayList<Coordinate> eventShowedSquare = new ArrayList<>();
 	
 // 8 X 8의 square를 가진 체스판을 만들어준다.
 	public BoardPanel() { 
@@ -49,53 +48,44 @@ public class BoardPanel extends FlatPanel {
 //	정해진 좌표의 하나의 칸을 생성해서 하나의 square가 배열로써 저장되어 좌표의 의미를 갖도록 해서 추후 클래스의 설명에 적혀있는 이벤트를 처리할때
 //	좌표의 값을 이용해서 square에 이벤트를 처리 할 수 있도록 하려고한다.
 	private BoardSquare createBoardSquare(int x, int y) {
-		boardSquare[y][x] = new BoardSquare();
-		boardSquare[y][x].setLayout(new LinearLayout(0));
-		boardSquare[y][x].setOpaque(true);
-		
-		if((x+y)%2==0) {
-			boardSquare[y][x].setBackground(Theme.BOARD_DARK_SQUARE_COLOR);
-		} else {
-			boardSquare[y][x].setBackground(Theme.BOARD_LIGHT_SQUARE_COLOR);
-		}
-		boardSquare[y][x].setOriginalColor();
+		boardSquare[y][x] = new BoardSquare((x+y)%2==0 ? Theme.BOARD_DARK_SQUARE_COLOR : Theme.BOARD_LIGHT_SQUARE_COLOR);
 		boardSquare[y][x].setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(Component component) {
+				System.out.println("if문 내부 실행");
+				refreshEventShowedSquare();
+				eventShowedSquare.clear();
+				
 				boardSquare[y][x].getChessman().setMoveableSquareCoordinate(x, y);
 				ArrayList<Coordinate> listTest = boardSquare[y][x].getChessman().getMoveableSquareCoordinate();
-//				System.out.println(listTest.size());
 				for(Coordinate test : listTest) {
-//					System.out.println("("+test.getX()+","+test.getY()+")");
-//					System.out.println(test.getY());
 					boardSquare[test.getY()][test.getX()].setSquareEventColor();
 				}
+				
+				eventShowedSquare.addAll(listTest);
+				
 				boardSquare[y][x].getChessman().refreshMoveableSquareCoordinate();
-//				int moveableCount = MoveAbleTest.moveableTest(x, y, boardSquare[y][x].getSquareContains());
-//				for(int count = 0; count < moveableCount; count++) {
-//					boardSquare[y+count][x].setSquareEventColor();
-//				}
-//				if(once) {
-//					if(tempSquare!=null) {
-//						tempSquare.setSquareOriginalColor();
-//						System.out.println("0000");
-//					}
-//					tempSquare = boardSquare[y][x];
-//					tempSquare.setSquareEventColor();
-//					
-//					once = false;
-//				} else {
-//					System.out.println("2222");
-//					tempSquare.setSquareOriginalColor();
-//					tempSquare = boardSquare[y][x];
-//					tempSquare.setSquareEventColor();
-//					
-//					once = true;
-//				}
+				System.out.println(eventShowedSquare.size());
 			}
 		});
 		
 		return boardSquare[y][x];
+	}
+	
+	void setEventShowedSquare(ArrayList<Coordinate> eventShowedSquare) {
+		System.out.println("setEventShowedSquare 메서드 실행" + eventShowedSquare.size());
+		for(Coordinate test : eventShowedSquare) {
+			this.eventShowedSquare.add(test);
+		}
+		System.out.println("setEventShowedSquare 메서드 실행" + this.eventShowedSquare.size());
+	}
+	
+	void refreshEventShowedSquare() {
+		System.out.println("refreshEventShowedSquare 메서드 실행" + eventShowedSquare.size());
+		for(Coordinate test : eventShowedSquare) {
+			System.out.println("내부 실행?" + test.getX() +"/"+ test.getY());
+			boardSquare[test.getY()][test.getX()].setSquareOriginalColor();
+		}
 	}
 	
 //	chessman(King, Queen, Bishop, Knight, Rook, Pawn)을 원하는 좌표값(x,y)의 square에 올려준다.

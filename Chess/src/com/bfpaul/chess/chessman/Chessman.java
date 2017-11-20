@@ -17,7 +17,7 @@ public class Chessman extends FlatImagePanel {
 	// 체스말의 이동가능한 square의 갯수
 	private final int MOVEABLE_SQUARE_COUNT;
 	// 체스말이 움직일 수 있는 square의 좌표들로써 체스말에 따라 움직일 수 있는 좌표를 표현하고자 했다
-	private ArrayList<Coordinate> MoveableSquareCoordinate = new ArrayList<>();
+	private ArrayList<Coordinate> moveableSquareCoordinate = new ArrayList<>();
 
 	// 체스말을 생성한다.
 	// 체스말은 흰색인지 아닌지, 이동가능한 square의 갯수에 대한 정보를 갖고
@@ -42,13 +42,13 @@ public class Chessman extends FlatImagePanel {
 	
 	// 체스말의 이동가능한 네모칸 좌표들을 설정해준다
 	public void setMoveableSquareCoordinate(int x, int y) {
-		MoveableSquareCoordinate.add(new Coordinate(x, y));
+		moveableSquareCoordinate.add(new Coordinate(x, y));
 	}
 	// 체스말의 이동가능한 네모칸 좌표들을 초기화한다.
 	public void refreshMoveableSquareCoordinate() {
-		MoveableSquareCoordinate.clear();
+		moveableSquareCoordinate.clear();
 	}
 	public ArrayList<Coordinate> getMoveableSquareCoordinate() {
-		return MoveableSquareCoordinate;
+		return moveableSquareCoordinate;
 	}
 }
