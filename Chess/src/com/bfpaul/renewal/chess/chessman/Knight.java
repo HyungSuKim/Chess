@@ -27,7 +27,7 @@ class Knight implements Chessman {
 	}
 
 	@Override
-	public int moveableSquareCount() {
+	public int getMoveableSquareCount() {
 		return 3;
 	}
 

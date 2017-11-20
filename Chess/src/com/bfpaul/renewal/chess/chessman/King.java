@@ -27,7 +27,7 @@ class King implements Chessman {
 	}
 
 	@Override
-	public int moveableSquareCount() {
+	public int getMoveableSquareCount() {
 		return 1;
 	}
 

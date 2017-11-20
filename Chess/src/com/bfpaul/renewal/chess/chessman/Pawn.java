@@ -31,7 +31,7 @@ class Pawn implements Chessman {
 	}
 
 	@Override
-	public int moveableSquareCount() {
+	public int getMoveableSquareCount() {
 		if(!isMoved) {
 			return 2;
 		} else {

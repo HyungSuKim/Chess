@@ -14,7 +14,7 @@ interface Chessman {
 	
 	boolean isWhite();
 	
-	int moveableSquareCount();
+	int getMoveableSquareCount();
 	
 	Image getChessmanImage();
 	
