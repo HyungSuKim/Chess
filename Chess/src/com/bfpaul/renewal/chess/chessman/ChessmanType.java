@@ -1,5 +1,12 @@
 package com.bfpaul.renewal.chess.chessman;
 
+import com.bfpaul.renewal.chess.chessman.bishop.Bishop;
+import com.bfpaul.renewal.chess.chessman.king.King;
+import com.bfpaul.renewal.chess.chessman.knight.Knight;
+import com.bfpaul.renewal.chess.chessman.pawn.Pawn;
+import com.bfpaul.renewal.chess.chessman.queen.Queen;
+import com.bfpaul.renewal.chess.chessman.rook.Rook;
+
 // Chessman(체스말)의 타입과 각 타입의 말의 게임 시작 시 초기 말의 수를 정해준다.
 public enum ChessmanType{
 	KING(1),

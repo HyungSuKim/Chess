@@ -1,17 +1,22 @@
-package com.bfpaul.renewal.chess.chessman;
+package com.bfpaul.renewal.chess.chessman.pawn;
 
 import java.awt.Image;
+
+import com.bfpaul.renewal.chess.chessman.Chessman;
+import com.bfpaul.renewal.chess.chessman.ChessmanImage;
+import com.bfpaul.renewal.chess.chessman.ChessmanType;
+import com.bfpaul.renewal.chess.chessman.Direction;
 /*
  * Pawn의 특성을 가진 체스말로써의 역할을 하기위해서 만들어졌다.   
  * Pawn의 표현을 위한 이미지와 이동을 위한 정보를 제공한다.
  * 
  * isMoved : Pawn은 첫 움직임이 있기전 2칸을 움직일 수 있다는 것을 표현하기위한 변수
  */
-class Pawn implements Chessman {
+public class Pawn implements Chessman {
 	private final boolean IS_WHITE;
 	private boolean isMoved;
 	
-	Pawn(boolean isWhite) {
+	public Pawn(boolean isWhite) {
 		IS_WHITE = isWhite;
 	}
 	
