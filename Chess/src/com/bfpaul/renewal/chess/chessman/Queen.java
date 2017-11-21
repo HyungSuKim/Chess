@@ -34,5 +34,10 @@ class Queen implements Chessman {
 	public Image getChessmanImage() {
 		return ChessmanImage.getChessmanImage(IS_WHITE, ChessmanType.QUEEN);
 	}
+
+	@Override
+	public ChessmanType getChessmanType() {
+		return ChessmanType.QUEEN;
+	}
 	
 }

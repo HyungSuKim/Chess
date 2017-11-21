@@ -8,7 +8,7 @@ import java.awt.Image;
  * 
  * MOVEABLE_SQUARE_COUNT : -1 -> 이동가능한 칸의 수가 정해지지 않은 말들 (Queen, Bishop, Rook)
  */
-interface Chessman {
+public interface Chessman {
 	
 	Direction[] getDirection();
 	
@@ -18,5 +18,5 @@ interface Chessman {
 	
 	Image getChessmanImage();
 	
-	
+	ChessmanType getChessmanType();
 }

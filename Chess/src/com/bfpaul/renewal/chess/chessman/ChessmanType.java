@@ -19,15 +19,15 @@ public enum ChessmanType{
 		return INIT_COUNT;
 	}
 	
-//	public Chessman createChessman(boolean isWhite) {
-//		switch(this) {
-//		case KING : return new King(isWhite);
-//		case QUEEN : return new Queen(isWhite);
-//		case BISHOP : return new Bishop(isWhite);
-//		case KNIGHT : return new Knight(isWhite);
-//		case ROOK : return new Rook(isWhite);
-//		case PAWN : return new Pawn(isWhite);
-//		default : return new King(isWhite);
-//		}
-//	}
+	public Chessman createChessman(boolean isWhite) {
+		switch(this) {
+		case KING : return new King(isWhite);
+		case QUEEN : return new Queen(isWhite);
+		case BISHOP : return new Bishop(isWhite);
+		case KNIGHT : return new Knight(isWhite);
+		case ROOK : return new Rook(isWhite);
+		case PAWN : return new Pawn(isWhite);
+		default : return new King(isWhite);
+		}
+	}
 }

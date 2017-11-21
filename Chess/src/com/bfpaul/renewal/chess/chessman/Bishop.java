@@ -35,4 +35,9 @@ class Bishop implements Chessman {
 		return ChessmanImage.getChessmanImage(IS_WHITE, ChessmanType.BISHOP);
 	}
 
+	@Override
+	public ChessmanType getChessmanType() {
+		return ChessmanType.BISHOP;
+	}
+
 }

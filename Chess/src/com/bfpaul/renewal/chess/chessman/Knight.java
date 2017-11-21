@@ -35,6 +35,11 @@ class Knight implements Chessman {
 	public Image getChessmanImage() {
 		return ChessmanImage.getChessmanImage(IS_WHITE, ChessmanType.KNIGHT);
 	}
+
+	@Override
+	public ChessmanType getChessmanType() {
+		return ChessmanType.KNIGHT;
+	}
 	
 
 }

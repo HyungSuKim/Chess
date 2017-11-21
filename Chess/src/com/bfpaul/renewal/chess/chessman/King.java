@@ -43,4 +43,9 @@ class King implements Chessman {
 	public boolean isMoved() {
 		return isMoved;
 	}
+
+	@Override
+	public ChessmanType getChessmanType() {
+		return ChessmanType.KING;
+	}
 }

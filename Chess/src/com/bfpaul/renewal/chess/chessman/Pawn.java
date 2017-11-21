@@ -42,4 +42,9 @@ class Pawn implements Chessman {
 	public void setIsMoved() {
 		isMoved = true;
 	}
+
+	@Override
+	public ChessmanType getChessmanType() {
+		return ChessmanType.PAWN;
+	}
 }
