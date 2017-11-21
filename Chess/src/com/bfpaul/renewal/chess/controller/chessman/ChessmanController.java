@@ -12,9 +12,15 @@ class ChessmanController {
 	
 	private ChessmanController() { }
 	
-	public static void pickChessman(Chessman chessman) {
-
-			// 체스말의 움직임 가능 경로를 반환하는 메서드 호출
-		
+	public static void pickUpChessman(Chessman chessman) {
+		switch(chessman.getChessmanType()) {
+		case KING :
+		case QUEEN :
+		case BISHOP :
+		case KNIGHT :
+		case ROOK :
+		case PAWN :
+			default : break;
+		}
 	}
 }
