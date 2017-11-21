@@ -1,11 +1,6 @@
-package com.bfpaul.renewal.chess.chessman.king;
+package com.bfpaul.renewal.chess.chessman;
 
 import java.awt.Image;
-
-import com.bfpaul.renewal.chess.chessman.Chessman;
-import com.bfpaul.renewal.chess.chessman.ChessmanImage;
-import com.bfpaul.renewal.chess.chessman.ChessmanType;
-import com.bfpaul.renewal.chess.chessman.Direction;
 /*
  * King의 특성을 가진 체스말로써 역할 하기위해서 만들어졌다.   
  * King의 표현을 위한 이미지와 이동을 위한 정보를 제공한다.

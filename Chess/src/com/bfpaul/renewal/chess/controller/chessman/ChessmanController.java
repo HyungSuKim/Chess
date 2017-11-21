@@ -1,4 +1,6 @@
-package com.bfpaul.renewal.chess.chessman;
+package com.bfpaul.renewal.chess.controller.chessman;
+
+import com.bfpaul.renewal.chess.chessman.Chessman;
 
 /* 
  * 체스말들을 이용해서 보드위에 놓여지는 것과 사라지는 것, 이동하는 것을 보드위에 표현하기 위해 존재한다. 
