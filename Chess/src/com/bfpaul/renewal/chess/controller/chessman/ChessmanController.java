@@ -16,14 +16,6 @@ public class ChessmanController {
 	private ChessmanController() { }
 	
 	public static ArrayList<Coordinate> pickUpChessman(Chessman chessman, int x, int y) {
-		switch(chessman.getChessmanType()) {
-//		case KING : 
-//		case QUEEN : 
-//		case BISHOP : 
-//		case KNIGHT :
-//		case ROOK :
-		case PAWN : return AvailableMoveOperator.pawnAvailableMove(chessman, x, y);
-			default : return AvailableMoveOperator.pawnAvailableMove(chessman, x, y);
-		}
+		return AvailableMoveOperator.availableMoveCoordinate(chessman, x, y);
 	}
 }
