@@ -22,8 +22,8 @@ public class ChessmanController {
 //		case BISHOP : 
 //		case KNIGHT :
 //		case ROOK :
-		case PAWN : return MovementOperator.pawnAvailableMove(chessman, x, y);
-			default : return MovementOperator.pawnAvailableMove(chessman, x, y);
+		case PAWN : return AvailableMoveOperator.pawnAvailableMove(chessman, x, y);
+			default : return AvailableMoveOperator.pawnAvailableMove(chessman, x, y);
 		}
 	}
 }
