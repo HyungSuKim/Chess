@@ -1,6 +1,9 @@
 package com.bfpaul.renewal.chess.controller.chessman;
 
+import java.util.ArrayList;
+
 import com.bfpaul.renewal.chess.chessman.Chessman;
+import com.bfpaul.renewal.chess.controller.Coordinate;
 
 /* 
  * 체스말들을 이용해서 보드위에 놓여지는 것과 사라지는 것, 이동하는 것을 보드위에 표현하기 위해 존재한다. 
@@ -8,19 +11,19 @@ import com.bfpaul.renewal.chess.chessman.Chessman;
  * 
  * 작성중...
  */
-class ChessmanController {
+public class ChessmanController {
 	
 	private ChessmanController() { }
 	
-	public static void pickUpChessman(Chessman chessman) {
+	public static ArrayList<Coordinate> pickUpChessman(Chessman chessman, int x, int y) {
 		switch(chessman.getChessmanType()) {
-		case KING :
-		case QUEEN :
-		case BISHOP :
-		case KNIGHT :
-		case ROOK :
-		case PAWN :
-			default : break;
+//		case KING : 
+//		case QUEEN : 
+//		case BISHOP : 
+//		case KNIGHT :
+//		case ROOK :
+		case PAWN : return MovementOperator.pawnAvailableMove(chessman, x, y);
+			default : return MovementOperator.pawnAvailableMove(chessman, x, y);
 		}
 	}
 }
