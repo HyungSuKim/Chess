@@ -35,6 +35,7 @@ public class MoveableRouteCalculator {
 					moveableRoute.add(availCoordinate);
 				}
 				break;
+				default : break;
 			case UP_LEFT:
 				for (Coordinate availCoordinate : upLeftRouteCalculator(moveableSquare, x, y)) {
 					moveableRoute.add(availCoordinate);
@@ -61,7 +62,7 @@ public class MoveableRouteCalculator {
 	}
 
 	private static Coordinate[] upRouteCalculator(int moveableSquareCount, int x, int y) {
-		if (moveableSquareCount == -1) {
+		if (moveableSquareCount == -1 || moveableSquareCount > Coordinate.getMaximumY() - y) {
 			moveableSquareCount = Coordinate.getMaximumY() - y;
 		}
 		
@@ -73,7 +74,7 @@ public class MoveableRouteCalculator {
 	}
 	
 	private static Coordinate[] downRouteCalculator(int moveableSquareCount, int x, int y) {
-		if (moveableSquareCount == -1) {
+		if (moveableSquareCount == -1 || moveableSquareCount > y - Coordinate.getMinimumY()) {
 			moveableSquareCount = y - Coordinate.getMinimumY();
 		}
 		
@@ -86,7 +87,7 @@ public class MoveableRouteCalculator {
 	}
 	
 	private static Coordinate[] leftRouteCalculator(int moveableSquareCount, int x, int y) {
-		if (moveableSquareCount == -1) {
+		if (moveableSquareCount == -1 || moveableSquareCount > x - Coordinate.getMinimumX()) {
 			moveableSquareCount = x - Coordinate.getMinimumX();
 		}
 		
@@ -99,7 +100,7 @@ public class MoveableRouteCalculator {
 	}
 	
 	private static Coordinate[] rightRouteCalculator(int moveableSquareCount, int x, int y) {
-		if (moveableSquareCount == -1) {
+		if (moveableSquareCount == -1 || moveableSquareCount > Coordinate.getMaximumX() - x) {
 			moveableSquareCount = Coordinate.getMaximumX() - x;
 		}
 		
@@ -117,7 +118,11 @@ public class MoveableRouteCalculator {
 		
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
-			availCoordinate[count-1] = new Coordinate((x - count), (y + count));
+			if(Coordinate.isValidate((x - count), (y + count))) {
+				availCoordinate[count-1] = new Coordinate((x - count), (y + count));
+			} else {
+				availCoordinate[count-1] = new Coordinate(x, y);
+			}
 		}
 		return availCoordinate;
 	}
@@ -129,7 +134,11 @@ public class MoveableRouteCalculator {
 		
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
-			availCoordinate[count-1] = new Coordinate((x + count), (y + count));
+			if(Coordinate.isValidate((x + count), (y + count))) {
+				availCoordinate[count-1] = new Coordinate((x + count), (y + count));
+			} else {
+				availCoordinate[count-1] = new Coordinate(x, y);
+			}
 		}
 		return availCoordinate;
 	}
@@ -141,7 +150,11 @@ public class MoveableRouteCalculator {
 		
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
-			availCoordinate[count-1] = new Coordinate((x - count), (y - count));
+			if(Coordinate.isValidate((x - count), (y - count))) {
+				availCoordinate[count-1] = new Coordinate((x - count), (y - count));
+			} else {
+				availCoordinate[count-1] = new Coordinate(x, y);
+			}
 		}
 		return availCoordinate;
 	}
@@ -153,7 +166,11 @@ public class MoveableRouteCalculator {
 		
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
-			availCoordinate[count-1] = new Coordinate((x + count), (y - count));
+			if(Coordinate.isValidate((x + count), (y - count))) {
+				availCoordinate[count-1] = new Coordinate((x + count), (y - count));
+			} else {
+				availCoordinate[count-1] = new Coordinate(x, y);
+			}
 		}
 		return availCoordinate;
 	}
