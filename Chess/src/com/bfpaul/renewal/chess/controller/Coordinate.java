@@ -17,6 +17,22 @@ public class Coordinate {
 		return (MINIMUM_X <= x && x <= MAXIMUM_X) && (MINIMUM_Y <= y && y <= MAXIMUM_Y);
 	}
 	
+	public static int getMaximumX() {
+		return MAXIMUM_X;
+	}
+	
+	public static int getMaximumY() {
+		return MAXIMUM_Y;
+	}
+	
+	public static int getMinimumX() {
+		return MINIMUM_X;
+	}
+	
+	public static int getMinimumY() {
+		return MINIMUM_Y;
+	}
+	
 	public int getX() {
 		return x;
 	}

@@ -17,7 +17,11 @@ public class Pawn implements Chessman {
 	
 	@Override
 	public Direction[] getDirection() {
-		return new Direction[] { Direction.UP, Direction.LEFT, Direction.RIGHT };
+		if(IS_WHITE) {
+			return new Direction[] { Direction.UP };
+		} else {
+			return new Direction[] { Direction.DOWN };
+		}
 	}
 	
 	@Override

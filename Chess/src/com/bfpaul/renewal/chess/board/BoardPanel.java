@@ -10,7 +10,7 @@ import com.bfpaul.renewal.chess.Theme;
 import com.bfpaul.renewal.chess.chessman.Chessman;
 import com.bfpaul.renewal.chess.chessman.ChessmanType;
 import com.bfpaul.renewal.chess.controller.Coordinate;
-import com.bfpaul.renewal.chess.controller.chessman.ChessmanController;
+import com.bfpaul.renewal.chess.controller.chessman.MoveableRouteCalculator;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.layout.linear.constraints.LinearConstraints;
@@ -56,7 +56,7 @@ public class BoardPanel extends FlatPanel {
 			@Override
 			public void onClick(Component component) {
 				
-				showMoveableSquare(ChessmanController.pickUpChessman(boardSquare[y][x].getChessman(), x, y));
+				showMoveableSquare(MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y));
 				
 //				if (boardSquare[y][x].isContain()) {
 //					chessman = boardSquare[y][x].getChessman();
