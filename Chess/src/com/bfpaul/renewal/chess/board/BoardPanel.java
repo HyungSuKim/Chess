@@ -2,13 +2,14 @@ package com.bfpaul.renewal.chess.board;
 
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.util.ArrayList;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 
 import com.bfpaul.renewal.chess.Theme;
 import com.bfpaul.renewal.chess.chessman.Chessman;
 import com.bfpaul.renewal.chess.chessman.ChessmanType;
+import com.bfpaul.renewal.chess.chessman.Direction;
 import com.bfpaul.renewal.chess.controller.Coordinate;
 import com.bfpaul.renewal.chess.controller.chessman.MoveableRouteCalculator;
 import com.mommoo.flat.component.FlatPanel;
@@ -22,7 +23,8 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 public class BoardPanel extends FlatPanel {
 	// 체스 판의 하나하나의 square로써 체스말을 놓아준다던가 체스말을 제외해준다거나 이동가능범위를 표현해줄 최소단위의 칸이다.
 	private BoardSquare[][] boardSquare = new BoardSquare[8][8];
-	private Chessman chessman;
+	private BoardSquare selectedSquare;
+	private Map<Direction, Coordinate[]> moveableSquare;
 
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
 	public BoardPanel() {
@@ -55,16 +57,18 @@ public class BoardPanel extends FlatPanel {
 
 			@Override
 			public void onClick(Component component) {
-				
-				showMoveableSquare(MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y));
-				
-//				if (boardSquare[y][x].isContain()) {
-//					chessman = boardSquare[y][x].getChessman();
-//					boardSquare[y][x].removeChessmanFromSquare();
-//				} else {
-//					boardSquare[y][x].setChessmanOnSquare(chessman);
-//					chessman = null;
-//				}
+				if (boardSquare[y][x].isContain()) {
+					boardSquare[y][x].setSquareEventColor();
+					moveableSquare = MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y);
+					showMoveableSquare(boardSquare[y][x].getChessman().isWhite());
+					selectedSquare = boardSquare[y][x];
+				} else {
+					boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
+					selectedSquare.removeChessmanFromSquare();
+					disableMoveableSquare();
+					selectedSquare.setSquareOriginalColor();
+					selectedSquare = null;
+				}
 			}
 		});
 
@@ -139,9 +143,32 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	private void showMoveableSquare(ArrayList<Coordinate> moveableCoordinate) {
-		for(Coordinate coordinate : moveableCoordinate) {
-			boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
+	private void showMoveableSquare(boolean isWhite) {
+		for (Direction direction : moveableSquare.keySet()) {
+			moveableSquareJudger(isWhite, moveableSquare.get(direction));
+		}
+	}
+
+	private void disableMoveableSquare() {
+		for (Direction direction : moveableSquare.keySet()) {
+			for (Coordinate coordinate : moveableSquare.get(direction)) {
+				boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
+			}
+		}
+	}
+
+	private void moveableSquareJudger(boolean isWhite, Coordinate[] moveableCoordinate) {
+		for (Coordinate coordinate : moveableCoordinate) {
+			if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
+					&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == isWhite) {
+				break;
+			} else if(boardSquare[coordinate.getY()][coordinate.getX()].isContain()
+					&&boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite) {
+				boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
+				break;
+			} else {
+				boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
+			}
 		}
 	}
 }

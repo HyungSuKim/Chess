@@ -1,6 +1,7 @@
 package com.bfpaul.renewal.chess.controller.chessman;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.bfpaul.renewal.chess.chessman.Chessman;
 import com.bfpaul.renewal.chess.chessman.Direction;
@@ -10,51 +11,34 @@ public class MoveableRouteCalculator {
 	private MoveableRouteCalculator() {
 	}
 
-	public static ArrayList<Coordinate> selectChessman(Chessman chessman, int x, int y) {
-		ArrayList<Coordinate> moveableRoute = new ArrayList<>();
-		int moveableSquare = chessman.getMoveableSquareCount();
+	public static Map<Direction, Coordinate[]> selectChessman(Chessman chessman, int x, int y) {
+		Map<Direction, Coordinate[]> moveableRoute = new HashMap<>();
+		int moveableSquareCount = chessman.getMoveableSquareCount();
 		for (Direction direction : chessman.getDirection()) {
 			switch (direction) {
 			case UP:
-				for (Coordinate availCoordinate : upRouteCalculator(moveableSquare, x, y)) {
-					moveableRoute.add(availCoordinate);
-				}
+				moveableRoute.put(Direction.UP, upRouteCalculator(moveableSquareCount, x, y));
 				break;
 			case DOWN:
-				for (Coordinate availCoordinate : downRouteCalculator(moveableSquare, x, y)) {
-					moveableRoute.add(availCoordinate);
-				}
+				moveableRoute.put(Direction.DOWN, downRouteCalculator(moveableSquareCount, x, y));
 				break;
 			case LEFT:
-				for (Coordinate availCoordinate : leftRouteCalculator(moveableSquare, x, y)) {
-					moveableRoute.add(availCoordinate);
-				}
+				moveableRoute.put(Direction.LEFT, leftRouteCalculator(moveableSquareCount, x, y));
 				break;
 			case RIGHT:
-				for (Coordinate availCoordinate : rightRouteCalculator(moveableSquare, x, y)) {
-					moveableRoute.add(availCoordinate);
-				}
+				moveableRoute.put(Direction.RIGHT, rightRouteCalculator(moveableSquareCount, x, y));
 				break;
-				default : break;
 			case UP_LEFT:
-				for (Coordinate availCoordinate : upLeftRouteCalculator(moveableSquare, x, y)) {
-					moveableRoute.add(availCoordinate);
-				}
+				moveableRoute.put(Direction.UP_LEFT, upLeftRouteCalculator(moveableSquareCount, x, y));
 				break;
 			case UP_RIGHT:
-				for (Coordinate availCoordinate : upRightRouteCalculator(moveableSquare, x, y)) {
-					moveableRoute.add(availCoordinate);
-				}
+				moveableRoute.put(Direction.UP_RIGHT, upRightRouteCalculator(moveableSquareCount, x, y));
 				break;
 			case DOWN_LEFT:
-				for (Coordinate availCoordinate : downLeftRouteCalculator(moveableSquare, x, y)) {
-					moveableRoute.add(availCoordinate);
-				}
+				moveableRoute.put(Direction.DOWN_LEFT, downLeftRouteCalculator(moveableSquareCount, x, y));
 				break;
 			case DOWN_RIGHT:
-				for (Coordinate availCoordinate : downRightRouteCalculator(moveableSquare, x, y)) {
-					moveableRoute.add(availCoordinate);
-				}
+				moveableRoute.put(Direction.DOWN_RIGHT, downRightRouteCalculator(moveableSquareCount, x, y));
 				break;
 			}
 		}

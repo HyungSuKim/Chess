@@ -19,7 +19,7 @@ public class BoardSquare extends FlatImagePanel {
 
 	BoardSquare(Color originalColor) {	
 		this.originalColor = originalColor;
-//		setEnableClickEvent(false);
+		setEnableClickEvent(false);
 		setLayout(new LinearLayout(0));
 		setOpaque(true);
 		setBackground(originalColor);
@@ -30,6 +30,7 @@ public class BoardSquare extends FlatImagePanel {
 	void setChessmanOnSquare(Chessman chessman) {
 		this.chessman = chessman;
 		isContain = true;
+		setEnableClickEvent(true);
 		setImage(chessman.getChessmanImage(), ImageOption.MATCH_PARENT);
 	}
 
@@ -37,10 +38,16 @@ public class BoardSquare extends FlatImagePanel {
 	void setSquareOriginalColor() {
 		setBackground(originalColor);
 		setAlpha(1.0f);
+		if(isContain) {
+			setEnableClickEvent(true);
+		} else {
+			setEnableClickEvent(false);
+		}
 	}
 	
 	void setSquareEventColor() {
 		setBackground(Theme.LIGHT_BLUE_COLOR);
+		setEnableClickEvent(true);
 		setAlpha(0.6f);
 	}
 
@@ -48,7 +55,7 @@ public class BoardSquare extends FlatImagePanel {
 	void removeChessmanFromSquare() {
 		chessman = null;
 		isContain = false;
-		setImage(null);
+		setImage(null); 
 	}
 	
 	boolean isContain() {
