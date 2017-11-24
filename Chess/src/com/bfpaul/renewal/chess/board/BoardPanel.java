@@ -64,23 +64,22 @@ public class BoardPanel extends FlatPanel {
 					moveableSquare = MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y);
 					showMoveableSquare(boardSquare[y][x].getChessman().isWhite());
 				} else if (selectedSquare == boardSquare[y][x]) {
-					ableSquareClickEvent();
-					selectedSquare.setSquareOriginalColor();
-					disableMoveableSquare();
-					selectedSquare = null;
+					initSquareEvent();
 				} else {
-					ableSquareClickEvent();
-					System.out.println("옮기기 실행");
 					boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
 					selectedSquare.removeChessmanFromSquare();
-					disableMoveableSquare();
-					selectedSquare.setSquareOriginalColor();
-					selectedSquare = null;
+					initSquareEvent();
 				}
 			}
 		});
-
 		return boardSquare[y][x];
+	}
+	
+	private void initSquareEvent() {
+		ableSquareClickEvent();
+		disableMoveableSquare();
+		selectedSquare.setSquareOriginalColor();
+		selectedSquare = null;
 	}
 
 	// chessman(King, Queen, Bishop, Knight, Rook, Pawn)을 원하는 좌표값(x,y)의 square에
