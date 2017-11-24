@@ -23,7 +23,7 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 public class BoardPanel extends FlatPanel {
 	// 체스 판의 하나하나의 square로써 체스말을 놓아준다던가 체스말을 제외해준다거나 이동가능범위를 표현해줄 최소단위의 칸이다.
 	private BoardSquare[][] boardSquare = new BoardSquare[8][8];
-	private BoardSquare selectedSquare;
+	private BoardSquare selectedSquare = null;
 	private Map<Direction, Coordinate[]> moveableSquare;
 
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
@@ -57,12 +57,20 @@ public class BoardPanel extends FlatPanel {
 
 			@Override
 			public void onClick(Component component) {
-				if (boardSquare[y][x].isContain()) {
+				if (boardSquare[y][x].isContain() && selectedSquare == null) {
+					disableSquareClickEvent();
+					selectedSquare = boardSquare[y][x];
 					boardSquare[y][x].setSquareEventColor();
 					moveableSquare = MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y);
 					showMoveableSquare(boardSquare[y][x].getChessman().isWhite());
-					selectedSquare = boardSquare[y][x];
+				} else if (selectedSquare == boardSquare[y][x]) {
+					ableSquareClickEvent();
+					selectedSquare.setSquareOriginalColor();
+					disableMoveableSquare();
+					selectedSquare = null;
 				} else {
+					ableSquareClickEvent();
+					System.out.println("옮기기 실행");
 					boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
 					selectedSquare.removeChessmanFromSquare();
 					disableMoveableSquare();
@@ -140,6 +148,23 @@ public class BoardPanel extends FlatPanel {
 		for (int count = 0; count < initCount; count++) {
 			setChessmanOnSquare(type.createChessman(true), count, 1);
 			setChessmanOnSquare(type.createChessman(false), count, 6);
+		}
+	}
+	private void disableSquareClickEvent() {
+		for (int y = 8; y > 0; y--) {
+			for (int x = 0; x < 8; x++) {
+				boardSquare[y-1][x].setEnableClickEvent(false);
+			}
+		}
+	}
+	
+	private void ableSquareClickEvent() {
+		for (int y = 8; y > 0; y--) {
+			for (int x = 0; x < 8; x++) {
+				if(boardSquare[y-1][x].isContain()) {
+					boardSquare[y-1][x].setEnableClickEvent(true);
+				}
+			}
 		}
 	}
 
