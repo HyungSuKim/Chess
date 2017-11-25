@@ -105,7 +105,7 @@ public class MoveableRouteCalculator {
 			if(Coordinate.isValidate((x - count), (y + count))) {
 				availCoordinate[count-1] = new Coordinate((x - count), (y + count));
 			} else {
-				availCoordinate[count-1] = new Coordinate(x, y);
+				availCoordinate[count-1] = null;
 			}
 		}
 		return availCoordinate;
@@ -121,7 +121,7 @@ public class MoveableRouteCalculator {
 			if(Coordinate.isValidate((x + count), (y + count))) {
 				availCoordinate[count-1] = new Coordinate((x + count), (y + count));
 			} else {
-				availCoordinate[count-1] = new Coordinate(x, y);
+				availCoordinate[count-1] = null;
 			}
 		}
 		return availCoordinate;
@@ -137,7 +137,7 @@ public class MoveableRouteCalculator {
 			if(Coordinate.isValidate((x - count), (y - count))) {
 				availCoordinate[count-1] = new Coordinate((x - count), (y - count));
 			} else {
-				availCoordinate[count-1] = new Coordinate(x, y);
+				availCoordinate[count-1] = null;
 			}
 		}
 		return availCoordinate;
@@ -153,7 +153,7 @@ public class MoveableRouteCalculator {
 			if(Coordinate.isValidate((x + count), (y - count))) {
 				availCoordinate[count-1] = new Coordinate((x + count), (y - count));
 			} else {
-				availCoordinate[count-1] = new Coordinate(x, y);
+				availCoordinate[count-1] = null;
 			}
 		}
 		return availCoordinate;

@@ -10,6 +10,7 @@ import com.bfpaul.renewal.chess.Theme;
 import com.bfpaul.renewal.chess.chessman.Chessman;
 import com.bfpaul.renewal.chess.chessman.ChessmanType;
 import com.bfpaul.renewal.chess.chessman.Direction;
+import com.bfpaul.renewal.chess.chessman.Pawn;
 import com.bfpaul.renewal.chess.controller.Coordinate;
 import com.bfpaul.renewal.chess.controller.chessman.MoveableRouteCalculator;
 import com.mommoo.flat.component.FlatPanel;
@@ -58,15 +59,21 @@ public class BoardPanel extends FlatPanel {
 			@Override
 			public void onClick(Component component) {
 				if (boardSquare[y][x].isContain() && selectedSquare == null) {
+					System.out.println("1");
 					disableSquareClickEvent();
 					selectedSquare = boardSquare[y][x];
 					boardSquare[y][x].setSquareEventColor();
 					moveableSquare = MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y);
 					showMoveableSquare(boardSquare[y][x].getChessman().isWhite());
 				} else if (selectedSquare == boardSquare[y][x]) {
+					System.out.println("2");
 					initSquareEvent();
 				} else {
+					System.out.println("3");
 					boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
+					if(boardSquare[y][x].getChessman() instanceof Pawn) {
+						((Pawn)boardSquare[y][x].getChessman()).setIsMoved();
+					}
 					selectedSquare.removeChessmanFromSquare();
 					initSquareEvent();
 				}
@@ -176,6 +183,7 @@ public class BoardPanel extends FlatPanel {
 	private void disableMoveableSquare() {
 		for (Direction direction : moveableSquare.keySet()) {
 			for (Coordinate coordinate : moveableSquare.get(direction)) {
+				if(coordinate != null)
 				boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
 			}
 		}
@@ -183,15 +191,17 @@ public class BoardPanel extends FlatPanel {
 
 	private void moveableSquareJudger(boolean isWhite, Coordinate[] moveableCoordinate) {
 		for (Coordinate coordinate : moveableCoordinate) {
-			if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
-					&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == isWhite) {
-				break;
-			} else if(boardSquare[coordinate.getY()][coordinate.getX()].isContain()
-					&&boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite) {
-				boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
-				break;
-			} else {
-				boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
+			if(coordinate != null) {
+				if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
+						&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == isWhite) {
+					break;
+				} else if(boardSquare[coordinate.getY()][coordinate.getX()].isContain()
+						&&boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite) {
+					boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
+					break;
+				} else {
+					boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
+				}
 			}
 		}
 	}
