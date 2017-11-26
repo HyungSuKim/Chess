@@ -10,6 +10,7 @@ import com.bfpaul.renewal.chess.Theme;
 import com.bfpaul.renewal.chess.chessman.Chessman;
 import com.bfpaul.renewal.chess.chessman.ChessmanType;
 import com.bfpaul.renewal.chess.chessman.Direction;
+import com.bfpaul.renewal.chess.chessman.Knight;
 import com.bfpaul.renewal.chess.chessman.Pawn;
 import com.bfpaul.renewal.chess.controller.Coordinate;
 import com.bfpaul.renewal.chess.controller.chessman.MoveableRouteCalculator;
@@ -201,7 +202,11 @@ public class BoardPanel extends FlatPanel {
 			if(coordinate != null) {
 				if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
 						&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == isWhite) {
-					break;
+					if(!(selectedSquare.getChessman() instanceof Knight)) break;
+				} else if(boardSquare[coordinate.getY()][coordinate.getX()].isContain()
+						&&boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite
+						&& selectedSquare.getChessman() instanceof Knight) {
+					boardSquare[coordinate.getY()][coordinate.getX()].setSquareAttackableColor();
 				} else if(boardSquare[coordinate.getY()][coordinate.getX()].isContain()
 						&&boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite) {
 					boardSquare[coordinate.getY()][coordinate.getX()].setSquareAttackableColor();
