@@ -26,6 +26,7 @@ public class BoardPanel extends FlatPanel {
 	private BoardSquare[][] boardSquare = new BoardSquare[8][8];
 	private BoardSquare selectedSquare = null;
 	private Map<Direction, Coordinate[]> moveableSquare;
+	boolean isWhite = true;
 
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
 	public BoardPanel() {
@@ -55,7 +56,6 @@ public class BoardPanel extends FlatPanel {
 		boardSquare[y][x] = new BoardSquare(
 				(x + y) % 2 == 0 ? Theme.BOARD_DARK_SQUARE_COLOR : Theme.BOARD_LIGHT_SQUARE_COLOR);
 		boardSquare[y][x].setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(Component component) {
 				if (boardSquare[y][x].isContain() && selectedSquare == null) {
@@ -67,25 +67,30 @@ public class BoardPanel extends FlatPanel {
 					showMoveableSquare(boardSquare[y][x].getChessman().isWhite());
 				} else if (selectedSquare == boardSquare[y][x]) {
 					System.out.println("2");
-					initSquareEvent();
+					initSquareEvent(isWhite);
 				} else {
 					System.out.println("3");
+					isWhite = !isWhite;
+					System.out.println(isWhite);
+					if(boardSquare[y][x].getChessman() != null) {
+						System.out.println(boardSquare[y][x].getChessman().getChessmanType().name());
+					}
 					boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
 					if(boardSquare[y][x].getChessman() instanceof Pawn) {
 						((Pawn)boardSquare[y][x].getChessman()).setIsMoved();
 					}
 					selectedSquare.removeChessmanFromSquare();
-					initSquareEvent();
+					initSquareEvent(isWhite);
 				}
 			}
 		});
 		return boardSquare[y][x];
 	}
 	
-	private void initSquareEvent() {
-		ableSquareClickEvent();
-		disableMoveableSquare();
+	private void initSquareEvent(boolean isWhite) {
 		selectedSquare.setSquareOriginalColor();
+		disableMoveableSquare();
+		ableSquareClickEvent(isWhite);
 		selectedSquare = null;
 	}
 
@@ -164,11 +169,13 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 	
-	private void ableSquareClickEvent() {
+	private void ableSquareClickEvent(boolean isWhite) {
 		for (int y = 8; y > 0; y--) {
 			for (int x = 0; x < 8; x++) {
-				if(boardSquare[y-1][x].isContain()) {
+				if(boardSquare[y-1][x].isContain() && boardSquare[y-1][x].getChessman().isWhite() == isWhite) {
 					boardSquare[y-1][x].setEnableClickEvent(true);
+				} else {
+					boardSquare[y-1][x].setEnableClickEvent(false);
 				}
 			}
 		}
@@ -197,7 +204,7 @@ public class BoardPanel extends FlatPanel {
 					break;
 				} else if(boardSquare[coordinate.getY()][coordinate.getX()].isContain()
 						&&boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite) {
-					boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
+					boardSquare[coordinate.getY()][coordinate.getX()].setSquareAttackableColor();
 					break;
 				} else {
 					boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();

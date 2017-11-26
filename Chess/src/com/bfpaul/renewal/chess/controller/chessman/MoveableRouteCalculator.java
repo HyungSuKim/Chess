@@ -44,11 +44,23 @@ public class MoveableRouteCalculator {
 		}
 		return moveableRoute;
 	}
-
-	private static Coordinate[] upRouteCalculator(int moveableSquareCount, int x, int y) {
+	
+	private static int upSquareCountConverter(int moveableSquareCount, int y) {
 		if (moveableSquareCount == -1 || moveableSquareCount > Coordinate.getMaximumY() - y) {
 			moveableSquareCount = Coordinate.getMaximumY() - y;
 		}
+		return moveableSquareCount;
+	}
+	
+	private static int downSquareCountConverter(int moveableSquareCount, int y) {
+		if (moveableSquareCount == -1 || moveableSquareCount > y - Coordinate.getMinimumY()) {
+			moveableSquareCount = y - Coordinate.getMinimumY();
+		}
+		return moveableSquareCount;
+	}
+
+	private static Coordinate[] upRouteCalculator(int moveableSquareCount, int x, int y) {
+		moveableSquareCount = upSquareCountConverter(moveableSquareCount, y);
 		
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
@@ -58,9 +70,7 @@ public class MoveableRouteCalculator {
 	}
 	
 	private static Coordinate[] downRouteCalculator(int moveableSquareCount, int x, int y) {
-		if (moveableSquareCount == -1 || moveableSquareCount > y - Coordinate.getMinimumY()) {
-			moveableSquareCount = y - Coordinate.getMinimumY();
-		}
+		moveableSquareCount = downSquareCountConverter(moveableSquareCount, y);
 		
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
@@ -96,9 +106,7 @@ public class MoveableRouteCalculator {
 	}
 	
 	private static Coordinate[] upLeftRouteCalculator(int moveableSquareCount, int x, int y) {
-		if (moveableSquareCount == -1) {
-			moveableSquareCount = Coordinate.getMaximumY() - y;
-		}
+		moveableSquareCount = upSquareCountConverter(moveableSquareCount, y);
 		
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
@@ -112,9 +120,7 @@ public class MoveableRouteCalculator {
 	}
 	
 	private static Coordinate[] upRightRouteCalculator(int moveableSquareCount, int x, int y) {
-		if (moveableSquareCount == -1) {
-			moveableSquareCount = Coordinate.getMaximumY() - y;
-		}
+		moveableSquareCount = upSquareCountConverter(moveableSquareCount, y);
 		
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
@@ -128,9 +134,7 @@ public class MoveableRouteCalculator {
 	}
 	
 	private static Coordinate[] downLeftRouteCalculator(int moveableSquareCount, int x, int y) {
-		if (moveableSquareCount == -1) {
-			moveableSquareCount = y - Coordinate.getMinimumY();
-		}
+		moveableSquareCount = downSquareCountConverter(moveableSquareCount, y);
 		
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
@@ -144,9 +148,7 @@ public class MoveableRouteCalculator {
 	}
 	
 	private static Coordinate[] downRightRouteCalculator(int moveableSquareCount, int x, int y) {
-		if (moveableSquareCount == -1) {
-			moveableSquareCount = y - Coordinate.getMinimumY();
-		}
+		moveableSquareCount = downSquareCountConverter(moveableSquareCount, y);
 		
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {

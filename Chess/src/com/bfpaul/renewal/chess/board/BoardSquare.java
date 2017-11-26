@@ -37,15 +37,21 @@ public class BoardSquare extends FlatImagePanel {
 	void setSquareOriginalColor() {
 		setBackground(originalColor);
 		setAlpha(1.0f);
-		 if(isContain) {
-		 setEnableClickEvent(true);
-		 } else {
-		 setEnableClickEvent(false);
-		 }
+		if (isContain) {
+			setEnableClickEvent(true);
+		} else {
+			setEnableClickEvent(false);
+		}
 	}
 
 	void setSquareEventColor() {
 		setBackground(Theme.LIGHT_BLUE_COLOR);
+		setEnableClickEvent(true);
+		setAlpha(0.6f);
+	}
+
+	void setSquareAttackableColor() {
+		setBackground(Color.RED);
 		setEnableClickEvent(true);
 		setAlpha(0.6f);
 	}
