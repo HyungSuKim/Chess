@@ -27,7 +27,7 @@ public class BoardSquare extends FlatImagePanel {
 	}
 
 	// 가지고있는 체스말이 없으면 체스말을 네모칸위에 올려준다.
-	void setChessmanOnSquare(Chessman chessman) {
+	public void setChessmanOnSquare(Chessman chessman) {
 		this.chessman = chessman;
 		isContain = true;
 		setEnableClickEvent(true);
@@ -71,7 +71,7 @@ public class BoardSquare extends FlatImagePanel {
 		setEnabled(enable);
 	}
 
-	Chessman getChessman() {
+	public Chessman getChessman() {
 		return chessman;
 	}
 }

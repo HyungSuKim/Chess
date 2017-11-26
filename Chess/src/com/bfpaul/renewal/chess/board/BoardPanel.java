@@ -12,6 +12,7 @@ import com.bfpaul.renewal.chess.chessman.ChessmanType;
 import com.bfpaul.renewal.chess.chessman.Direction;
 import com.bfpaul.renewal.chess.chessman.Knight;
 import com.bfpaul.renewal.chess.chessman.Pawn;
+import com.bfpaul.renewal.chess.chessman.PawnPromotionSelectView;
 import com.bfpaul.renewal.chess.controller.Coordinate;
 import com.bfpaul.renewal.chess.controller.chessman.MoveableRouteCalculator;
 import com.mommoo.flat.component.FlatPanel;
@@ -60,26 +61,29 @@ public class BoardPanel extends FlatPanel {
 			@Override
 			public void onClick(Component component) {
 				if (boardSquare[y][x].isContain() && selectedSquare == null) {
-					System.out.println("1");
 					disableSquareClickEvent();
 					selectedSquare = boardSquare[y][x];
 					boardSquare[y][x].setSquareEventColor();
 					moveableSquare = MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y);
 					showMoveableSquare(boardSquare[y][x].getChessman().isWhite());
 				} else if (selectedSquare == boardSquare[y][x]) {
-					System.out.println("2");
 					initSquareEvent(isWhite);
 				} else {
-					System.out.println("3");
 					isWhite = !isWhite;
-					System.out.println(isWhite);
 					if(boardSquare[y][x].getChessman() != null) {
 						System.out.println(boardSquare[y][x].getChessman().getChessmanType().name());
 					}
 					boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
+					
 					if(boardSquare[y][x].getChessman() instanceof Pawn) {
 						((Pawn)boardSquare[y][x].getChessman()).setIsMoved();
 					}
+					
+					if(boardSquare[y][x].getChessman() instanceof Pawn && (y == 0 || y == 7)) {
+//						System.out.println("폰 프로모션가능");
+						new PawnPromotionSelectView(boardSquare[y][x]);
+					}
+					
 					selectedSquare.removeChessmanFromSquare();
 					initSquareEvent(isWhite);
 				}
@@ -209,9 +213,12 @@ public class BoardPanel extends FlatPanel {
 					boardSquare[coordinate.getY()][coordinate.getX()].setSquareAttackableColor();
 				} else if(boardSquare[coordinate.getY()][coordinate.getX()].isContain()
 						&&boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite) {
+					if(selectedSquare.getChessman() instanceof Pawn) break;
 					boardSquare[coordinate.getY()][coordinate.getX()].setSquareAttackableColor();
 					break;
 				} else {
+					if(selectedSquare.getChessman() instanceof Pawn &&
+							boardSquare[coordinate.getY()][coordinate.getX()].isContain()) break;
 					boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
 				}
 			}
