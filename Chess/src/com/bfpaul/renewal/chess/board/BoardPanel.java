@@ -2,6 +2,7 @@ package com.bfpaul.renewal.chess.board;
 
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -30,7 +31,7 @@ public class BoardPanel extends FlatPanel {
 	private BoardSquare[][] boardSquare = new BoardSquare[8][8];
 	private BoardSquare selectedSquare = null;
 	private Map<Direction, Coordinate[]> moveableSquare;
-	private BoardSquare castlingSquare = null;
+	private ArrayList<BoardSquare> castlingSquare = new ArrayList<>();
 	boolean isWhite = true;
 
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
@@ -74,15 +75,23 @@ public class BoardPanel extends FlatPanel {
 							&& !((King) boardSquare[y][x].getChessman()).isMoved())
 							|| boardSquare[y][x].getChessman() instanceof Rook
 							&& !((Rook) boardSquare[y][x].getChessman()).isMoved()) {
-						castlingSquare = castlingValidateChecker(boardSquare[y][x], x, y);
-						if(castlingSquare != null) castlingSquare.setSquareCastlingColor();
+						castlingValidateChecker(boardSquare[y][x], x, y);
+						if(!castlingSquare.isEmpty()) {
+							for(BoardSquare square : castlingSquare) {
+								square.setSquareCastlingColor();
+							}
+						}
 					}
 
 					showMoveableSquare(boardSquare[y][x].getChessman().isWhite());
 					// 다시 눌렀을때
 				} else if (selectedSquare == boardSquare[y][x]) {
 					initSquareEvent(isWhite);
-					if(castlingSquare != null) castlingSquare.setSquareOriginalColor();
+					if(!castlingSquare.isEmpty()) {
+						for(BoardSquare square : castlingSquare) {
+							square.setSquareOriginalColor();
+						}
+					}
 				} else {
 					// 이동경로로 이동했을 때
 					isWhite = !isWhite;
@@ -118,95 +127,80 @@ public class BoardPanel extends FlatPanel {
 		return boardSquare[y][x];
 	}
 
-	private BoardSquare castlingValidateChecker(BoardSquare square, int x, int y) {
+	private void castlingValidateChecker(BoardSquare square, int x, int y) {
 		ChessmanType type = square.getChessman().getChessmanType();
 
 		switch (type) {
 		case KING:
-			return kingCastlingChecker(isWhite, x, y);
+			kingCastlingChecker(isWhite, x, y);
+			break;
 		case ROOK:
-			return rookCastlingChecker(isWhite, x, y);
+			rookCastlingChecker(isWhite, x, y);
+			break;
 		default:
-			return null;
+			break;
 		}
 	}
 
-	private BoardSquare kingCastlingChecker(boolean isWhite, int x, int y) {
+	private void kingCastlingChecker(boolean isWhite, int x, int y) {
+		castlingSquare.clear();
 		if (isWhite) {
 			if (!boardSquare[0][5].isContain() && !boardSquare[0][6].isContain()
 					&& boardSquare[0][7].isContain() && boardSquare[0][7].getChessman() instanceof Rook) {
 				if (!((Rook) boardSquare[0][7].getChessman()).isMoved()) {
-					return boardSquare[0][7];
-				} else {
-					return null;
+					castlingSquare.add(boardSquare[0][7]);
 				}
-			} else if (!boardSquare[0][1].isContain() && !boardSquare[0][2].isContain() && !boardSquare[0][3].isContain()
+			}
+			
+			if (!boardSquare[0][1].isContain() && !boardSquare[0][2].isContain() && !boardSquare[0][3].isContain()
 					&& boardSquare[0][0].isContain() && boardSquare[0][0].getChessman() instanceof Rook) {
 				if (!((Rook) boardSquare[0][0].getChessman()).isMoved()) {
-					return boardSquare[0][0];
-				} else {
-					return null;
+					castlingSquare.add(boardSquare[0][0]);
 				}
-			} else {
-				return null;
 			}
+			
 		} else {
 			if (!boardSquare[7][5].isContain() && !boardSquare[7][6].isContain()
 					&& boardSquare[7][7].isContain() && boardSquare[7][7].getChessman() instanceof Rook) {
 				if (!((Rook) boardSquare[7][7].getChessman()).isMoved()) {
-					return boardSquare[7][7];
-				} else {
-					return null;
+					castlingSquare.add(boardSquare[7][7]);
 				}
-			} else if (!boardSquare[7][1].isContain() && !boardSquare[7][2].isContain() && !boardSquare[7][3].isContain()
+			}
+			
+			if (!boardSquare[7][1].isContain() && !boardSquare[7][2].isContain() && !boardSquare[7][3].isContain()
 					&& boardSquare[7][0].isContain() && boardSquare[7][0].getChessman() instanceof Rook) {
 				if (!((Rook) boardSquare[7][0].getChessman()).isMoved()) {
-					return boardSquare[7][0];
-				} else {
-					return null;
+					castlingSquare.add(boardSquare[7][0]);
 				}
-			} else {
-				return null;
 			}
 		}
 	}
 
-	private BoardSquare rookCastlingChecker(boolean isWhite, int x, int y) {
+	private void rookCastlingChecker(boolean isWhite, int x, int y) {
+		castlingSquare.clear();
 		if (isWhite) {
 			if (!boardSquare[0][5].isContain() && !boardSquare[0][6].isContain()
 					&& boardSquare[0][4].isContain() && boardSquare[0][4].getChessman() instanceof King) {
 				if (!((King) boardSquare[0][4].getChessman()).isMoved()) {
-					return boardSquare[0][4];
-				} else {
-					return null;
+					castlingSquare.add(boardSquare[0][4]);
 				}
 			} else if (!boardSquare[0][1].isContain() && !boardSquare[0][2].isContain() && !boardSquare[0][3].isContain()
 					&& boardSquare[0][4].isContain() && boardSquare[0][4].getChessman() instanceof King) {
 				if (!((King) boardSquare[0][4].getChessman()).isMoved()) {
-					return boardSquare[0][4];
-				} else {
-					return null;
+					castlingSquare.add(boardSquare[0][4]);
 				}
-			} else {
-				return null;
 			}
 		} else {
 			if (!boardSquare[7][5].isContain() && !boardSquare[7][6].isContain()
 					&& boardSquare[7][4].isContain() && boardSquare[7][4].getChessman() instanceof King) {
 				if (!((King) boardSquare[7][4].getChessman()).isMoved()) {
-					return boardSquare[7][4];
-				} else {
-					return null;
+					castlingSquare.add(boardSquare[7][4]);
 				}
 			} else if (!boardSquare[7][1].isContain() && !boardSquare[7][2].isContain() && !boardSquare[7][3].isContain()
 					&& boardSquare[7][4].isContain() && boardSquare[7][4].getChessman() instanceof King) {
 				if (!((King) boardSquare[7][4].getChessman()).isMoved()) {
-					return boardSquare[7][4];
-				} else {
-					return null;
+					castlingSquare.add(boardSquare[7][4]);
 				}
-			} else {
-				return null;
 			}
 		}
 	}
