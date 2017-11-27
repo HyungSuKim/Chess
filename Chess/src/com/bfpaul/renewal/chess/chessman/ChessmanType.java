@@ -2,8 +2,8 @@ package com.bfpaul.renewal.chess.chessman;
 
 // Chessman(체스말)의 타입과 각 타입의 말의 게임 시작 시 초기 말의 수를 정해준다.
 public enum ChessmanType{
-	KING(1),
 	QUEEN(1),
+	KING(1),
 	BISHOP(2),
 	KNIGHT(2),
 	ROOK(2),

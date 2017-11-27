@@ -2,6 +2,7 @@ package com.bfpaul.renewal.chess.chessman;
 
 import java.awt.Component;
 
+import com.bfpaul.chess.Images;
 import com.bfpaul.chess.Theme;
 import com.bfpaul.renewal.chess.board.BoardSquare;
 import com.mommoo.flat.component.OnClickListener;
@@ -18,10 +19,14 @@ public class PawnPromotionSelectView {
 	
 	public PawnPromotionSelectView(BoardSquare boardSquare) {
 		
-		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.QUEEN), new LinearConstraints(1, LinearSpace.MATCH_PARENT));
-		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.BISHOP), new LinearConstraints(1, LinearSpace.MATCH_PARENT));
-		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.KNIGHT), new LinearConstraints(1, LinearSpace.MATCH_PARENT));
-		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.ROOK), new LinearConstraints(1, LinearSpace.MATCH_PARENT));
+		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.QUEEN),
+				new LinearConstraints(1, LinearSpace.MATCH_PARENT));
+		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.BISHOP),
+				new LinearConstraints(1, LinearSpace.MATCH_PARENT));
+		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.KNIGHT),
+				new LinearConstraints(1, LinearSpace.MATCH_PARENT));
+		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.ROOK),
+				new LinearConstraints(1, LinearSpace.MATCH_PARENT));
 		frame.show();
 	}
 	
@@ -29,6 +34,9 @@ public class PawnPromotionSelectView {
 		FlatFrame frame = new FlatFrame();
 		frame.setTitle("폰 프로모션");
 		frame.setSize(400, 200);
+		frame.setIconImage(Images.ICON);
+		frame.setProcessIconImage(Images.ICON);
+		frame.setTitleBarColor(Theme.TITLE_BAR_COLOR);
 		frame.getContainer().setBackground(Theme.DARK_BLUE_COLOR);
 		frame.getContainer().setLayout(new LinearLayout(10));
 		return frame;
@@ -67,7 +75,6 @@ public class PawnPromotionSelectView {
 				
 				frame.hide();
 			}
-			
 		});
 		return imagePanel;
 	}

@@ -55,6 +55,12 @@ public class BoardSquare extends FlatImagePanel {
 		setEnableClickEvent(true);
 		setAlpha(0.6f);
 	}
+	
+	void setSquareCastlingColor() {
+		setBackground(Color.YELLOW);
+		setEnableClickEvent(true);
+		setAlpha(0.6f);
+	}
 
 	// 체스말을 가지고있으면 체스말을 네모칸위에서 제거한다.
 	void removeChessmanFromSquare() {
