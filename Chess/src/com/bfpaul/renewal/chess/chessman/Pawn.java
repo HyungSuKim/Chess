@@ -43,6 +43,10 @@ public class Pawn implements Chessman {
 		}
 	}
 	
+	public boolean isMoved() {
+		return isMoved;
+	}
+	
 	public void setIsMoved() {
 		isMoved = true;
 	}

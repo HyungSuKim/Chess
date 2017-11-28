@@ -2,7 +2,6 @@ package com.bfpaul.renewal.chess.board;
 
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -34,6 +33,7 @@ public class BoardPanel extends FlatPanel {
 	private Map<Direction, Coordinate[]> moveableSquare;
 	private ArrayList<BoardSquare> kingCastlingSquare = new ArrayList<>();
 	private ArrayList<BoardSquare> pawnAtackableSquare = new ArrayList<>();
+	private BoardSquare enPassantSquare = null;
 	boolean isWhite = true;
 
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
@@ -48,8 +48,9 @@ public class BoardPanel extends FlatPanel {
 				add(createBoardSquare(x, (y - 1)), createMatchParentConstraints(1));
 			}
 		}
-
 		setWholeChessmanOnBoard();
+		disableSquareClickEvent();
+		ableSquareClickEvent(isWhite);
 	}
 
 	// 입력된 무게와 부모의 크기만큼 영역을 차지하는 제약조건을 생성하여 반환한다.
@@ -71,42 +72,49 @@ public class BoardPanel extends FlatPanel {
 					disableSquareClickEvent();
 					selectedSquare = boardSquare[y][x];
 					boardSquare[y][x].setSquareEventColor();
-					
-					pawnAtackableJudger(x, y);
-					if(!pawnAtackableSquare.isEmpty()) {
-						for(BoardSquare square : pawnAtackableSquare) {
+
+					pawnAtackableChecker(x, y);
+					if (!pawnAtackableSquare.isEmpty()) {
+						for (BoardSquare square : pawnAtackableSquare) {
 							square.setSquareAttackableColor();
 						}
 					}
-					
-					/*원래있던 부분*/
+
+					if (enPassantSquare != null) {
+						enPassantSquare.setSquareAttackableColor();
+					}
+
+					/* 원래있던 부분 */
 					moveableSquare = MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y);
-					/*원래있던 부분*/
+					/* 원래있던 부분 */
 					if ((boardSquare[y][x].getChessman() instanceof King
 							&& !((King) boardSquare[y][x].getChessman()).isMoved())) {
 						kingCastlingChecker(boardSquare[y][x].getChessman().isWhite(), x, y);
-						if(!kingCastlingSquare.isEmpty()) {
-							for(BoardSquare square : kingCastlingSquare) {
+						if (!kingCastlingSquare.isEmpty()) {
+							for (BoardSquare square : kingCastlingSquare) {
 								square.setSquareCastlingColor();
 							}
 						}
 					}
-					
 
 					showMoveableSquare(boardSquare[y][x].getChessman().isWhite());
 					// 다시 눌렀을때
 				} else if (selectedSquare == boardSquare[y][x]) {
 					initSquareEvent(isWhite);
-					if(!pawnAtackableSquare.isEmpty()) {
-						for(BoardSquare square : pawnAtackableSquare) {
+					if (!pawnAtackableSquare.isEmpty()) {
+						for (BoardSquare square : pawnAtackableSquare) {
 							square.setSquareOriginalColor();
 						}
 					}
-					
-					if(!kingCastlingSquare.isEmpty()) {
-						for(BoardSquare square : kingCastlingSquare) {
+
+					if (!kingCastlingSquare.isEmpty()) {
+						for (BoardSquare square : kingCastlingSquare) {
 							square.setSquareOriginalColor();
 						}
+					}
+
+					if (enPassantSquare != null) {
+						enPassantSquare.setSquareOriginalColor();
 					}
 				} else {
 					// 이동경로로 이동했을 때
@@ -114,33 +122,26 @@ public class BoardPanel extends FlatPanel {
 					if (boardSquare[y][x].getChessman() != null) {
 						System.out.println(boardSquare[y][x].getChessman().getChessmanType().name());
 					}
-					
-					if(kingCastlingSquare.size() != 0) {
+
+					if (selectedSquare.getChessman() instanceof King && kingCastlingSquare.size() != 0) {
 						kingCastling(selectedSquare.getChessman().isWhite(), x, y);
-						
-						for(BoardSquare square : kingCastlingSquare) {
+
+						for (BoardSquare square : kingCastlingSquare) {
 							square.setSquareOriginalColor();
 						}
 						kingCastlingSquare.clear();
 					} else {
 						boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
 					}
-					
-					if(!pawnAtackableSquare.isEmpty()) {
-						for(BoardSquare square : pawnAtackableSquare) {
-							square.setSquareOriginalColor();
-						}
-						pawnAtackableSquare.clear();
-					} else {
-						boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
+
+					if (boardSquare[y][x].getChessman() instanceof Pawn) {
+						pawnAttack(x, y);
+						pawnEnPassant(x, y);
 					}
-					
+
 					// checkmateChecker(isWhite,
 					// MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x,
 					// y));
-					if (boardSquare[y][x].getChessman() instanceof Pawn) {
-						((Pawn) boardSquare[y][x].getChessman()).setIsMoved();
-					}
 
 					if (boardSquare[y][x].getChessman() instanceof King) {
 						((King) boardSquare[y][x].getChessman()).setIsMoved();
@@ -163,26 +164,99 @@ public class BoardPanel extends FlatPanel {
 		return boardSquare[y][x];
 	}
 
-	private void pawnAtackableJudger(int x, int y) {
+	private void pawnAttack(int x, int y) {
+		if (selectedSquare.getChessman() instanceof Pawn && !pawnAtackableSquare.isEmpty()) {
+			for (BoardSquare square : pawnAtackableSquare) {
+				square.setSquareOriginalColor();
+			}
+			pawnAtackableSquare.clear();
+		} else {
+			boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
+		}
+	}
+
+	private void pawnEnPassant(int x, int y) {
+		if (boardSquare[y][x].getChessman() instanceof Pawn) {
+			// 만약에 폰의 이동이 기존위치에서 차가 2일때 만 앙파상 체크를 한다... 하면 괜찮을거같은ㄷ?
+			if (Math.abs(boardSquare[y][x].getY() - selectedSquare.getY()) == 174) {
+				((Pawn) boardSquare[y][x].getChessman()).setIsMoved();
+				System.out.println("앙파상 검사하자");
+				pawnEnPassantChecker(boardSquare[y][x].getChessman().isWhite(), x, y);
+
+			} else if (enPassantSquare != null && boardSquare[y][x] == enPassantSquare) {
+				if (boardSquare[y][x].getChessman().isWhite()) {
+					boardSquare[y - 1][x].removeChessmanFromSquare();
+					enPassantSquare.setSquareOriginalColor();
+					enPassantSquare = null;
+				} else {
+					boardSquare[y + 1][x].removeChessmanFromSquare();
+					enPassantSquare.setSquareOriginalColor();
+					enPassantSquare = null;
+				}
+			} else if (enPassantSquare != null && boardSquare[y][x] != enPassantSquare) {
+				enPassantSquare.setSquareOriginalColor();
+				enPassantSquare = null;
+			} else {
+				((Pawn) boardSquare[y][x].getChessman()).setIsMoved();
+				if (enPassantSquare != null) {
+					enPassantSquare.setSquareOriginalColor();
+					enPassantSquare = null;
+				}
+			}
+		}
+	}
+
+	private void pawnEnPassantChecker(boolean isWhite, int x, int y) {
+		if (isWhite) {
+			// boardSquare[y][x-1] 또는 boardSquare[y][x+1] 있는게 검정폰이냐? 를 검사하고
+			if (Coordinate.isValidate(x - 1, y))
+				if ((boardSquare[y][x - 1].isContain() && boardSquare[y][x - 1].getChessman() instanceof Pawn
+						&& !boardSquare[y][x - 1].getChessman().isWhite())) {
+					enPassantSquare = boardSquare[y - 1][x];
+				}
+			// 맞으면 boardSquare[y-1][x]를 앙파상 스퀘어에 저장
+			if (Coordinate.isValidate(x + 1, y))
+				if ((boardSquare[y][x + 1].isContain() && boardSquare[y][x + 1].getChessman() instanceof Pawn
+						&& !boardSquare[y][x + 1].getChessman().isWhite())) {
+					enPassantSquare = boardSquare[y - 1][x];
+				}
+
+		} else {
+			// boardSquare[y][x-1] 또는 boardSquare[y][x+1] 있는게 흰색폰이냐? 를 검사하고
+			if (Coordinate.isValidate(x - 1, y))
+				if ((boardSquare[y][x - 1].isContain() && boardSquare[y][x - 1].getChessman() instanceof Pawn
+						&& boardSquare[y][x - 1].getChessman().isWhite())) {
+					enPassantSquare = boardSquare[y + 1][x];
+				}
+			// 맞으면 boardSquare[y+1][x]를 앙파상 스퀘어에 저장
+			if (Coordinate.isValidate(x + 1, y))
+				if ((boardSquare[y][x + 1].isContain() && boardSquare[y][x + 1].getChessman() instanceof Pawn
+						&& boardSquare[y][x + 1].getChessman().isWhite())) {
+					enPassantSquare = boardSquare[y + 1][x];
+				}
+		}
+	}
+
+	private void pawnAtackableChecker(int x, int y) {
 		pawnAtackableSquare.clear();
 		if (isWhite && boardSquare[y][x].getChessman() instanceof Pawn) {
-			if(Coordinate.isValidate(x + 1, y + 1))
-			if (boardSquare[y + 1][x + 1].isContain() && !boardSquare[y + 1][x + 1].getChessman().isWhite()) {
-				pawnAtackableSquare.add(boardSquare[y + 1][x + 1]);
-			}
-			if(Coordinate.isValidate(x - 1, y + 1))
-			if (boardSquare[y + 1][x - 1].isContain() && !boardSquare[y + 1][x - 1].getChessman().isWhite()) {
-				pawnAtackableSquare.add(boardSquare[y + 1][x - 1]);
-			}
+			if (Coordinate.isValidate(x + 1, y + 1))
+				if (boardSquare[y + 1][x + 1].isContain() && !boardSquare[y + 1][x + 1].getChessman().isWhite()) {
+					pawnAtackableSquare.add(boardSquare[y + 1][x + 1]);
+				}
+			if (Coordinate.isValidate(x - 1, y + 1))
+				if (boardSquare[y + 1][x - 1].isContain() && !boardSquare[y + 1][x - 1].getChessman().isWhite()) {
+					pawnAtackableSquare.add(boardSquare[y + 1][x - 1]);
+				}
 		} else if (!isWhite && boardSquare[y][x].getChessman() instanceof Pawn) {
-			if(Coordinate.isValidate(x - 1, y - 1))
-			if (boardSquare[y - 1][x - 1].isContain() && boardSquare[y - 1][x - 1].getChessman().isWhite()) {
-				pawnAtackableSquare.add(boardSquare[y - 1][x - 1]);
-			}
-			if(Coordinate.isValidate(x + 1, y - 1))
-			if (boardSquare[y - 1][x + 1].isContain() && boardSquare[y - 1][x + 1].getChessman().isWhite()) {
-				pawnAtackableSquare.add(boardSquare[y - 1][x + 1]);
-			}
+			if (Coordinate.isValidate(x - 1, y - 1))
+				if (boardSquare[y - 1][x - 1].isContain() && boardSquare[y - 1][x - 1].getChessman().isWhite()) {
+					pawnAtackableSquare.add(boardSquare[y - 1][x - 1]);
+				}
+			if (Coordinate.isValidate(x + 1, y - 1))
+				if (boardSquare[y - 1][x + 1].isContain() && boardSquare[y - 1][x + 1].getChessman().isWhite()) {
+					pawnAtackableSquare.add(boardSquare[y - 1][x + 1]);
+				}
 		}
 	}
 
@@ -303,7 +377,7 @@ public class BoardPanel extends FlatPanel {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-			 setPawnOnBoard(ChessmanType.PAWN);
+			setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
