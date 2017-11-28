@@ -80,8 +80,10 @@ public class BoardPanel extends FlatPanel {
 						}
 					}
 
-					if (enPassantSquare != null) {
-						enPassantSquare.setSquareAttackableColor();
+					if (enPassantSquare != null && boardSquare[y][x].getChessman() instanceof Pawn) {
+						if ((Math.abs(enPassantSquare.getX() - boardSquare[y][x].getX()) == 114)
+								&& (Math.abs(enPassantSquare.getY() - boardSquare[y][x].getY()) == 95))
+							enPassantSquare.setSquareAttackableColor();
 					}
 
 					/* 원래있던 부분 */
@@ -130,8 +132,11 @@ public class BoardPanel extends FlatPanel {
 							square.setSquareOriginalColor();
 						}
 						kingCastlingSquare.clear();
+						enPassantSquare = null;
 					} else {
 						boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
+						if (!(boardSquare[y][x].getChessman() instanceof Pawn))
+							enPassantSquare = null;
 					}
 
 					if (boardSquare[y][x].getChessman() instanceof Pawn) {
@@ -139,9 +144,8 @@ public class BoardPanel extends FlatPanel {
 						pawnEnPassant(x, y);
 					}
 
-					// checkmateChecker(isWhite,
-					// MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x,
-					// y));
+					checkmateChecker(isWhite,
+							MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y));
 
 					if (boardSquare[y][x].getChessman() instanceof King) {
 						((King) boardSquare[y][x].getChessman()).setIsMoved();
@@ -178,9 +182,8 @@ public class BoardPanel extends FlatPanel {
 	private void pawnEnPassant(int x, int y) {
 		if (boardSquare[y][x].getChessman() instanceof Pawn) {
 			// 만약에 폰의 이동이 기존위치에서 차가 2일때 만 앙파상 체크를 한다... 하면 괜찮을거같은ㄷ?
-			if (Math.abs(boardSquare[y][x].getY() - selectedSquare.getY()) == 174) {
+			if (Math.abs(boardSquare[y][x].getY() - selectedSquare.getY()) == 190) {
 				((Pawn) boardSquare[y][x].getChessman()).setIsMoved();
-				System.out.println("앙파상 검사하자");
 				pawnEnPassantChecker(boardSquare[y][x].getChessman().isWhite(), x, y);
 
 			} else if (enPassantSquare != null && boardSquare[y][x] == enPassantSquare) {
@@ -504,15 +507,12 @@ public class BoardPanel extends FlatPanel {
 						&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite
 						&& selectedSquare.getChessman() instanceof Knight) {
 
-					boardSquare[coordinate.getY()][coordinate.getX()].setSquareAttackableColor();
-
 				} else if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
 						&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite) {
 
 					if (selectedSquare.getChessman() instanceof Pawn)
 						break;
 
-					boardSquare[coordinate.getY()][coordinate.getX()].setSquareAttackableColor();
 					break;
 
 				} else {
@@ -520,7 +520,6 @@ public class BoardPanel extends FlatPanel {
 							&& boardSquare[coordinate.getY()][coordinate.getX()].isContain())
 						break;
 
-					boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
 				}
 			}
 		}
