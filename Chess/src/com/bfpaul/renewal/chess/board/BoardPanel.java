@@ -2,6 +2,7 @@ package com.bfpaul.renewal.chess.board;
 
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -31,7 +32,8 @@ public class BoardPanel extends FlatPanel {
 	private BoardSquare[][] boardSquare = new BoardSquare[8][8];
 	private BoardSquare selectedSquare = null;
 	private Map<Direction, Coordinate[]> moveableSquare;
-	private ArrayList<BoardSquare> castlingSquare = new ArrayList<>();
+	private ArrayList<BoardSquare> kingCastlingSquare = new ArrayList<>();
+	private ArrayList<BoardSquare> pawnAtackableSquare = new ArrayList<>();
 	boolean isWhite = true;
 
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
@@ -69,24 +71,40 @@ public class BoardPanel extends FlatPanel {
 					disableSquareClickEvent();
 					selectedSquare = boardSquare[y][x];
 					boardSquare[y][x].setSquareEventColor();
+					
+					pawnAtackableJudger(x, y);
+					if(!pawnAtackableSquare.isEmpty()) {
+						for(BoardSquare square : pawnAtackableSquare) {
+							square.setSquareAttackableColor();
+						}
+					}
+					
+					/*원래있던 부분*/
 					moveableSquare = MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y);
-
+					/*원래있던 부분*/
 					if ((boardSquare[y][x].getChessman() instanceof King
 							&& !((King) boardSquare[y][x].getChessman()).isMoved())) {
 						kingCastlingChecker(boardSquare[y][x].getChessman().isWhite(), x, y);
-						if(!castlingSquare.isEmpty()) {
-							for(BoardSquare square : castlingSquare) {
+						if(!kingCastlingSquare.isEmpty()) {
+							for(BoardSquare square : kingCastlingSquare) {
 								square.setSquareCastlingColor();
 							}
 						}
 					}
+					
 
 					showMoveableSquare(boardSquare[y][x].getChessman().isWhite());
 					// 다시 눌렀을때
 				} else if (selectedSquare == boardSquare[y][x]) {
 					initSquareEvent(isWhite);
-					if(!castlingSquare.isEmpty()) {
-						for(BoardSquare square : castlingSquare) {
+					if(!pawnAtackableSquare.isEmpty()) {
+						for(BoardSquare square : pawnAtackableSquare) {
+							square.setSquareOriginalColor();
+						}
+					}
+					
+					if(!kingCastlingSquare.isEmpty()) {
+						for(BoardSquare square : kingCastlingSquare) {
 							square.setSquareOriginalColor();
 						}
 					}
@@ -97,13 +115,22 @@ public class BoardPanel extends FlatPanel {
 						System.out.println(boardSquare[y][x].getChessman().getChessmanType().name());
 					}
 					
-					if(castlingSquare.size() != 0) {
+					if(kingCastlingSquare.size() != 0) {
 						kingCastling(selectedSquare.getChessman().isWhite(), x, y);
 						
-						for(BoardSquare square : castlingSquare) {
+						for(BoardSquare square : kingCastlingSquare) {
 							square.setSquareOriginalColor();
 						}
-						castlingSquare.clear();
+						kingCastlingSquare.clear();
+					} else {
+						boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
+					}
+					
+					if(!pawnAtackableSquare.isEmpty()) {
+						for(BoardSquare square : pawnAtackableSquare) {
+							square.setSquareOriginalColor();
+						}
+						pawnAtackableSquare.clear();
 					} else {
 						boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
 					}
@@ -136,53 +163,76 @@ public class BoardPanel extends FlatPanel {
 		return boardSquare[y][x];
 	}
 
+	private void pawnAtackableJudger(int x, int y) {
+		pawnAtackableSquare.clear();
+		if (isWhite && boardSquare[y][x].getChessman() instanceof Pawn) {
+			if(Coordinate.isValidate(x + 1, y + 1))
+			if (boardSquare[y + 1][x + 1].isContain() && !boardSquare[y + 1][x + 1].getChessman().isWhite()) {
+				pawnAtackableSquare.add(boardSquare[y + 1][x + 1]);
+			}
+			if(Coordinate.isValidate(x - 1, y + 1))
+			if (boardSquare[y + 1][x - 1].isContain() && !boardSquare[y + 1][x - 1].getChessman().isWhite()) {
+				pawnAtackableSquare.add(boardSquare[y + 1][x - 1]);
+			}
+		} else if (!isWhite && boardSquare[y][x].getChessman() instanceof Pawn) {
+			if(Coordinate.isValidate(x - 1, y - 1))
+			if (boardSquare[y - 1][x - 1].isContain() && boardSquare[y - 1][x - 1].getChessman().isWhite()) {
+				pawnAtackableSquare.add(boardSquare[y - 1][x - 1]);
+			}
+			if(Coordinate.isValidate(x + 1, y - 1))
+			if (boardSquare[y - 1][x + 1].isContain() && boardSquare[y - 1][x + 1].getChessman().isWhite()) {
+				pawnAtackableSquare.add(boardSquare[y - 1][x + 1]);
+			}
+		}
+	}
+
 	private void kingCastlingChecker(boolean isWhite, int x, int y) {
-		castlingSquare.clear();
+		kingCastlingSquare.clear();
 		if (isWhite) {
-			if (!boardSquare[0][5].isContain() && !boardSquare[0][6].isContain()
-					&& boardSquare[0][7].isContain() && boardSquare[0][7].getChessman() instanceof Rook) {
+			if (!boardSquare[0][5].isContain() && !boardSquare[0][6].isContain() && boardSquare[0][7].isContain()
+					&& boardSquare[0][7].getChessman() instanceof Rook) {
 				if (!((Rook) boardSquare[0][7].getChessman()).isMoved()) {
-					castlingSquare.add(boardSquare[0][7]);
+					kingCastlingSquare.add(boardSquare[0][7]);
 				}
 			}
-			
+
 			if (!boardSquare[0][1].isContain() && !boardSquare[0][2].isContain() && !boardSquare[0][3].isContain()
 					&& boardSquare[0][0].isContain() && boardSquare[0][0].getChessman() instanceof Rook) {
 				if (!((Rook) boardSquare[0][0].getChessman()).isMoved()) {
-					castlingSquare.add(boardSquare[0][0]);
+					kingCastlingSquare.add(boardSquare[0][0]);
 				}
 			}
 		} else {
-			if (!boardSquare[7][5].isContain() && !boardSquare[7][6].isContain()
-					&& boardSquare[7][7].isContain() && boardSquare[7][7].getChessman() instanceof Rook) {
+			if (!boardSquare[7][5].isContain() && !boardSquare[7][6].isContain() && boardSquare[7][7].isContain()
+					&& boardSquare[7][7].getChessman() instanceof Rook) {
 				if (!((Rook) boardSquare[7][7].getChessman()).isMoved()) {
-					castlingSquare.add(boardSquare[7][7]);
+					kingCastlingSquare.add(boardSquare[7][7]);
 				}
 			}
-			
+
 			if (!boardSquare[7][1].isContain() && !boardSquare[7][2].isContain() && !boardSquare[7][3].isContain()
 					&& boardSquare[7][0].isContain() && boardSquare[7][0].getChessman() instanceof Rook) {
 				if (!((Rook) boardSquare[7][0].getChessman()).isMoved()) {
-					castlingSquare.add(boardSquare[7][0]);
+					kingCastlingSquare.add(boardSquare[7][0]);
 				}
 			}
 		}
 	}
-	
+
 	private void kingCastling(boolean isWhite, int x, int y) {
-		if(isWhite) {
-			if(selectedSquare.getChessman() instanceof King && selectedSquare.getChessman().isWhite()
+		if (isWhite) {
+			if (selectedSquare.getChessman() instanceof King && selectedSquare.getChessman().isWhite()
 					&& (x == 7 && y == 0)) {
-				((King)selectedSquare.getChessman()).setIsMoved();
-				((Rook)boardSquare[y][x].getChessman()).setIsMoved();
+				((King) selectedSquare.getChessman()).setIsMoved();
+				((Rook) boardSquare[y][x].getChessman()).setIsMoved();
 				boardSquare[0][6].setChessmanOnSquare(selectedSquare.getChessman());
 				selectedSquare.removeChessmanFromSquare();
 				boardSquare[0][5].setChessmanOnSquare(boardSquare[y][x].getChessman());
 				boardSquare[y][x].removeChessmanFromSquare();
 			} else if (selectedSquare.getChessman() instanceof King && selectedSquare.getChessman().isWhite()
 					&& (x == 0 && y == 0)) {
-				((King)selectedSquare.getChessman()).setIsMoved();
-				((Rook)boardSquare[y][x].getChessman()).setIsMoved();
+				((King) selectedSquare.getChessman()).setIsMoved();
+				((Rook) boardSquare[y][x].getChessman()).setIsMoved();
 				boardSquare[0][2].setChessmanOnSquare(selectedSquare.getChessman());
 				selectedSquare.removeChessmanFromSquare();
 				boardSquare[0][3].setChessmanOnSquare(boardSquare[y][x].getChessman());
@@ -191,18 +241,18 @@ public class BoardPanel extends FlatPanel {
 				boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
 			}
 		} else {
-			if(selectedSquare.getChessman() instanceof King && !selectedSquare.getChessman().isWhite()
+			if (selectedSquare.getChessman() instanceof King && !selectedSquare.getChessman().isWhite()
 					&& (x == 7 && y == 7)) {
-				((King)selectedSquare.getChessman()).setIsMoved();
-				((Rook)boardSquare[y][x].getChessman()).setIsMoved();
+				((King) selectedSquare.getChessman()).setIsMoved();
+				((Rook) boardSquare[y][x].getChessman()).setIsMoved();
 				boardSquare[7][6].setChessmanOnSquare(selectedSquare.getChessman());
 				selectedSquare.removeChessmanFromSquare();
 				boardSquare[7][5].setChessmanOnSquare(boardSquare[y][x].getChessman());
 				boardSquare[y][x].removeChessmanFromSquare();
 			} else if (selectedSquare.getChessman() instanceof King && !selectedSquare.getChessman().isWhite()
 					&& (x == 0 && y == 7)) {
-				((King)selectedSquare.getChessman()).setIsMoved();
-				((Rook)boardSquare[y][x].getChessman()).setIsMoved();
+				((King) selectedSquare.getChessman()).setIsMoved();
+				((Rook) boardSquare[y][x].getChessman()).setIsMoved();
 				boardSquare[7][2].setChessmanOnSquare(selectedSquare.getChessman());
 				selectedSquare.removeChessmanFromSquare();
 				boardSquare[7][3].setChessmanOnSquare(boardSquare[y][x].getChessman());
@@ -253,7 +303,7 @@ public class BoardPanel extends FlatPanel {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-			// setPawnOnBoard(ChessmanType.PAWN);
+			 setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
