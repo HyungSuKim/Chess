@@ -6,6 +6,7 @@ import javax.swing.BorderFactory;
 
 import com.bfpaul.chess.Theme;
 import com.bfpaul.renewal.chess.chessman.Chessman;
+import com.bfpaul.renewal.chess.chessman.King;
 import com.mommoo.flat.image.FlatImagePanel;
 import com.mommoo.flat.image.ImageOption;
 import com.mommoo.flat.layout.linear.LinearLayout;
@@ -28,10 +29,14 @@ public class BoardSquare extends FlatImagePanel {
 
 	// 가지고있는 체스말이 없으면 체스말을 네모칸위에 올려준다.
 	public void setChessmanOnSquare(Chessman chessman) {
-		this.chessman = chessman;
-		isContain = true;
-		setEnableClickEvent(true);
-		setImage(chessman.getChessmanImage(), ImageOption.MATCH_PARENT);
+		if(getBackground().equals(Color.ORANGE) && chessman instanceof King) {
+			System.out.println("체크메이트 된 칸으로 옮길수 없어요");
+		} else {
+			this.chessman = chessman;
+			isContain = true;
+			setEnableClickEvent(true);
+			setImage(chessman.getChessmanImage(), ImageOption.MATCH_PARENT);
+		}
 	}
 
 	void setSquareOriginalColor() {
@@ -53,6 +58,12 @@ public class BoardSquare extends FlatImagePanel {
 	void setSquareAttackableColor() {
 		setBackground(Color.RED);
 		setEnableClickEvent(true);
+		setAlpha(0.6f);
+	}
+	
+	void setSquareCheckmateColor() {
+		setBackground(Color.ORANGE);
+		setEnableClickEvent(false);
 		setAlpha(0.6f);
 	}
 	

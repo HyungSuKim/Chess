@@ -17,6 +17,7 @@ public class MoveableRouteCalculator {
 	public static Map<Direction, Coordinate[]> selectChessman(Chessman chessman, int x, int y) {
 		selectedChessman = chessman;
 		Map<Direction, Coordinate[]> moveableRoute = new HashMap<>();
+		System.out.println(chessman.getMoveableSquareCount());
 		int moveableSquareCount = chessman.getMoveableSquareCount();
 		for (Direction direction : chessman.getDirection()) {
 			switch (direction) {
