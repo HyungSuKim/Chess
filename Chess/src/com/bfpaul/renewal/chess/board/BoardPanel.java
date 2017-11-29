@@ -3,6 +3,7 @@ package com.bfpaul.renewal.chess.board;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -34,7 +35,8 @@ public class BoardPanel extends FlatPanel {
 	private ArrayList<BoardSquare> kingCastlingSquare = new ArrayList<>();
 	private ArrayList<BoardSquare> pawnAtackableSquare = new ArrayList<>();
 	private BoardSquare enPassantSquare = null;
-	private Coordinate[] checkmateSquare = null;
+//	private Coordinate[] checkmateSquare = null;
+	private Map<Direction, Coordinate[]> checkmateSquare = new HashMap<>();
 	boolean isWhite = true;
 
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
@@ -91,12 +93,13 @@ public class BoardPanel extends FlatPanel {
 					moveableSquare = MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y);
 					/* 원래있던 부분 */
 					/*체크메이트 테스팅 코드*/
-					if(checkmateSquare != null) {
-						for(Coordinate coordinate : checkmateSquare) {
-							if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King) break;
-							boardSquare[coordinate.getY()][coordinate.getX()].setSquareCheckmateColor();
+					if(!checkmateSquare.isEmpty()) {
+						for(Direction direction : checkmateSquare.keySet()) {
+							for(Coordinate coordinate : checkmateSquare.get(direction)) {
+								if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King) break;
+								boardSquare[coordinate.getY()][coordinate.getX()].setSquareCheckmateColor();
+							}
 						}
-//						boardSquare[y][x].setSquareEventColor();
 					}
 					/*체크메이트 테스팅 코드*/
 					if ((boardSquare[y][x].getChessman() instanceof King
@@ -128,14 +131,17 @@ public class BoardPanel extends FlatPanel {
 					if (enPassantSquare != null) {
 						enPassantSquare.setSquareOriginalColor();
 					}
-					
-					if(checkmateSquare != null) {
-						for(Coordinate coordinate : checkmateSquare) {
-							if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King) break;
-							boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
+					/*체크메이트 테스트*/					
+					if(!checkmateSquare.isEmpty()) {
+						for(Direction direction : checkmateSquare.keySet()) {
+							for(Coordinate coordinate : checkmateSquare.get(direction)) {
+								if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King) break;
+								boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
+							}
 						}
-//						boardSquare[y][x].setSquareEventColor();
 					}
+					/*체크메이트 테스트*/
+					
 				} else {
 					// 이동경로로 이동했을 때
 					isWhite = !isWhite;
@@ -162,11 +168,13 @@ public class BoardPanel extends FlatPanel {
 						pawnEnPassant(x, y);
 					}
 					
-					if(boardSquare[y][x].isContain()) {
-//						움직인 칸이 말을 가지고있을때 만 체크메이트 계산을 하도록 하는 것이다. 이유는 앙파상의 경우에는 클릭한 칸에는 이미 말이 없을것이기 때문이다.
-						checkmateChecker(isWhite,
-								MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y));
+					if(!checkmateSquare.isEmpty()) {
+						for(Direction direction : checkmateSquare.keySet())
+							for(Coordinate coordinate : checkmateSquare.get(direction))
+								boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
 					}
+					
+					checkmateChecker(isWhite);
 
 					if (boardSquare[y][x].getChessman() instanceof King) {
 						((King) boardSquare[y][x].getChessman()).setIsMoved();
@@ -509,7 +517,18 @@ public class BoardPanel extends FlatPanel {
 
 	
 	///////////////////////체크메이트////////////////////////////
-	private void checkmateChecker(boolean isWhite, Map<Direction, Coordinate[]> moveableSquare) {
+	private void checkmateChecker(boolean isWhite) {
+		System.out.println("체크메이트 체커");
+		for (int y = 8; y > 0; y--) {
+			for (int x = 0; x < 8; x++) {
+				if(boardSquare[y-1][x].isContain())
+					checkmateRoute(isWhite,
+							MoveableRouteCalculator.selectChessman(boardSquare[y-1][x].getChessman(), x, y-1));
+			}
+		}
+	}
+	
+	private void checkmateRoute(boolean isWhite, Map<Direction, Coordinate[]> moveableSquare) {
 		System.out.println("체크메이트 체커");
 //		for (Direction direction : moveableSquare.keySet()) {
 //			checkmateJudger(isWhite, moveableSquare.get(direction));
@@ -546,19 +565,18 @@ public class BoardPanel extends FlatPanel {
 							System.out.println(direction.name());
 							/*테스트 문구 흠흠?*/
 							switch(direction) {
-							case UP : checkmateSquare = moveableSquare.get(Direction.UP); break;
-							case DOWN : checkmateSquare = moveableSquare.get(Direction.DOWN); break;
-							case LEFT :  checkmateSquare = moveableSquare.get(Direction.LEFT); break;
-							case RIGHT :  checkmateSquare = moveableSquare.get(Direction.RIGHT); break;
-							case UP_LEFT :  checkmateSquare = moveableSquare.get(Direction.UP_LEFT); break;
-							case UP_RIGHT :  checkmateSquare = moveableSquare.get(Direction.UP_RIGHT); break;
-							case DOWN_LEFT :  checkmateSquare = moveableSquare.get(Direction.DOWN_LEFT); break;
-							case DOWN_RIGHT :  checkmateSquare = moveableSquare.get(Direction.DOWN_RIGHT); break;
-								default : break; 
+							case UP : checkmateSquare.put(Direction.UP, moveableSquare.get(Direction.UP)); break;
+							case DOWN : checkmateSquare.put(Direction.DOWN, moveableSquare.get(Direction.DOWN)); break;
+							case LEFT : checkmateSquare.put(Direction.LEFT, moveableSquare.get(Direction.LEFT)); break;
+							case RIGHT : checkmateSquare.put(Direction.RIGHT, moveableSquare.get(Direction.RIGHT)); break;
+							case UP_LEFT : checkmateSquare.put(Direction.UP_LEFT, moveableSquare.get(Direction.UP_LEFT)); break;
+							case UP_RIGHT : checkmateSquare.put(Direction.UP_RIGHT, moveableSquare.get(Direction.UP_RIGHT)); break;
+							case DOWN_LEFT : checkmateSquare.put(Direction.DOWN_LEFT, moveableSquare.get(Direction.DOWN_LEFT)); break;
+							case DOWN_RIGHT : checkmateSquare.put(Direction.DOWN_RIGHT, moveableSquare.get(Direction.DOWN_RIGHT)); break;
+								default : break;
 							}
 							break;
 						}
-
 					} else {
 						if (selectedSquare.getChessman() instanceof Pawn
 								&& boardSquare[coordinate.getY()][coordinate.getX()].isContain())
