@@ -1,5 +1,6 @@
 package com.bfpaul.renewal.chess.board;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.ArrayList;
@@ -96,8 +97,11 @@ public class BoardPanel extends FlatPanel {
 					if(!checkmateSquare.isEmpty()) {
 						for(Direction direction : checkmateSquare.keySet()) {
 							for(Coordinate coordinate : checkmateSquare.get(direction)) {
-								if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King) break;
-								boardSquare[coordinate.getY()][coordinate.getX()].setSquareCheckmateColor();
+								if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King) {
+									boardSquare[coordinate.getY()][coordinate.getX()].setBackground(Color.ORANGE);
+								} else {
+									boardSquare[coordinate.getY()][coordinate.getX()].setSquareCheckmateColor();
+								}
 							}
 						}
 					}
@@ -135,7 +139,6 @@ public class BoardPanel extends FlatPanel {
 					if(!checkmateSquare.isEmpty()) {
 						for(Direction direction : checkmateSquare.keySet()) {
 							for(Coordinate coordinate : checkmateSquare.get(direction)) {
-								if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King) break;
 								boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
 							}
 						}
@@ -172,9 +175,8 @@ public class BoardPanel extends FlatPanel {
 						for(Direction direction : checkmateSquare.keySet())
 							for(Coordinate coordinate : checkmateSquare.get(direction))
 								boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
+						checkmateSquare.clear();
 					}
-					
-					checkmateChecker(isWhite);
 
 					if (boardSquare[y][x].getChessman() instanceof King) {
 						((King) boardSquare[y][x].getChessman()).setIsMoved();
@@ -190,6 +192,7 @@ public class BoardPanel extends FlatPanel {
 					}
 
 					selectedSquare.removeChessmanFromSquare();
+					checkmateChecker(isWhite);
 					initSquareEvent(isWhite);
 				}
 			}
@@ -508,8 +511,13 @@ public class BoardPanel extends FlatPanel {
 					if (selectedSquare.getChessman() instanceof Pawn
 							&& boardSquare[coordinate.getY()][coordinate.getX()].isContain())
 						break;
-
-					boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
+					if(boardSquare[coordinate.getY()][coordinate.getX()].getBackground().equals(Color.ORANGE)
+							&& selectedSquare.getChessman() instanceof King) {
+						boardSquare[coordinate.getY()][coordinate.getX()].setSquareCheckmateColor();
+					} else {
+						boardSquare[coordinate.getY()][coordinate.getX()].setSquareEventColor();
+					}
+					
 				}
 			}
 		}
@@ -521,7 +529,7 @@ public class BoardPanel extends FlatPanel {
 		System.out.println("체크메이트 체커");
 		for (int y = 8; y > 0; y--) {
 			for (int x = 0; x < 8; x++) {
-				if(boardSquare[y-1][x].isContain())
+				if(boardSquare[y-1][x].isContain() && boardSquare[y-1][x].getChessman().isWhite() != isWhite)
 					checkmateRoute(isWhite,
 							MoveableRouteCalculator.selectChessman(boardSquare[y-1][x].getChessman(), x, y-1));
 			}
