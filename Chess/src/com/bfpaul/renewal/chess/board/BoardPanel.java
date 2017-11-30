@@ -180,8 +180,9 @@ public class BoardPanel extends FlatPanel {
 					if (!checkmateSquare.isEmpty()) {
 						for (Direction direction : checkmateSquare.keySet())
 							for (Coordinate coordinate : checkmateSquare.get(direction))
+								if(coordinate != null)
 								boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
-//						checkmateSquare.clear();
+						checkmateSquare.clear();
 					}
 
 					if (boardSquare[y][x].getChessman() instanceof King) {
@@ -421,7 +422,7 @@ public class BoardPanel extends FlatPanel {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-			// setPawnOnBoard(ChessmanType.PAWN);
+//			setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
@@ -534,7 +535,7 @@ public class BoardPanel extends FlatPanel {
 
 	/////////////////////// 체크메이트////////////////////////////
 	private void checkmateChecker(boolean isWhite) {
-		checkmateSquare.clear();
+//		checkmateSquare.clear();
 		for (int y = 8; y > 0; y--) {
 			for (int x = 0; x < 8; x++) {
 				if (boardSquare[y - 1][x].isContain() && boardSquare[y - 1][x].getChessman().isWhite() != isWhite)
@@ -543,7 +544,7 @@ public class BoardPanel extends FlatPanel {
 			}
 		}
 	}
-
+	
 	private void checkmateRoute(BoardSquare checkingSquare, Map<Direction, Coordinate[]> moveableSquare) {
 		for (Direction direction : moveableSquare.keySet()) {
 			for (Coordinate coordinate : moveableSquare.get(direction)) {
@@ -563,16 +564,7 @@ public class BoardPanel extends FlatPanel {
 							case UP:
 								if (checkingSquare.getChessman() instanceof Knight) {
 									if (!moveableSquare.isEmpty())
-										for (Coordinate moveableCoordinate : moveableSquare.get(Direction.UP)) {
-											if (Coordinate.isValidate(moveableCoordinate.getX(),
-													moveableCoordinate.getY()))
-												if (boardSquare[moveableCoordinate.getY()][moveableCoordinate.getX()]
-														.getChessman() instanceof King) {
-													Coordinate[] checkResult = new Coordinate[1];
-													checkResult[0] = moveableCoordinate;
-													checkmateSquare.put(Direction.UP, checkResult);
-												}
-										}
+										knightCheckmateRoute(moveableSquare, Direction.UP);										
 									break;
 								} else {
 									checkmateSquare.put(Direction.UP, moveableSquare.get(Direction.UP));
@@ -581,16 +573,7 @@ public class BoardPanel extends FlatPanel {
 							case DOWN:
 								if (checkingSquare.getChessman() instanceof Knight) {
 									if (!moveableSquare.isEmpty())
-										for (Coordinate moveableCoordinate : moveableSquare.get(Direction.DOWN)) {
-											if (Coordinate.isValidate(moveableCoordinate.getX(),
-													moveableCoordinate.getY()))
-												if (boardSquare[moveableCoordinate.getY()][moveableCoordinate.getX()]
-														.getChessman() instanceof King) {
-													Coordinate[] checkResult = new Coordinate[1];
-													checkResult[0] = moveableCoordinate;
-													checkmateSquare.put(Direction.DOWN, checkResult);
-												}
-										}
+										knightCheckmateRoute(moveableSquare, Direction.DOWN);
 									break;
 								} else {
 									checkmateSquare.put(Direction.DOWN, moveableSquare.get(Direction.DOWN));
@@ -599,16 +582,7 @@ public class BoardPanel extends FlatPanel {
 							case LEFT:
 								if (!moveableSquare.isEmpty())
 									if (checkingSquare.getChessman() instanceof Knight) {
-										for (Coordinate moveableCoordinate : moveableSquare.get(Direction.LEFT)) {
-											if (Coordinate.isValidate(moveableCoordinate.getX(),
-													moveableCoordinate.getY()))
-												if (boardSquare[moveableCoordinate.getY()][moveableCoordinate.getX()]
-														.getChessman() instanceof King) {
-													Coordinate[] checkResult = new Coordinate[1];
-													checkResult[0] = moveableCoordinate;
-													checkmateSquare.put(Direction.LEFT, checkResult);
-												}
-										}
+										knightCheckmateRoute(moveableSquare, Direction.LEFT);
 										break;
 									} else {
 										checkmateSquare.put(Direction.LEFT, moveableSquare.get(Direction.LEFT));
@@ -617,16 +591,7 @@ public class BoardPanel extends FlatPanel {
 							case RIGHT:
 								if (checkingSquare.getChessman() instanceof Knight) {
 									if (!moveableSquare.isEmpty())
-										for (Coordinate moveableCoordinate : moveableSquare.get(Direction.RIGHT)) {
-											if (Coordinate.isValidate(moveableCoordinate.getX(),
-													moveableCoordinate.getY()))
-												if (boardSquare[moveableCoordinate.getY()][moveableCoordinate.getX()]
-														.getChessman() instanceof King) {
-													Coordinate[] checkResult = new Coordinate[1];
-													checkResult[0] = moveableCoordinate;
-													checkmateSquare.put(Direction.RIGHT, checkResult);
-												}
-										}
+										knightCheckmateRoute(moveableSquare, Direction.RIGHT);
 									break;
 								} else {
 									checkmateSquare.put(Direction.RIGHT, moveableSquare.get(Direction.RIGHT));
@@ -653,6 +618,18 @@ public class BoardPanel extends FlatPanel {
 				}
 			}
 		}
-
+	}
+	
+	private void knightCheckmateRoute(Map<Direction, Coordinate[]> moveableSquare, Direction direction) {
+		for (Coordinate moveableCoordinate : moveableSquare.get(direction)) {
+			if (Coordinate.isValidate(moveableCoordinate.getX(),
+					moveableCoordinate.getY()))
+				if (boardSquare[moveableCoordinate.getY()][moveableCoordinate.getX()]
+						.getChessman() instanceof King) {
+					Coordinate[] checkResult = new Coordinate[1];
+					checkResult[0] = moveableCoordinate;
+					checkmateSquare.put(direction, checkResult);
+				}
+		}
 	}
 }
