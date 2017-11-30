@@ -29,7 +29,7 @@ public class BoardSquare extends FlatImagePanel {
 
 	// 가지고있는 체스말이 없으면 체스말을 네모칸위에 올려준다.
 	public void setChessmanOnSquare(Chessman chessman) {
-		if(getBackground().equals(Color.ORANGE) && chessman instanceof King) {
+		if(getBackground().equals(Color.GREEN) && chessman instanceof King) {
 			System.out.println("체크메이트 된 칸으로 옮길수 없어요");
 		} else {
 			this.chessman = chessman;
@@ -50,8 +50,8 @@ public class BoardSquare extends FlatImagePanel {
 	}
 
 	void setSquareEventColor() {
-		if(getBackground().equals(Color.ORANGE)) {
-			setBackground(Color.ORANGE);
+		if(getBackground().equals(Color.GREEN)) {
+			setBackground(Color.GREEN);
 			setEnableClickEvent(true);
 		} else {
 			setBackground(Theme.LIGHT_BLUE_COLOR);
@@ -67,7 +67,7 @@ public class BoardSquare extends FlatImagePanel {
 	}
 	
 	void setSquareCheckmateColor() {
-		setBackground(Color.ORANGE);
+		setBackground(Color.GREEN);
 		setEnableClickEvent(false);
 		setAlpha(0.6f);
 	}

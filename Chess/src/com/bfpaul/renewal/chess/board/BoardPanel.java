@@ -93,12 +93,15 @@ public class BoardPanel extends FlatPanel {
 					/* 원래있던 부분 */
 					moveableSquare = MoveableRouteCalculator.selectChessman(boardSquare[y][x].getChessman(), x, y);
 					/* 원래있던 부분 */
-					/*체크메이트 테스팅 코드*/
+					/*체크메이트 테스팅 코드*/					
 					if(!checkmateSquare.isEmpty()) {
 						for(Direction direction : checkmateSquare.keySet()) {
 							for(Coordinate coordinate : checkmateSquare.get(direction)) {
+								System.out.println(checkmateSquare.get(direction).length);
+								System.out.println(coordinate.getX() + "////" + coordinate.getY());
 								if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King) {
-									boardSquare[coordinate.getY()][coordinate.getX()].setBackground(Color.ORANGE);
+									boardSquare[coordinate.getY()][coordinate.getX()].setBackground(Color.GREEN);
+								} else if(boardSquare[coordinate.getY()][coordinate.getX()].isContain()) {
 								} else {
 									boardSquare[coordinate.getY()][coordinate.getX()].setSquareCheckmateColor();
 								}
@@ -139,6 +142,7 @@ public class BoardPanel extends FlatPanel {
 					if(!checkmateSquare.isEmpty()) {
 						for(Direction direction : checkmateSquare.keySet()) {
 							for(Coordinate coordinate : checkmateSquare.get(direction)) {
+								if(Coordinate.isValidate(coordinate.getX(), coordinate.getY()))
 								boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
 							}
 						}
@@ -511,7 +515,7 @@ public class BoardPanel extends FlatPanel {
 					if (selectedSquare.getChessman() instanceof Pawn
 							&& boardSquare[coordinate.getY()][coordinate.getX()].isContain())
 						break;
-					if(boardSquare[coordinate.getY()][coordinate.getX()].getBackground().equals(Color.ORANGE)
+					if(boardSquare[coordinate.getY()][coordinate.getX()].getBackground().equals(Color.GREEN)
 							&& selectedSquare.getChessman() instanceof King) {
 						boardSquare[coordinate.getY()][coordinate.getX()].setSquareCheckmateColor();
 					} else {
@@ -527,43 +531,45 @@ public class BoardPanel extends FlatPanel {
 	///////////////////////체크메이트////////////////////////////
 	private void checkmateChecker(boolean isWhite) {
 		System.out.println("체크메이트 체커");
+		checkmateSquare.clear();
 		for (int y = 8; y > 0; y--) {
 			for (int x = 0; x < 8; x++) {
 				if(boardSquare[y-1][x].isContain() && boardSquare[y-1][x].getChessman().isWhite() != isWhite)
-					checkmateRoute(isWhite,
+					checkmateRoute(boardSquare[y-1][x],
 							MoveableRouteCalculator.selectChessman(boardSquare[y-1][x].getChessman(), x, y-1));
 			}
 		}
 	}
 	
-	private void checkmateRoute(boolean isWhite, Map<Direction, Coordinate[]> moveableSquare) {
+	private void checkmateRoute(BoardSquare checkingSquare, Map<Direction, Coordinate[]> moveableSquare) {
 		System.out.println("체크메이트 체커");
 //		for (Direction direction : moveableSquare.keySet()) {
 //			checkmateJudger(isWhite, moveableSquare.get(direction));
 //		}
 		for (Direction direction : moveableSquare.keySet()) {
-			int count = 0;
 			for (Coordinate coordinate : moveableSquare.get(direction)) {
-				++count;
 				if (coordinate != null) {
 					// 이동경로의 좌표에 같은편이 있을때
 					if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
-							&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite) {
+						&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite()
+						== checkingSquare.getChessman().isWhite()) {
 						System.out.println("경로에 같은 색 말이 있어요!" + isWhite);
-						if (!(selectedSquare.getChessman() instanceof Knight))
-							break;
+						break;
+//						if (!(selectedSquare.getChessman() instanceof Knight))
+//							break;
 						// 선택된 말이 나이트이고 이동경로에 적군이있을때
-					} else if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
-							&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == isWhite
-							&& selectedSquare.getChessman() instanceof Knight) {
-						if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King)
-							System.out.println("체크메이트!1");
+//					} else if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
+//							&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == isWhite
+//							&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof Knight) {
+//						if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King)
+//							System.out.println("나이트 체크메이트!!!");
 
 					} else if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
-							&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == isWhite) {
+							&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite()
+							!= checkingSquare.getChessman().isWhite()) {
 
-						if (selectedSquare.getChessman() instanceof Pawn)
-							break;
+//						if (selectedSquare.getChessman() instanceof Pawn)
+//							break;
 						
 						if(!(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King)) {
 							System.out.println("앞에 기물이 있네요!2");
@@ -573,10 +579,71 @@ public class BoardPanel extends FlatPanel {
 							System.out.println(direction.name());
 							/*테스트 문구 흠흠?*/
 							switch(direction) {
-							case UP : checkmateSquare.put(Direction.UP, moveableSquare.get(Direction.UP)); break;
-							case DOWN : checkmateSquare.put(Direction.DOWN, moveableSquare.get(Direction.DOWN)); break;
-							case LEFT : checkmateSquare.put(Direction.LEFT, moveableSquare.get(Direction.LEFT)); break;
-							case RIGHT : checkmateSquare.put(Direction.RIGHT, moveableSquare.get(Direction.RIGHT)); break;
+							/*knight로 인해 수정중....*/
+							case UP : 
+								if(checkingSquare.getChessman() instanceof Knight) {
+									if(!moveableSquare.isEmpty())
+									for(Coordinate moveableCoordinate : moveableSquare.get(Direction.UP)) {
+										if(Coordinate.isValidate(moveableCoordinate.getX(), moveableCoordinate.getY()))
+										if(boardSquare[moveableCoordinate.getY()][moveableCoordinate.getX()].getChessman()
+												instanceof King) {
+											Coordinate[] checkResult = new Coordinate[1];
+											checkResult[0] = moveableCoordinate;
+											checkmateSquare.put(Direction.UP, checkResult);
+										}
+									}
+									break;
+								} else {
+									checkmateSquare.put(Direction.UP, moveableSquare.get(Direction.UP)); break;
+								}
+							case DOWN :
+								if(checkingSquare.getChessman() instanceof Knight) {
+									if(!moveableSquare.isEmpty())
+									for(Coordinate moveableCoordinate : moveableSquare.get(Direction.DOWN)) {
+										if(Coordinate.isValidate(moveableCoordinate.getX(), moveableCoordinate.getY()))
+										if(boardSquare[moveableCoordinate.getY()][moveableCoordinate.getX()].getChessman()
+												instanceof King) {
+											Coordinate[] checkResult = new Coordinate[1];
+											checkResult[0] = moveableCoordinate;
+											checkmateSquare.put(Direction.DOWN, checkResult);
+										}
+									}
+									break;
+								} else {
+									checkmateSquare.put(Direction.DOWN, moveableSquare.get(Direction.DOWN)); break;
+								}
+							case LEFT :
+								if(!moveableSquare.isEmpty())
+								if(checkingSquare.getChessman() instanceof Knight) {
+									for(Coordinate moveableCoordinate : moveableSquare.get(Direction.LEFT)) {
+										if(Coordinate.isValidate(moveableCoordinate.getX(), moveableCoordinate.getY()))
+										if(boardSquare[moveableCoordinate.getY()][moveableCoordinate.getX()].getChessman()
+												instanceof King) {
+											Coordinate[] checkResult = new Coordinate[1];
+											checkResult[0] = moveableCoordinate;
+											checkmateSquare.put(Direction.LEFT, checkResult);
+										}
+									}
+									break;
+								} else {
+									checkmateSquare.put(Direction.LEFT, moveableSquare.get(Direction.LEFT)); break;
+								}
+							case RIGHT :
+								if(checkingSquare.getChessman() instanceof Knight) {
+									if(!moveableSquare.isEmpty())
+									for(Coordinate moveableCoordinate : moveableSquare.get(Direction.LEFT)) {
+										if(Coordinate.isValidate(moveableCoordinate.getX(), moveableCoordinate.getY()))
+										if(boardSquare[moveableCoordinate.getY()][moveableCoordinate.getX()].getChessman()
+												instanceof King) {
+											Coordinate[] checkResult = new Coordinate[1];
+											checkResult[0] = moveableCoordinate;
+											checkmateSquare.put(Direction.LEFT, checkResult);
+										}
+									}
+									break;
+								} else {
+									checkmateSquare.put(Direction.LEFT, moveableSquare.get(Direction.LEFT)); break;
+								}
 							case UP_LEFT : checkmateSquare.put(Direction.UP_LEFT, moveableSquare.get(Direction.UP_LEFT)); break;
 							case UP_RIGHT : checkmateSquare.put(Direction.UP_RIGHT, moveableSquare.get(Direction.UP_RIGHT)); break;
 							case DOWN_LEFT : checkmateSquare.put(Direction.DOWN_LEFT, moveableSquare.get(Direction.DOWN_LEFT)); break;
@@ -586,54 +653,73 @@ public class BoardPanel extends FlatPanel {
 							break;
 						}
 					} else {
-						if (selectedSquare.getChessman() instanceof Pawn
-								&& boardSquare[coordinate.getY()][coordinate.getX()].isContain())
-							break;
-
+//						if (selectedSquare.getChessman() instanceof Pawn
+//								&& boardSquare[coordinate.getY()][coordinate.getX()].isContain())
+//							break;
 					}
 				}
 			}
 		}
 		
 	}
-
-//	private void checkmateJudger(boolean isWhite, Coordinate[] moveableCoordinate) {
-//		for (Coordinate coordinate : moveableCoordinate) {
-//			if (coordinate != null) {
-//				// 이동경로의 좌표에 같은편이 있을때
-//				if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
-//						&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite) {
-//					System.out.println("경로에 같은 색 말이 있어요!" + isWhite);
-//					if (!(selectedSquare.getChessman() instanceof Knight))
+	
+//	private void checkmateRoute(boolean isWhite, Map<Direction, Coordinate[]> moveableSquare) {
+//		System.out.println("체크메이트 체커");
+////		for (Direction direction : moveableSquare.keySet()) {
+////			checkmateJudger(isWhite, moveableSquare.get(direction));
+////		}
+//		for (Direction direction : moveableSquare.keySet()) {
+//			for (Coordinate coordinate : moveableSquare.get(direction)) {
+//				if (coordinate != null) {
+//					// 이동경로의 좌표에 같은편이 있을때
+//					if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
+//							&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() != isWhite) {
+//						System.out.println("경로에 같은 색 말이 있어요!" + isWhite);
 //						break;
-//					// 선택된 말이 나이트이고 이동경로에 적군이있을때
-//				} else if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
-//						&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == isWhite
-//						&& selectedSquare.getChessman() instanceof Knight) {
-//					if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King)
-//						System.out.println("체크메이트!1");
+////						if (!(selectedSquare.getChessman() instanceof Knight))
+////							break;
+//						// 선택된 말이 나이트이고 이동경로에 적군이있을때
+////					} else if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
+////							&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == isWhite
+////							&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof Knight) {
+////						if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King)
+////							System.out.println("나이트 체크메이트!!!");
 //
-//				} else if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
-//						&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == isWhite) {
+//					} else if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
+//							&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == isWhite) {
 //
-//					if (selectedSquare.getChessman() instanceof Pawn)
-//						break;
-//					
-//					if(!(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King)) {
-//						System.out.println("앞에 기물이 있네요!2");
-//						break;
-//					} else if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King) {
-//						System.out.println("체크메이트!3");
-//						break;
+////						if (selectedSquare.getChessman() instanceof Pawn)
+////							break;
+//						
+//						if(!(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King)) {
+//							System.out.println("앞에 기물이 있네요!2");
+//							break;
+//						} else if(boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King) {
+//							System.out.println("체크메이트!3");
+//							System.out.println(direction.name());
+//							/*테스트 문구 흠흠?*/
+//							switch(direction) {
+//							/*knight로 인해 수정중....*/
+//							case UP : checkmateSquare.put(Direction.UP, moveableSquare.get(Direction.UP)); break;
+//							case DOWN : checkmateSquare.put(Direction.DOWN, moveableSquare.get(Direction.DOWN)); break;
+//							case LEFT : checkmateSquare.put(Direction.LEFT, moveableSquare.get(Direction.LEFT)); break;
+//							case RIGHT : checkmateSquare.put(Direction.RIGHT, moveableSquare.get(Direction.RIGHT)); break;
+//							case UP_LEFT : checkmateSquare.put(Direction.UP_LEFT, moveableSquare.get(Direction.UP_LEFT)); break;
+//							case UP_RIGHT : checkmateSquare.put(Direction.UP_RIGHT, moveableSquare.get(Direction.UP_RIGHT)); break;
+//							case DOWN_LEFT : checkmateSquare.put(Direction.DOWN_LEFT, moveableSquare.get(Direction.DOWN_LEFT)); break;
+//							case DOWN_RIGHT : checkmateSquare.put(Direction.DOWN_RIGHT, moveableSquare.get(Direction.DOWN_RIGHT)); break;
+//								default : break;
+//							}
+//							break;
+//						}
+//					} else {
+////						if (selectedSquare.getChessman() instanceof Pawn
+////								&& boardSquare[coordinate.getY()][coordinate.getX()].isContain())
+////							break;
 //					}
-//
-//				} else {
-//					if (selectedSquare.getChessman() instanceof Pawn
-//							&& boardSquare[coordinate.getY()][coordinate.getX()].isContain())
-//						break;
-//
 //				}
 //			}
 //		}
+//		
 //	}
 }
