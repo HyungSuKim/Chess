@@ -112,7 +112,7 @@ public class BoardPanel extends FlatPanel {
 					/* 체크메이트 테스팅 코드 */
 					if ((boardSquare[y][x].getChessman() instanceof King
 							&& !((King) boardSquare[y][x].getChessman()).isMoved())) {
-						kingCastlingChecker(boardSquare[y][x].getChessman().isWhite(), x, y);
+						kingCastlingChecker(boardSquare[y][x].getChessman().isWhite());
 						if (!kingCastlingSquare.isEmpty()) {
 							for (BoardSquare square : kingCastlingSquare) {
 								square.setSquareCastlingColor();
@@ -140,33 +140,29 @@ public class BoardPanel extends FlatPanel {
 						enPassantSquare.setSquareOriginalColor();
 					}
 					/* 체크메이트 테스트 */
-					if (!checkmateSquare.isEmpty()) {
-						for (Direction direction : checkmateSquare.keySet()) {							
-							for (Coordinate coordinate : checkmateSquare.get(direction)) {
-								if (coordinate != null)
-								if (Coordinate.isValidate(coordinate.getX(), coordinate.getY()))
-									boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
-							}
-						}
-					}
+					initCheckmateSquare();
 					/* 체크메이트 테스트 */
 
 				} else {
 					// 이동경로로 이동했을 때
 					isWhite = !isWhite;
 					if (boardSquare[y][x].getChessman() != null) {
+//						잡 았을때 잡힌말을 추후에 CurrentChessmanView에 적용 시키기위해 테스트 하던 부분
+//						문제는 앙파상을 하는경우에 잡힌 폰이 표시되지 않는 다는 것과 캐슬링을 하는 경우 Rook이 잡힌걸로 표시된다는 것이다.
+//						그래서 움직임이 끝날때마다 각 말을 세어줄까... 생각은 하고있는데 아직 미정이다.
 						System.out.println(boardSquare[y][x].getChessman().getChessmanType().name());
 					}
 
 					if (selectedSquare.getChessman() instanceof King && kingCastlingSquare.size() != 0) {
 						kingCastling(selectedSquare.getChessman().isWhite(), x, y);
-
+//						앙파상이 활성화 되어있는 상태에서 앙파상을 하지않고 캐슬링을 했을 때 
 						for (BoardSquare square : kingCastlingSquare) {
 							square.setSquareOriginalColor();
 						}
 						kingCastlingSquare.clear();
 						enPassantSquare = null;
 					} else {
+//						앙파상이 활성화 된 곳으로 이동을 하지 않았을 때
 						boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
 						if (!(boardSquare[y][x].getChessman() instanceof Pawn))
 							enPassantSquare = null;
@@ -176,14 +172,9 @@ public class BoardPanel extends FlatPanel {
 						pawnAttack(x, y);
 						pawnEnPassant(x, y);
 					}
-
-					if (!checkmateSquare.isEmpty()) {
-						for (Direction direction : checkmateSquare.keySet())
-							for (Coordinate coordinate : checkmateSquare.get(direction))
-								if(coordinate != null)
-								boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
-						checkmateSquare.clear();
-					}
+					
+					initCheckmateSquare();
+					checkmateSquare.clear();
 
 					if (boardSquare[y][x].getChessman() instanceof King) {
 						((King) boardSquare[y][x].getChessman()).setIsMoved();
@@ -204,6 +195,15 @@ public class BoardPanel extends FlatPanel {
 			}
 		});
 		return boardSquare[y][x];
+	}
+	
+	private void initCheckmateSquare() {
+		if (!checkmateSquare.isEmpty()) {
+			for (Direction direction : checkmateSquare.keySet())
+				for (Coordinate coordinate : checkmateSquare.get(direction))
+					if(coordinate != null)
+					boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
+		}
 	}
 
 	private void pawnAttack(int x, int y) {
@@ -301,7 +301,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	private void kingCastlingChecker(boolean isWhite, int x, int y) {
+	private void kingCastlingChecker(boolean isWhite) {
 		kingCastlingSquare.clear();
 		if (isWhite) {
 			if (!boardSquare[0][5].isContain() && !boardSquare[0][6].isContain() && boardSquare[0][7].isContain()
@@ -338,48 +338,43 @@ public class BoardPanel extends FlatPanel {
 		if (isWhite) {
 			if (selectedSquare.getChessman() instanceof King && selectedSquare.getChessman().isWhite()
 					&& (x == 7 && y == 0)) {
-				((King) selectedSquare.getChessman()).setIsMoved();
-				((Rook) boardSquare[y][x].getChessman()).setIsMoved();
-				if(boardSquare[0][6].getBackground().equals(Color.GREEN)) boardSquare[0][6].setSquareOriginalColor();
-				boardSquare[0][6].setChessmanOnSquare(selectedSquare.getChessman());
-				selectedSquare.removeChessmanFromSquare();
-				boardSquare[0][5].setChessmanOnSquare(boardSquare[y][x].getChessman());
-				boardSquare[y][x].removeChessmanFromSquare();
+				kingCastlingOperator(x, y);
 			} else if (selectedSquare.getChessman() instanceof King && selectedSquare.getChessman().isWhite()
 					&& (x == 0 && y == 0)) {
-				((King) selectedSquare.getChessman()).setIsMoved();
-				((Rook) boardSquare[y][x].getChessman()).setIsMoved();
-				if(boardSquare[0][2].getBackground().equals(Color.GREEN)) boardSquare[0][2].setSquareOriginalColor();
-				boardSquare[0][2].setChessmanOnSquare(selectedSquare.getChessman());
-				selectedSquare.removeChessmanFromSquare();
-				boardSquare[0][3].setChessmanOnSquare(boardSquare[y][x].getChessman());
-				boardSquare[y][x].removeChessmanFromSquare();
+				kingCastlingOperator(x, y);
 			} else {
 				boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
 			}
 		} else {
 			if (selectedSquare.getChessman() instanceof King && !selectedSquare.getChessman().isWhite()
 					&& (x == 7 && y == 7)) {
-				((King) selectedSquare.getChessman()).setIsMoved();
-				((Rook) boardSquare[y][x].getChessman()).setIsMoved();
-				if(boardSquare[7][6].getBackground().equals(Color.GREEN)) boardSquare[7][6].setSquareOriginalColor();
-				boardSquare[7][6].setChessmanOnSquare(selectedSquare.getChessman());
-				selectedSquare.removeChessmanFromSquare();
-				boardSquare[7][5].setChessmanOnSquare(boardSquare[y][x].getChessman());
-				boardSquare[y][x].removeChessmanFromSquare();
+				kingCastlingOperator(x, y);
 			} else if (selectedSquare.getChessman() instanceof King && !selectedSquare.getChessman().isWhite()
 					&& (x == 0 && y == 7)) {
-				((King) selectedSquare.getChessman()).setIsMoved();
-				((Rook) boardSquare[y][x].getChessman()).setIsMoved();
-				if(boardSquare[7][2].getBackground().equals(Color.GREEN)) boardSquare[7][2].setSquareOriginalColor();
-				boardSquare[7][2].setChessmanOnSquare(selectedSquare.getChessman());
-				selectedSquare.removeChessmanFromSquare();
-				boardSquare[7][3].setChessmanOnSquare(boardSquare[y][x].getChessman());
-				boardSquare[y][x].removeChessmanFromSquare();
+				kingCastlingOperator(x, y);
 			} else {
 				boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
 			}
 		}
+	}
+	
+	public void kingCastlingOperator(int x, int y) {
+		((King) selectedSquare.getChessman()).setIsMoved();
+		((Rook) boardSquare[y][x].getChessman()).setIsMoved();
+		
+		if(x==0) {
+			if(boardSquare[y][x+2].getBackground().equals(Color.GREEN)) boardSquare[y][x+2].setSquareOriginalColor();
+			boardSquare[y][x+2].setChessmanOnSquare(selectedSquare.getChessman());
+			selectedSquare.removeChessmanFromSquare();
+			boardSquare[y][x+3].setChessmanOnSquare(boardSquare[y][x].getChessman());
+		} else if(x==7) {
+			if(boardSquare[y][x-1].getBackground().equals(Color.GREEN)) boardSquare[y][x-1].setSquareOriginalColor();
+			boardSquare[y][x-1].setChessmanOnSquare(selectedSquare.getChessman());
+			selectedSquare.removeChessmanFromSquare();
+			boardSquare[y][x-2].setChessmanOnSquare(boardSquare[y][x].getChessman());
+		}
+		
+		boardSquare[y][x].removeChessmanFromSquare();
 	}
 
 	public void initSquareEvent(boolean isWhite) {
