@@ -17,7 +17,6 @@ public class MoveableRouteCalculator {
 	public static Map<Direction, Coordinate[]> selectChessman(Chessman chessman, int x, int y) {
 		selectedChessman = chessman;
 		Map<Direction, Coordinate[]> moveableRoute = new HashMap<>();
-		System.out.println(chessman.getMoveableSquareCount());
 		int moveableSquareCount = chessman.getMoveableSquareCount();
 		for (Direction direction : chessman.getDirection()) {
 			switch (direction) {
@@ -74,7 +73,6 @@ public class MoveableRouteCalculator {
 		moveableSquareCount = upSquareCountConverter(moveableSquareCount, y);
 
 		if (selectedChessman instanceof Knight && moveableSquareCount != 0 && moveableSquareCount != 1) {
-			System.out.println("URCx : " + x + " y : " + y + " msc : " + moveableSquareCount);
 			Coordinate[] availCoordinate = new Coordinate[2];
 			availCoordinate[0] = leftRouteCalculator(1, x, y + moveableSquareCount - 1)[0];
 			availCoordinate[1] = rightRouteCalculator(1, x, y + moveableSquareCount - 1)[0];
@@ -97,7 +95,6 @@ public class MoveableRouteCalculator {
 		moveableSquareCount = downSquareCountConverter(moveableSquareCount, y);
 
 		if (selectedChessman instanceof Knight && moveableSquareCount != 0 && moveableSquareCount != 1) {
-			System.out.println("DRCx : " + x + " y : " + y + " msc : " + moveableSquareCount);
 			Coordinate[] availCoordinate = new Coordinate[2];
 			availCoordinate[0] = leftRouteCalculator(1, x, (y - moveableSquareCount + 1))[0];
 			availCoordinate[1] = rightRouteCalculator(1, x, (y - moveableSquareCount + 1))[0];
@@ -125,7 +122,6 @@ public class MoveableRouteCalculator {
 		}
 
 		if (selectedChessman instanceof Knight && moveableSquareCount != 0 && moveableSquareCount != 1) {
-			System.out.println("LRCx : " + x + " y : " + y + " msc : " + moveableSquareCount);
 			Coordinate[] availCoordinate = new Coordinate[2];
 			availCoordinate[0] = upRouteCalculator(1, x - moveableSquareCount + 1, y)[0];
 			availCoordinate[1] = downRouteCalculator(1, x - moveableSquareCount + 1, y)[0];
@@ -149,13 +145,10 @@ public class MoveableRouteCalculator {
 			moveableSquareCount = 0;
 		} else if ((moveableSquareCount == -1 || moveableSquareCount > Coordinate.getMaximumX() - x)
 				&& !(selectedChessman instanceof Knight)) {
-			System.out.println("RRCmsc셋팅전 : " + moveableSquareCount);
 			moveableSquareCount = Coordinate.getMaximumX() - x;
-			System.out.println("RRCmsc셋팅후 : " + moveableSquareCount);
 		}
 
 		if (selectedChessman instanceof Knight && moveableSquareCount != 0 && moveableSquareCount != 1) {
-			System.out.println("RRCx : " + x + " y : " + y + " msc : " + moveableSquareCount);
 			Coordinate[] availCoordinate = new Coordinate[2];
 			availCoordinate[0] = upRouteCalculator(1, x + moveableSquareCount - 1, y)[0];
 			availCoordinate[1] = downRouteCalculator(1, x + moveableSquareCount - 1, y)[0];

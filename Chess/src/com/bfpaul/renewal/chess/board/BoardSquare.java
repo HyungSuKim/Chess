@@ -30,7 +30,6 @@ public class BoardSquare extends FlatImagePanel {
 	// 가지고있는 체스말이 없으면 체스말을 네모칸위에 올려준다.
 	public void setChessmanOnSquare(Chessman chessman) {
 		if(getBackground().equals(Color.GREEN) && chessman instanceof King) {
-			System.out.println("체크메이트 된 칸으로 옮길수 없어요");
 		} else {
 			this.chessman = chessman;
 			isContain = true;
