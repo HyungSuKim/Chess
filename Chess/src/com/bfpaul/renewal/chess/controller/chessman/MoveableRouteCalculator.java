@@ -84,7 +84,8 @@ public class MoveableRouteCalculator {
 				if (Coordinate.isValidate(x, (y + count))) {
 				availCoordinate[count - 1] = new Coordinate(x, (y + count));
 				} else {
-					availCoordinate[count - 1] = null;
+//					availCoordinate[count - 1] = null;
+					availCoordinate[count - 1] = new Coordinate(x, y);
 				}
 			}
 			return availCoordinate;

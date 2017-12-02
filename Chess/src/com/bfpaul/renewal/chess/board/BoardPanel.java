@@ -48,12 +48,22 @@ public class BoardPanel extends FlatPanel {
 
 		for (int y = 8; y > 0; y--) {
 			for (int x = 0; x < 8; x++) {
-				add(createBoardSquare(x, (y - 1)), createMatchParentConstraints(1));
+				createBoardSquare(x, (y - 1));
+				add(boardSquare[y-1][x], createMatchParentConstraints(1));
 			}
 		}
+		
+//		for (int y = 0; y < 8; y++) {
+//			for(int x = 0; x < 8; x++) {
+//				add(boardSquare[y][x], createMatchParentConstraints(1));
+//			}
+//		}
+		
+		
 		setWholeChessmanOnBoard();
 		disableSquareClickEvent();
 		ableSquareClickEvent(isWhite);
+		
 	}
 
 	// 입력된 무게와 부모의 크기만큼 영역을 차지하는 제약조건을 생성하여 반환한다.
@@ -417,7 +427,7 @@ public class BoardPanel extends FlatPanel {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-//			setPawnOnBoard(ChessmanType.PAWN);
+			setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}

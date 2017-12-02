@@ -11,19 +11,19 @@ import com.mommoo.flat.image.FlatImagePanel;
 import com.mommoo.flat.image.ImageOption;
 import com.mommoo.flat.layout.linear.LinearLayout;
 
-// 체스판의 하나의 네모칸으로써 체스말의 이동경로나 체스말을 놓거나 치우거나 하는 이벤트가 표현되는 가장 작은단위의 칸이다.
+// 체스판의 하나의 칸을 표현해주는 데이터이자 뷰로써
 @SuppressWarnings("serial")
 public class BoardSquare extends FlatImagePanel {
-	private final Color originalColor;
+	private final Color ORIGINAL_COLOR;
 	private Chessman chessman;
 	private boolean isContain;
 
 	BoardSquare(Color originalColor) {
-		this.originalColor = originalColor;
+		ORIGINAL_COLOR = originalColor;
 		setEnableClickEvent(false);
 		setLayout(new LinearLayout(0));
 		setOpaque(true);
-		setBackground(originalColor);
+		setBackground(ORIGINAL_COLOR);
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 	}
 
@@ -39,7 +39,7 @@ public class BoardSquare extends FlatImagePanel {
 	}
 
 	void setSquareOriginalColor() {
-		setBackground(originalColor);
+		setBackground(ORIGINAL_COLOR);
 		setAlpha(1.0f);
 		if (isContain) {
 			setEnableClickEvent(true);
