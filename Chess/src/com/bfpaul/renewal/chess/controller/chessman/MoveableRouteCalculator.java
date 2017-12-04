@@ -14,6 +14,42 @@ public class MoveableRouteCalculator {
 
 	private MoveableRouteCalculator() {
 	}
+	
+//	public static ArrayList<Route> selectChessman(Chessman chessman, int x, int y) {
+//		initCoordinate = new Coordinate(x, y);
+//		selectedChessman = chessman;
+//		ArrayList<Route> moveableRoute = new ArrayList<>();
+//		int moveableSquareCount = chessman.getMoveableSquareCount();
+//		for (Direction direction : chessman.getDirection()) {
+//			switch (direction) {
+//			case UP:
+//				moveableRoute.add(new Route(Direction.UP, upRouteCalculator(moveableSquareCount, x, y)));
+//				break;
+//			case DOWN:
+//				moveableRoute.add(new Route(Direction.DOWN, downRouteCalculator(moveableSquareCount, x, y)));
+//				break;
+//			case LEFT:
+//				moveableRoute.add(new Route(Direction.LEFT, leftRouteCalculator(moveableSquareCount, x, y)));
+//				break;
+//			case RIGHT:
+//				moveableRoute.add(new Route(Direction.RIGHT, rightRouteCalculator(moveableSquareCount, x, y)));
+//				break;
+//			case UP_LEFT:
+//				moveableRoute.add(new Route(Direction.UP_LEFT, upLeftRouteCalculator(moveableSquareCount, x, y)));
+//				break;
+//			case UP_RIGHT:
+//				moveableRoute.add(new Route(Direction.UP_RIGHT, upRightRouteCalculator(moveableSquareCount, x, y)));
+//				break;
+//			case DOWN_LEFT:
+//				moveableRoute.add(new Route(Direction.DOWN_LEFT, downLeftRouteCalculator(moveableSquareCount, x, y)));
+//				break;
+//			case DOWN_RIGHT:
+//				moveableRoute.add(new Route(Direction.DOWN_RIGHT, downRightRouteCalculator(moveableSquareCount, x, y)));
+//				break;
+//			}
+//		}
+//		return moveableRoute;
+//	}
 
 	public static Map<Direction, Coordinate[]> selectChessman(Chessman chessman, int x, int y) {
 		initCoordinate = new Coordinate(x, y);

@@ -46,7 +46,7 @@ public class BoardPanel extends FlatPanel {
 	// 체스 판의 하나하나의 square로써 체스말을 놓아준다던가 체스말을 제외해준다거나 이동가능범위를 표현해줄 최소단위의 칸이다.
 	private BoardSquare[][] boardSquare = new BoardSquare[8][8];
 	private BoardSquare selectedSquare = null;
-	private Map<Direction, Coordinate[]> moveableSquare;
+	private Map<Direction, Coordinate[]> moveableSquare = new HashMap<>();
 	boolean isWhite = true;
 
 	// 캐슬링 관련
@@ -159,7 +159,7 @@ public class BoardPanel extends FlatPanel {
 				} else {
 					// 이동경로로 이동했을 때
 					isWhite = !isWhite;
-					if (boardSquare[y][x].getChessman() != null) {
+					if (boardSquare[y][x].isContain()) {
 						// 잡 았을때 잡힌말을 추후에 CurrentChessmanView에 적용 시키기위해 테스트 하던 부분
 						// 문제는 앙파상을 하는경우에 잡힌 폰이 표시되지 않는 다는 것과 캐슬링을 하는 경우 Rook이 잡힌걸로 표시된다는 것이다.
 						// 그래서 움직임이 끝날때마다 각 말을 세어줄까... 생각은 하고있는데 아직 미정이다.
@@ -207,7 +207,6 @@ public class BoardPanel extends FlatPanel {
 		if (!checkmateSquare.isEmpty()) {
 			for (Direction direction : checkmateSquare.keySet())
 				for (Coordinate coordinate : checkmateSquare.get(direction))
-//					if (coordinate != null)
 						boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
 		}
 	}
@@ -344,7 +343,6 @@ public class BoardPanel extends FlatPanel {
 	private void disableMoveableSquare() {
 		for (Direction direction : moveableSquare.keySet()) {
 			for (Coordinate coordinate : moveableSquare.get(direction)) {
-//				if(coordinate != null)
 				boardSquare[coordinate.getY()][coordinate.getX()].setSquareOriginalColor();
 			}
 		}
@@ -406,7 +404,6 @@ public class BoardPanel extends FlatPanel {
 	private void checkmateRoute(BoardSquare checkingSquare, Map<Direction, Coordinate[]> moveableSquare) {
 		for (Direction direction : moveableSquare.keySet()) {
 			for (Coordinate coordinate : moveableSquare.get(direction)) {
-//				if(coordinate != null)
 				if (boardSquare[coordinate.getY()][coordinate.getX()].isContain()
 						&& boardSquare[coordinate.getY()][coordinate.getX()].getChessman().isWhite() == checkingSquare
 								.getChessman().isWhite()) {
