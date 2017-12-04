@@ -16,7 +16,7 @@ import java.awt.Image;
  * 				UP의 경우 UP_LEFT, UP_RIGHT로 / DOWN의 경우 DOWN_LEFT, DOWN_RIGHT로
  * 				LEFT의 경우 UP_LEFT, DOWN_LEFT로 / RIGHT의 경우 UP_RIGHT로 DOWN_RIGHT로 1칸 이동한다.
  */
-public class Knight implements Chessman {
+public class Knight extends Chessman {
 	
 	private final boolean IS_WHITE;
 	

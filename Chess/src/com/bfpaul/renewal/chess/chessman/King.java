@@ -7,7 +7,7 @@ import java.awt.Image;
  * 
  * isMoved 추후 king과 rook의 캐슬링을 구현하기 위한 속성
  */
-public class King implements Chessman {
+public class King extends Chessman {
 	
 	private final boolean IS_WHITE;
 	private boolean isMoved;

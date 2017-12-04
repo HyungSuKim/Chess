@@ -7,7 +7,7 @@ import java.awt.Image;
  * 
  * moveableSquareCount() { return -1 } : Queen의 움직임은 칸수의 제한이 없음을 표현하고자 했다.
  */
-public class Queen implements Chessman {
+public class Queen extends Chessman {
 	
 	private final boolean IS_WHITE;
 	

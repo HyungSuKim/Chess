@@ -7,7 +7,7 @@ import java.awt.Image;
  * 
  * isMoved : Pawn은 첫 움직임이 있기전 2칸을 움직일 수 있다는 것을 표현하기위한 변수
  */
-public class Pawn implements Chessman {
+public class Pawn extends Chessman {
 	private final boolean IS_WHITE;
 	private boolean isMoved;
 	

@@ -8,15 +8,15 @@ import java.awt.Image;
  * 
  * MOVEABLE_SQUARE_COUNT : -1 -> 이동가능한 칸의 수가 정해지지 않은 말들 (Queen, Bishop, Rook)
  */
-public interface Chessman {
+public abstract class Chessman {
 	
-	Direction[] getDirection();
+	public abstract Direction[] getDirection();
 	
-	boolean isWhite();
+	public abstract boolean isWhite();
 	
-	int getMoveableSquareCount();
+	public abstract int getMoveableSquareCount();
 	
-	Image getChessmanImage();
+	public abstract Image getChessmanImage();
 	
-	ChessmanType getChessmanType();
+	public abstract ChessmanType getChessmanType();
 }

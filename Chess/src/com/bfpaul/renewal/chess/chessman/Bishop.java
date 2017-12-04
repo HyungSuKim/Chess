@@ -7,7 +7,7 @@ import java.awt.Image;
  * 
  * moveableSquareCount() { return -1 } : Bishop의 움직임은 칸수의 제한이 없음을 표현하고자 했다.
  */
-public class Bishop implements Chessman {
+public class Bishop extends Chessman {
 	
 	private final boolean IS_WHITE;
 	
