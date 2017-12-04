@@ -9,12 +9,14 @@ import com.bfpaul.renewal.chess.chessman.Knight;
 import com.bfpaul.renewal.chess.controller.Coordinate;
 
 public class MoveableRouteCalculator {
+	private static Coordinate initCoordinate;
 	private static Chessman selectedChessman;
 
 	private MoveableRouteCalculator() {
 	}
 
 	public static Map<Direction, Coordinate[]> selectChessman(Chessman chessman, int x, int y) {
+		initCoordinate = new Coordinate(x, y);
 		selectedChessman = chessman;
 		Map<Direction, Coordinate[]> moveableRoute = new HashMap<>();
 		int moveableSquareCount = chessman.getMoveableSquareCount();
@@ -53,7 +55,7 @@ public class MoveableRouteCalculator {
 		if (moveableSquareCount == 3 && moveableSquareCount - 1 > Coordinate.getMaximumY() - y) {
 			moveableSquareCount = 0;
 		} else if ((moveableSquareCount == -1 || moveableSquareCount > Coordinate.getMaximumY() - y)
-			&& !(selectedChessman instanceof Knight)) {
+				&& !(selectedChessman instanceof Knight)) {
 			moveableSquareCount = Coordinate.getMaximumY() - y;
 		}
 		return moveableSquareCount;
@@ -63,7 +65,7 @@ public class MoveableRouteCalculator {
 		if (moveableSquareCount == 3 && moveableSquareCount - 1 > y - Coordinate.getMinimumY()) {
 			moveableSquareCount = 0;
 		} else if ((moveableSquareCount == -1 || moveableSquareCount > y - Coordinate.getMinimumY())
-			&& !(selectedChessman instanceof Knight)) {
+				&& !(selectedChessman instanceof Knight)) {
 			moveableSquareCount = y - Coordinate.getMinimumY();
 		}
 		return moveableSquareCount;
@@ -78,14 +80,17 @@ public class MoveableRouteCalculator {
 			availCoordinate[1] = rightRouteCalculator(1, x, y + moveableSquareCount - 1)[0];
 			return availCoordinate;
 		} else {
-			if(moveableSquareCount == 0) { return new Coordinate[1]; }
+			if (moveableSquareCount == 0 && !(selectedChessman instanceof Knight)) {
+				Coordinate[] availCoordinate = new Coordinate[1];
+				availCoordinate[0] = initCoordinate;
+				return availCoordinate;
+			}
 			Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 			for (int count = 1; count <= moveableSquareCount; count++) {
 				if (Coordinate.isValidate(x, (y + count))) {
-				availCoordinate[count - 1] = new Coordinate(x, (y + count));
+					availCoordinate[count - 1] = new Coordinate(x, (y + count));
 				} else {
-//					availCoordinate[count - 1] = null;
-					availCoordinate[count - 1] = new Coordinate(x, y);
+					availCoordinate[count - 1] = initCoordinate;
 				}
 			}
 			return availCoordinate;
@@ -101,13 +106,17 @@ public class MoveableRouteCalculator {
 			availCoordinate[1] = rightRouteCalculator(1, x, (y - moveableSquareCount + 1))[0];
 			return availCoordinate;
 		} else {
-			if(moveableSquareCount == 0) { return new Coordinate[1]; }	
+			if (moveableSquareCount == 0 && !(selectedChessman instanceof Knight)) {
+				Coordinate[] availCoordinate = new Coordinate[1];
+				availCoordinate[0] = initCoordinate;
+				return availCoordinate; 
+			}
 			Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 			for (int count = 1; count <= moveableSquareCount; count++) {
 				if (Coordinate.isValidate(x, (y - count))) {
-				availCoordinate[count - 1] = new Coordinate(x, (y - count));
+					availCoordinate[count - 1] = new Coordinate(x, (y - count));
 				} else {
-					availCoordinate[count - 1] = null;
+					availCoordinate[count - 1] = initCoordinate;
 				}
 			}
 			return availCoordinate;
@@ -118,7 +127,7 @@ public class MoveableRouteCalculator {
 		if (moveableSquareCount == 3 && moveableSquareCount - 1 > x - Coordinate.getMinimumX()) {
 			moveableSquareCount = 0;
 		} else if ((moveableSquareCount == -1 || moveableSquareCount > x - Coordinate.getMinimumX())
-			&& !(selectedChessman instanceof Knight)) {
+				&& !(selectedChessman instanceof Knight)) {
 			moveableSquareCount = x - Coordinate.getMinimumX();
 		}
 
@@ -128,13 +137,17 @@ public class MoveableRouteCalculator {
 			availCoordinate[1] = downRouteCalculator(1, x - moveableSquareCount + 1, y)[0];
 			return availCoordinate;
 		} else {
-			if(moveableSquareCount == 0) { return new Coordinate[1]; }
+			if (moveableSquareCount == 0 && !(selectedChessman instanceof Knight)) {
+				Coordinate[] availCoordinate = new Coordinate[1];
+				availCoordinate[0] = initCoordinate;
+				return availCoordinate; 
+			}
 			Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 			for (int count = 1; count <= moveableSquareCount; count++) {
 				if (Coordinate.isValidate((x - count), y)) {
 					availCoordinate[count - 1] = new Coordinate((x - count), y);
 				} else {
-					availCoordinate[count - 1] = null;
+					availCoordinate[count - 1] = initCoordinate;
 				}
 			}
 			return availCoordinate;
@@ -155,13 +168,17 @@ public class MoveableRouteCalculator {
 			availCoordinate[1] = downRouteCalculator(1, x + moveableSquareCount - 1, y)[0];
 			return availCoordinate;
 		} else {
-			if(moveableSquareCount == 0) { return new Coordinate[1]; }
+			if (moveableSquareCount == 0 && !(selectedChessman instanceof Knight)) {
+				Coordinate[] availCoordinate = new Coordinate[1];
+				availCoordinate[0] = initCoordinate;
+				return availCoordinate;
+			}
 			Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 			for (int count = 1; count <= moveableSquareCount; count++) {
 				if (Coordinate.isValidate((x + count), y)) {
 					availCoordinate[count - 1] = new Coordinate((x + count), y);
 				} else {
-					availCoordinate[count - 1] = null;
+					availCoordinate[count - 1] = initCoordinate;
 				}
 			}
 			return availCoordinate;
@@ -171,12 +188,17 @@ public class MoveableRouteCalculator {
 	private static Coordinate[] upLeftRouteCalculator(int moveableSquareCount, int x, int y) {
 		moveableSquareCount = upSquareCountConverter(moveableSquareCount, y);
 
+		if (moveableSquareCount == 0) {
+			Coordinate[] availCoordinate = new Coordinate[1];
+			availCoordinate[0] = initCoordinate;
+			return availCoordinate; 
+		}
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
 			if (Coordinate.isValidate((x - count), (y + count))) {
 				availCoordinate[count - 1] = new Coordinate((x - count), (y + count));
 			} else {
-				availCoordinate[count - 1] = null;
+				availCoordinate[count - 1] = initCoordinate;
 			}
 		}
 		return availCoordinate;
@@ -185,12 +207,17 @@ public class MoveableRouteCalculator {
 	private static Coordinate[] upRightRouteCalculator(int moveableSquareCount, int x, int y) {
 		moveableSquareCount = upSquareCountConverter(moveableSquareCount, y);
 
+		if (moveableSquareCount == 0) {
+			Coordinate[] availCoordinate = new Coordinate[1];
+			availCoordinate[0] = initCoordinate;
+			return availCoordinate; 
+		}
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
 			if (Coordinate.isValidate((x + count), (y + count))) {
 				availCoordinate[count - 1] = new Coordinate((x + count), (y + count));
 			} else {
-				availCoordinate[count - 1] = null;
+				availCoordinate[count - 1] = initCoordinate;
 			}
 		}
 		return availCoordinate;
@@ -199,12 +226,17 @@ public class MoveableRouteCalculator {
 	private static Coordinate[] downLeftRouteCalculator(int moveableSquareCount, int x, int y) {
 		moveableSquareCount = downSquareCountConverter(moveableSquareCount, y);
 
+		if (moveableSquareCount == 0) {
+			Coordinate[] availCoordinate = new Coordinate[1];
+			availCoordinate[0] = initCoordinate;
+			return availCoordinate; 
+		}
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
 			if (Coordinate.isValidate((x - count), (y - count))) {
 				availCoordinate[count - 1] = new Coordinate((x - count), (y - count));
 			} else {
-				availCoordinate[count - 1] = null;
+				availCoordinate[count - 1] = initCoordinate;
 			}
 		}
 		return availCoordinate;
@@ -213,12 +245,17 @@ public class MoveableRouteCalculator {
 	private static Coordinate[] downRightRouteCalculator(int moveableSquareCount, int x, int y) {
 		moveableSquareCount = downSquareCountConverter(moveableSquareCount, y);
 
+		if (moveableSquareCount == 0) {
+			Coordinate[] availCoordinate = new Coordinate[1];
+			availCoordinate[0] = initCoordinate;
+			return availCoordinate; 
+		}
 		Coordinate[] availCoordinate = new Coordinate[moveableSquareCount];
 		for (int count = 1; count <= moveableSquareCount; count++) {
 			if (Coordinate.isValidate((x + count), (y - count))) {
 				availCoordinate[count - 1] = new Coordinate((x + count), (y - count));
 			} else {
-				availCoordinate[count - 1] = null;
+				availCoordinate[count - 1] = initCoordinate;
 			}
 		}
 		return availCoordinate;
