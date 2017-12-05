@@ -39,6 +39,7 @@ public class PawnPromotionSelectView {
 		frame.setTitleBarColor(Theme.TITLE_BAR_COLOR);
 		frame.getContainer().setBackground(Theme.DARK_BLUE_COLOR);
 		frame.getContainer().setLayout(new LinearLayout(10));
+		frame.setLocationOnScreenCenter();
 		return frame;
 	}
 	
