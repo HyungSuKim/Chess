@@ -69,6 +69,7 @@ public class BoardSquare extends FlatImagePanel {
 		if(getBackground().equals(Color.GREEN)) {
 			setBackground(Color.GREEN);
 			setEnableClickEvent(true);
+			setAlpha(0.6f);
 		} else {
 			setBackground(Theme.LIGHT_BLUE_COLOR);
 			setEnableClickEvent(true);
