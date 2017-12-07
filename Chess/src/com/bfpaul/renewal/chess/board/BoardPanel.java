@@ -109,8 +109,8 @@ public class BoardPanel extends FlatPanel {
 
 					selectedSquare = boardSquare[y][x];
 
-					moveHelper.moveableRoute = MoveableRouteCalculator.selectChessman(selectedSquare.getChessman(), x,
-							y);
+					moveHelper.setMoveableRoute(
+							MoveableRouteCalculator.selectChessman(selectedSquare.getChessman(), x, y));
 
 					selectedSquare.setSquareMoveableColor();
 
@@ -227,7 +227,7 @@ public class BoardPanel extends FlatPanel {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-			 setPawnOnBoard(ChessmanType.PAWN);
+			// setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
@@ -285,6 +285,10 @@ public class BoardPanel extends FlatPanel {
 	class MoveHelper {
 		private ArrayList<MoveableRoute> moveableRoute = new ArrayList<>();
 
+		private void setMoveableRoute(ArrayList<MoveableRoute> moveableRoute) {
+			this.moveableRoute = moveableRoute;
+		}
+
 		private void disableMoveableRoute() {
 			for (MoveableRoute moveableRoute : moveableRoute) {
 				for (Coordinate coordinate : moveableRoute.getCoordinates()) {
@@ -292,7 +296,7 @@ public class BoardPanel extends FlatPanel {
 				}
 			}
 		}
-		
+
 		private void showMoveableRoute(boolean isWhite) {
 			for (MoveableRoute moveableRoute : moveableRoute) {
 				checkSquaresIsContain(isWhite, moveableRoute.getCoordinates());
@@ -363,7 +367,6 @@ public class BoardPanel extends FlatPanel {
 		}
 
 		private void showPawnAttackableSquare(int x, int y) {
-			// pawnAtackableChecker(x, y);
 			if (!pawnAtackableSquare.isEmpty()) {
 				for (BoardSquare square : pawnAtackableSquare) {
 					square.setSquareAttackableColor();
@@ -384,20 +387,24 @@ public class BoardPanel extends FlatPanel {
 
 		private void checkPawnAtackableSquare(int x, int y) {
 			pawnAtackableSquare.clear();
-			if (isWhite && boardSquare[y][x].getChessman() instanceof Pawn) {
+			if (isWhite) {
+
 				if (Coordinate.isValidate(x + 1, y + 1))
 					if (boardSquare[y + 1][x + 1].isContain() && !boardSquare[y + 1][x + 1].getChessman().isWhite()) {
 						pawnAtackableSquare.add(boardSquare[y + 1][x + 1]);
 					}
+
 				if (Coordinate.isValidate(x - 1, y + 1))
 					if (boardSquare[y + 1][x - 1].isContain() && !boardSquare[y + 1][x - 1].getChessman().isWhite()) {
 						pawnAtackableSquare.add(boardSquare[y + 1][x - 1]);
 					}
-			} else if (!isWhite && boardSquare[y][x].getChessman() instanceof Pawn) {
+
+			} else {
 				if (Coordinate.isValidate(x - 1, y - 1))
 					if (boardSquare[y - 1][x - 1].isContain() && boardSquare[y - 1][x - 1].getChessman().isWhite()) {
 						pawnAtackableSquare.add(boardSquare[y - 1][x - 1]);
 					}
+
 				if (Coordinate.isValidate(x + 1, y - 1))
 					if (boardSquare[y - 1][x + 1].isContain() && boardSquare[y - 1][x + 1].getChessman().isWhite()) {
 						pawnAtackableSquare.add(boardSquare[y - 1][x + 1]);
@@ -419,25 +426,25 @@ public class BoardPanel extends FlatPanel {
 				}
 			}
 		}
-		
+
 		private void showCheckmateRouteOperation(int x, int y) {
 			if (selectedSquare.getChessman() instanceof King) { // 누른 말이 왕일때
 				boardSquare[y][x].setSquareCheckmateColor(); // 체크메이트 경로를 체크메이트 색으로 바꾸고
 				selectedSquare.setSquareMoveableCheckmateColor(); // 누른말의 왕은 움직일수있는 체크메이트 색으로 바꾼다.
-				
+
 			} else if (boardSquare[y][x].isContain() && boardSquare[y][x].getChessman() instanceof King) {
 				// 다른 말을 눌렀을 때
 				boardSquare[y][x].setSquareCheckmateColor();
-				
+
 			} else {
-				// 다른 말을 눌렀을 때 다른말의 이동경로가 체크에이트 경로와 같을 때				
+				// 다른 말을 눌렀을 때 다른말의 이동경로가 체크에이트 경로와 같을 때
 				if (boardSquare[y][x].getBackground().equals(Theme.LIGHT_BLUE_COLOR)) {
-						boardSquare[y][x].setSquareMoveableCheckmateColor();
+					boardSquare[y][x].setSquareMoveableCheckmateColor();
 				} else {
-				// 다른 말을 눌렀을 때 다른말의 이동경로가 체크에이트 경로와 다를 때
+					// 다른 말을 눌렀을 때 다른말의 이동경로가 체크에이트 경로와 다를 때
 					boardSquare[y][x].setSquareCheckmateColor();
 				}
-				
+
 			}
 		}
 
@@ -464,29 +471,44 @@ public class BoardPanel extends FlatPanel {
 		private void checkmateRoute(Chessman checkingChessman, ArrayList<MoveableRoute> moveableRoute) {
 			for (MoveableRoute route : moveableRoute) {
 				for (Coordinate coordinate : route.getCoordinates()) {
-					int x = coordinate.getX();
-					int y = coordinate.getY();
-
-					if (boardSquare[y][x].isContain()
-							&& boardSquare[y][x].getChessman().isWhite() != checkingChessman.isWhite()) {
-
-						if (boardSquare[y][x].getChessman() instanceof King) {
-							if (checkingChessman instanceof Knight) {
-								Coordinate[] checkmateCoordinate = new Coordinate[1];
-								checkmateCoordinate[0] = coordinate;
-								checkmateRoute.add(new MoveableRoute(route.getDirection(), checkmateCoordinate));
-								break;
-							} else {
-								checkmateRoute.add(new MoveableRoute(route.getDirection(), route.getCoordinates()));
-								break;
-							}
-						} else {
-							break;
-						}
-					}
+					if (!checkmateRouteOperator(checkingChessman, route, coordinate))
+						break;
 				}
 			}
 		}
+
+		private boolean checkmateRouteOperator(Chessman checkingChessman, MoveableRoute route, Coordinate coordinate) {
+			int x = coordinate.getX();
+			int y = coordinate.getY();
+
+			if (boardSquare[y][x].isContain()
+					&& boardSquare[y][x].getChessman().isWhite() != checkingChessman.isWhite()) {
+
+				return isEffectiveRoute(checkingChessman, route, coordinate);
+
+			} else {
+				return true;
+			}
+		}
+
+		private boolean isEffectiveRoute(Chessman checkingChessman, MoveableRoute route, Coordinate coordinate) {
+			if (boardSquare[coordinate.getY()][coordinate.getX()].getChessman() instanceof King) {
+				if (checkingChessman instanceof Knight) {
+					Coordinate[] checkmateCoordinate = new Coordinate[1];
+					checkmateCoordinate[0] = coordinate;
+					checkmateRoute.add(new MoveableRoute(route.getDirection(), checkmateCoordinate));
+					return true;
+
+				} else {
+					checkmateRoute.add(new MoveableRoute(route.getDirection(), route.getCoordinates()));
+					return true;
+				}
+
+			} else {
+				return false;
+			}
+		}
+
 	}
 
 	class EnPassantHelper {
@@ -560,7 +582,7 @@ public class BoardPanel extends FlatPanel {
 					}
 			}
 		}
-		
+
 		private boolean isSquareContainPawn(int x, int y) {
 			return (boardSquare[y][x].isContain() && boardSquare[y][x].getChessman() instanceof Pawn);
 		}
@@ -604,33 +626,43 @@ public class BoardPanel extends FlatPanel {
 			castlingSquare.clear();
 		}
 
+		private boolean isBetweenTwoSquareEmpty(int x, int y) {
+			return !boardSquare[y][x].isContain() && !boardSquare[y][x + 1].isContain();
+		}
+
+		private boolean isBetweenThreeSquareEmpty(int x, int y) {
+			return isBetweenTwoSquareEmpty(x, y) && !boardSquare[y][x + 2].isContain();
+		}
+
+		private boolean isSquareContainRook(int x, int y) {
+			return boardSquare[y][x].isContain() && boardSquare[y][x].getChessman() instanceof Rook;
+		}
+
 		// 캐슬링 관련
 		private void setCastlingSquare(boolean isWhite) {
 			castlingSquare.clear();
 			if (isWhite) {
-				if (!boardSquare[0][5].isContain() && !boardSquare[0][6].isContain() && boardSquare[0][7].isContain()
-						&& boardSquare[0][7].getChessman() instanceof Rook) {
+
+				if (isBetweenTwoSquareEmpty(5, 0) && isSquareContainRook(7, 0)) {
 					if (!((Rook) boardSquare[0][7].getChessman()).isMoved()) {
 						castlingSquare.add(boardSquare[0][7]);
 					}
 				}
 
-				if (!boardSquare[0][1].isContain() && !boardSquare[0][2].isContain() && !boardSquare[0][3].isContain()
-						&& boardSquare[0][0].isContain() && boardSquare[0][0].getChessman() instanceof Rook) {
+				if (isBetweenThreeSquareEmpty(1, 0) && isSquareContainRook(0, 0)) {
 					if (!((Rook) boardSquare[0][0].getChessman()).isMoved()) {
 						castlingSquare.add(boardSquare[0][0]);
 					}
 				}
 			} else {
-				if (!boardSquare[7][5].isContain() && !boardSquare[7][6].isContain() && boardSquare[7][7].isContain()
-						&& boardSquare[7][7].getChessman() instanceof Rook) {
+
+				if (isBetweenTwoSquareEmpty(5, 7) && isSquareContainRook(7, 7)) {
 					if (!((Rook) boardSquare[7][7].getChessman()).isMoved()) {
 						castlingSquare.add(boardSquare[7][7]);
 					}
 				}
 
-				if (!boardSquare[7][1].isContain() && !boardSquare[7][2].isContain() && !boardSquare[7][3].isContain()
-						&& boardSquare[7][0].isContain() && boardSquare[7][0].getChessman() instanceof Rook) {
+				if (isBetweenThreeSquareEmpty(1, 7) && isSquareContainRook(0, 7)) {
 					if (!((Rook) boardSquare[7][0].getChessman()).isMoved()) {
 						castlingSquare.add(boardSquare[7][0]);
 					}
