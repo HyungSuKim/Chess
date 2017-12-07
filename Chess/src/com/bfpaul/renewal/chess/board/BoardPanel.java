@@ -20,6 +20,7 @@ import com.bfpaul.renewal.chess.controller.MoveableRoute;
 import com.bfpaul.renewal.chess.controller.chessman.MoveableRouteCalculator;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
+import com.mommoo.flat.frame.FlatDialog;
 import com.mommoo.flat.layout.linear.constraints.LinearConstraints;
 import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 
@@ -105,91 +106,107 @@ public class BoardPanel extends FlatPanel {
 			public void onClick(Component component) {
 				// 처음눌렀을때
 				if (boardSquare[y][x].isContain() && selectedSquare == null) {
-					disableSquareClickEvent();
-
-					selectedSquare = boardSquare[y][x];
-
-					moveHelper.setMoveableRoute(
-							MoveableRouteCalculator.selectChessman(selectedSquare.getChessman(), x, y));
-
-					selectedSquare.setSquareMoveableColor();
-
-					if (selectedSquare.getChessman() instanceof Pawn) {
-						pawnAttackHelper.checkPawnAtackableSquare(x, y);
-						pawnAttackHelper.showPawnAttackableSquare(x, y);
-						enPassantHelper.checkShowEnPassantSquare(x, y);
-					}
-
-					moveHelper.showMoveableRoute(selectedSquare.getChessman().isWhite());
-					checkmateHelper.showCheckmateRoute();
-
-					if (selectedSquare.getChessman() instanceof King) {
-						castlingHelper.checkShowCastlingSquare(x, y);
-					}
+					selectChessman(x, y);
 
 				} else if (selectedSquare == boardSquare[y][x]) {
-					initSquareEvent(isWhite);
-
-					pawnAttackHelper.disablePawnAttackableSquare();
-
-					castlingHelper.cancelCastling();
-
-					enPassantHelper.cancelEnPassant();
-
-					checkmateHelper.disableCheckmateRoute();
+					deSelectChessman();
 
 				} else {
-					// 이동경로로 이동했을 때
-					isWhite = !isWhite;
-					if (boardSquare[y][x].isContain()) {
-						// 잡 았을때 잡힌말을 추후에 CurrentChessmanView에 적용 시키기위해 테스트 하던 부분
-						// 문제는 앙파상을 하는경우에 잡힌 폰이 표시되지 않는 다는 것과 캐슬링을 하는 경우 Rook이 잡힌걸로 표시된다는 것이다.
-						// 그래서 움직임이 끝날때마다 각 말을 세어줄까... 생각은 하고있는데 아직 미정이다.
-						System.out.println(boardSquare[y][x].getChessman().getChessmanType().name());
-					}
-
-					// 캐슬링 관련 & 앙파상 관련
-					if (selectedSquare.getChessman() instanceof King && castlingHelper.castlingSquare.size() != 0) {
-						castlingHelper.moveCastling(x, y);
-						enPassantHelper.initEnPassantSquare();
-					} else {
-						boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
-					}
-
-					if (boardSquare[y][x].getChessman() instanceof Pawn) {
-						pawnAttackHelper.pawnAttack(x, y);
-						enPassantHelper.moveEnPassant(x, y);
-						pawnAttackHelper.checkPawnAtackableSquare(x, y);
-					}
-
-					if (boardSquare[y][x].getChessman() instanceof King) {
-						((King) boardSquare[y][x].getChessman()).setIsMoved();
-					}
-
-					if (boardSquare[y][x].getChessman() instanceof Rook) {
-						((Rook) boardSquare[y][x].getChessman()).setIsMoved();
-					}
-
-					if (boardSquare[y][x].getChessman() instanceof Pawn && (y == 0 || y == 7)) {
-						new PawnPromotionSelectView(boardSquare[y][x]);
-					}
-
-					selectedSquare.removeChessmanFromSquare();
-
-					checkmateHelper.disableCheckmateRoute();
-
-					checkmateHelper.checkmateChecker(isWhite);
-
-					initSquareEvent(isWhite);
+					moveSelectedChessman(x, y);
 				}
 			}
 		});
 		return boardSquare[y][x];
 	}
+	
+	private void selectChessman(int x, int y) {
+		disableSquareClickEvent();
 
-	public void initSquareEvent(boolean isWhite) {
-		selectedSquare.setSquareOriginalColor();
+		selectedSquare = boardSquare[y][x];
+
+		moveHelper.setMoveableRoute(
+				MoveableRouteCalculator.selectChessman(selectedSquare.getChessman(), x, y));
+
+		selectedSquare.setSquareMoveableColor();
+
+		if (selectedSquare.getChessman() instanceof Pawn) {
+			pawnAttackHelper.checkPawnAtackableSquare(x, y);
+			pawnAttackHelper.showPawnAttackableSquare(x, y);
+			enPassantHelper.checkShowEnPassantSquare(x, y);
+		}
+
+		moveHelper.showMoveableRoute(selectedSquare.getChessman().isWhite());
+		checkmateHelper.showCheckmateRoute();
+
+		if (selectedSquare.getChessman() instanceof King) {
+			castlingHelper.checkShowCastlingSquare(x, y);
+		}
+	}
+	
+	private void deSelectChessman() {
 		moveHelper.disableMoveableRoute();
+		
+		initSquareEvent(isWhite);
+
+		pawnAttackHelper.disablePawnAttackableSquare();
+
+		castlingHelper.cancelCastling();
+
+		enPassantHelper.cancelEnPassant();
+
+		checkmateHelper.disableCheckmateRoute();
+	}
+	
+	private void moveSelectedChessman(int x, int y) {
+		// 이동경로로 이동했을 때
+		isWhite = !isWhite;
+		if (boardSquare[y][x].isContain()) {
+			// 잡 았을때 잡힌말을 추후에 CurrentChessmanView에 적용 시키기위해 테스트 하던 부분
+			// 문제는 앙파상을 하는경우에 잡힌 폰이 표시되지 않는 다는 것과 캐슬링을 하는 경우 Rook이 잡힌걸로 표시된다는 것이다.
+			// 그래서 움직임이 끝날때마다 각 말을 세어줄까... 생각은 하고있는데 아직 미정이다.
+			System.out.println(boardSquare[y][x].getChessman().getChessmanType().name());
+		}
+
+		// 캐슬링 관련 & 앙파상 관련
+		if (selectedSquare.getChessman() instanceof King && castlingHelper.castlingSquare.size() != 0) {
+			castlingHelper.moveCastling(x, y);
+			enPassantHelper.initEnPassantSquare();
+		} else {
+			boardSquare[y][x].setChessmanOnSquare(selectedSquare.getChessman());
+		}
+
+		if (boardSquare[y][x].getChessman() instanceof Pawn) {
+			pawnAttackHelper.pawnAttack(x, y);
+			enPassantHelper.moveEnPassant(x, y);
+			pawnAttackHelper.checkPawnAtackableSquare(x, y);
+		}
+
+		if (boardSquare[y][x].getChessman() instanceof King) {
+			((King) boardSquare[y][x].getChessman()).setIsMoved();
+		}
+
+		if (boardSquare[y][x].getChessman() instanceof Rook) {
+			((Rook) boardSquare[y][x].getChessman()).setIsMoved();
+		}
+
+		if (boardSquare[y][x].getChessman() instanceof Pawn && (y == 0 || y == 7)) {
+			new PawnPromotionSelectView(boardSquare[y][x]);
+		}
+
+		selectedSquare.removeChessmanFromSquare();
+
+		checkmateHelper.disableCheckmateRoute();
+
+		checkmateHelper.checkmateChecker(isWhite);
+		
+		moveHelper.disableMoveableRoute();
+
+		initSquareEvent(isWhite);
+	}
+	
+
+	private void initSquareEvent(boolean isWhite) {
+		selectedSquare.setSquareOriginalColor();
 		enableSquareClickEvent(isWhite);
 		selectedSquare = null;
 	}
@@ -197,7 +214,7 @@ public class BoardPanel extends FlatPanel {
 	// chessman(King, Queen, Bishop, Knight, Rook, Pawn)을 원하는 좌표값(x,y)의 square에
 	// 올려준다.
 	// 올려주는 역할을 BoardSquare class의 메서드를 이용해서 하는데 이를통해 원하는 로직을 따라서 체스말이 추가된다.
-	public void setChessmanOnSquare(Chessman chessman, int x, int y) {
+	private void setChessmanOnSquare(Chessman chessman, int x, int y) {
 		boardSquare[y][x].setChessmanOnSquare(chessman);
 	}
 
@@ -282,7 +299,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	class MoveHelper {
+	private class MoveHelper {
 		private ArrayList<MoveableRoute> moveableRoute = new ArrayList<>();
 
 		private void setMoveableRoute(ArrayList<MoveableRoute> moveableRoute) {
@@ -355,7 +372,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	class PawnAttackHelper {
+	private class PawnAttackHelper {
 		private ArrayList<BoardSquare> pawnAtackableSquare = new ArrayList<>(); // 내부클래스
 
 		private void disablePawnAttackableSquare() {
@@ -413,7 +430,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	class CheckmateHelper {
+	private class CheckmateHelper {
 		private ArrayList<MoveableRoute> checkmateRoute = new ArrayList<>();
 
 		private void showCheckmateRoute() {
@@ -497,6 +514,7 @@ public class BoardPanel extends FlatPanel {
 					Coordinate[] checkmateCoordinate = new Coordinate[1];
 					checkmateCoordinate[0] = coordinate;
 					checkmateRoute.add(new MoveableRoute(route.getDirection(), checkmateCoordinate));
+					
 					return true;
 
 				} else {
@@ -511,7 +529,7 @@ public class BoardPanel extends FlatPanel {
 
 	}
 
-	class EnPassantHelper {
+	private class EnPassantHelper {
 		private BoardSquare enPassantSquare = boardSquare[0][0];
 
 		private void initEnPassantSquare() {
@@ -588,7 +606,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	class CastlingHelper {
+	private class CastlingHelper {
 		// 캐슬링 관련
 		private ArrayList<BoardSquare> castlingSquare = new ArrayList<>(); // 내부클래스
 
@@ -604,9 +622,7 @@ public class BoardPanel extends FlatPanel {
 						square.setSquareCastlingColor();
 					}
 				}
-
 			}
-
 		}
 
 		private void cancelCastling() {

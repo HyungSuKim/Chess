@@ -24,4 +24,6 @@ public class Images {
 	public static final Image WHITE_KNIGHT = Toolkit.getDefaultToolkit().getImage("..\\Chess\\lib\\Image\\WhiteChessman\\White_Knight.png");
 	public static final Image WHITE_ROOK = Toolkit.getDefaultToolkit().getImage("..\\Chess\\lib\\Image\\WhiteChessman\\White_Rook.png");
 	public static final Image WHITE_PAWN = Toolkit.getDefaultToolkit().getImage("..\\Chess\\lib\\Image\\WhiteChessman\\White_Pawn.png");
+	
+	public static final Image CHECK = Toolkit.getDefaultToolkit().getImage("..\\Chess\\lib\\Image\\check.jpg");
 }
