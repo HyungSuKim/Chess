@@ -104,7 +104,7 @@ public class BoardSquare extends FlatImagePanel {
 	}
 
 	// 칸 위에 체스말이 있는지 없는지를 반환한다.
-	boolean isContain() {
+	boolean isContainChessman() {
 		return isContain;
 	}
 

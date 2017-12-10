@@ -16,8 +16,6 @@ public class MoveableRouteCalculator {
 	}
 	
 	public static ArrayList<MoveableRoute> selectChessman(Chessman chessman, int x, int y) {
-		System.out.println(x);
-		System.out.println(y);
 		initCoordinate = new Coordinate(x, y);
 		selectedChessman = chessman;
 		ArrayList<MoveableRoute> moveableRoute = new ArrayList<>();
@@ -60,7 +58,6 @@ public class MoveableRouteCalculator {
 				&& !(selectedChessman instanceof Knight)) {
 			moveableSquareCount = y - Coordinate.getMinimumY();
 		}
-		System.out.println(moveableSquareCount + "변환결과");
 		return moveableSquareCount;
 	}
 
@@ -71,19 +68,14 @@ public class MoveableRouteCalculator {
 				&& !(selectedChessman instanceof Knight)) {
 			moveableSquareCount = Coordinate.getMaximumY() - y;
 		}
-		System.out.println(moveableSquareCount + "변환결과");
 		return moveableSquareCount;
 	}
 
 	private static Coordinate[] upRouteCalculator(int moveableSquareCount, int x, int y) {
 		moveableSquareCount = upSquareCountConverter(moveableSquareCount, y);
-		System.out.println(moveableSquareCount);
 
 		if (selectedChessman instanceof Knight && moveableSquareCount != 0 && moveableSquareCount != 1) {
 			Coordinate[] availCoordinate = new Coordinate[2];
-			System.out.println(moveableSquareCount + "MSC");
-			System.out.println(x);
-			System.out.println(y);
 			availCoordinate[0] = leftRouteCalculator(1, x, y - moveableSquareCount + 1)[0];
 			availCoordinate[1] = rightRouteCalculator(1, x, y - moveableSquareCount + 1)[0];
 			return availCoordinate;
