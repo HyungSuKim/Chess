@@ -533,11 +533,36 @@ public class BoardPanel extends FlatPanel {
 		private void initEnPassantSquare() {
 			enPassantSquare = boardSquare[0][0];
 		}
+		
+		private boolean isEnPassantSquareEmpty() {
+			return enPassantSquare != boardSquare[0][0];
+		}
+		
+		private boolean isEnPassantMove(int x, int y) {
+			return isEnPassantSquareEmpty() && boardSquare[x][y] == enPassantSquare;
+		}
+		
+		private boolean isPawnMoveTwoSquares(int y) {
+			return Math.abs(initY - y) == 2;
+		}
+
+		
+		private boolean isAvailEnPassantCoordinate(int x, int y) {
+			return (Math.abs(enPassantX - x) == 1)	&& (Math.abs(enPassantY - y) == 0);
+		}
+		
+		private boolean isEnemyPawnContain(boolean isWhite, int x, int y) {
+			return isSquareContainPawn(x, y) && (boardSquare[x][y].getChessman().isWhite() != isWhite);
+		}
+
+		private boolean isSquareContainPawn(int x, int y) {
+			return (boardSquare[x][y].isContainChessman() && boardSquare[x][y].getChessman() instanceof Pawn);
+		}
 
 		private void checkShowEnPassantSquare(int x, int y) {
 			initY = y;
-			if (enPassantSquare != boardSquare[0][0] && boardSquare[x][y].getChessman() instanceof Pawn) {
-				if ((Math.abs(enPassantX - x) == 1)	&& (Math.abs(enPassantY - y) == 0)) {
+			if (isEnPassantSquareEmpty() && boardSquare[x][y].getChessman() instanceof Pawn) {
+				if (isAvailEnPassantCoordinate(x, y)) {
 					enPassantSquare.setSquareAttackableColor();
 				}
 			}
@@ -554,11 +579,11 @@ public class BoardPanel extends FlatPanel {
 				// 만약에 폰의 이동이 기존위치에서 차가 2일때 만 앙파상 체크를 한다... 하면 괜찮을거같은ㄷ?
 				((Pawn) boardSquare[x][y].getChessman()).setIsMoved();
 
-				if (Math.abs(initY - y) == 2) {
+				if (isPawnMoveTwoSquares(y)) {
 					setEnPassantSquare(boardSquare[x][y].getChessman().isWhite(), x, y);
 					return;
 
-				} else if (enPassantSquare != boardSquare[0][0] && boardSquare[x][y] == enPassantSquare) {
+				} else if (isEnPassantMove(x, y)) {
 					if (boardSquare[x][y].getChessman().isWhite()) {
 						boardSquare[x][y + 1].removeChessmanFromSquare();
 					} else {
@@ -580,31 +605,27 @@ public class BoardPanel extends FlatPanel {
 			if (isWhite) {
 				// boardSquare[y][x-1] 또는 boardSquare[y][x+1] 있는게 검정폰이냐? 를 검사하고
 				if (Coordinate.isValidate(x - 1, y))
-					if (isSquareContainPawn(x - 1, y) && !boardSquare[x - 1][y].getChessman().isWhite()) {
+					if (isEnemyPawnContain(isWhite, x - 1, y)) {
 						enPassantSquare = boardSquare[x][y + 1];
 					}
 				// 맞으면 boardSquare[y-1][x]를 앙파상 스퀘어에 저장
 				if (Coordinate.isValidate(x + 1, y))
-					if (isSquareContainPawn(x + 1, y) && !boardSquare[x + 1][y].getChessman().isWhite()) {
+					if (isEnemyPawnContain(isWhite, x + 1, y)) {	
 						enPassantSquare = boardSquare[x][y + 1];
 					}
 
 			} else {
 				// boardSquare[y][x-1] 또는 boardSquare[y][x+1] 있는게 흰색폰이냐? 를 검사하고
 				if (Coordinate.isValidate(x - 1, y))
-					if (isSquareContainPawn(x - 1, y) && boardSquare[x - 1][y].getChessman().isWhite()) {
+					if (isEnemyPawnContain(isWhite, x - 1, y)) {
 						enPassantSquare = boardSquare[x][y - 1];
 					}
 				// 맞으면 boardSquare[y+1][x]를 앙파상 스퀘어에 저장
 				if (Coordinate.isValidate(x + 1, y))
-					if (isSquareContainPawn(x + 1, y) && boardSquare[x + 1][y].getChessman().isWhite()) {
+					if (isEnemyPawnContain(isWhite, x + 1, y)) {
 						enPassantSquare = boardSquare[x][y - 1];
 					}
 			}
-		}
-
-		private boolean isSquareContainPawn(int x, int y) {
-			return (boardSquare[x][y].isContainChessman() && boardSquare[x][y].getChessman() instanceof Pawn);
 		}
 	}
 
