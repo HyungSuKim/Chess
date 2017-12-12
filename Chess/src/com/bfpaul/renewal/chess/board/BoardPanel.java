@@ -119,7 +119,6 @@ public class BoardPanel extends FlatPanel {
 	}
 
 	private void selectChessman(int x, int y) {
-		System.out.println("체스말을 선택했을때  x : " + x + "y :" + y);
 		disableSquareClickEvent(); // 초기에 말을 골랐을때 모든 칸의 클릭 이벤트를 풀고
 
 		selectedSquare = boardSquare[x][y]; // 그 눌린말의 스퀘어 정보를 선택된 스퀘어에 저장하고
@@ -158,7 +157,6 @@ public class BoardPanel extends FlatPanel {
 	}
 
 	private void moveSelectedChessman(int x, int y) {
-		System.out.println("체스말을 이동했을때  x : " + x + "y :" + y);
 		// 이동경로로 이동했을 때
 		isWhite = !isWhite; // 이동을 했을 때 움직인 색의 반대색으로 설정한다. 
 		if (boardSquare[x][y].isContainChessman()) {
@@ -178,8 +176,8 @@ public class BoardPanel extends FlatPanel {
 		}
 
 		if (selectedSquare.getChessman() instanceof Pawn) { // 선택된 말이 폰이면
-			pawnAttackHelper.pawnAttack(x, y); // 흠?
-			enPassantHelper.moveEnPassant(x, y); // 흠?
+			pawnAttackHelper.disablePawnAttackableSquare();
+			enPassantHelper.checkEnPassant(x, y); // 흠?
 		}
 
 		if (selectedSquare.getChessman() instanceof King) {
@@ -381,17 +379,6 @@ public class BoardPanel extends FlatPanel {
 				}
 			}
 		}
-
-		private void pawnAttack(int x, int y) {
-			if (selectedSquare.getChessman() instanceof Pawn && !pawnAttackableSquare.isEmpty()) {
-				for (BoardSquare square : pawnAttackableSquare) {
-					square.setSquareOriginalColor();
-				}
-				pawnAttackableSquare.clear();
-			} else {
-				boardSquare[x][y].setChessmanOnSquare(selectedSquare.getChessman());
-			}
-		}
 		
 		private boolean isEnemy(int x, int y) {
 			return boardSquare[x][y].isContainChessman() && (boardSquare[x][y].getChessman().isWhite() != isWhite);
@@ -427,6 +414,7 @@ public class BoardPanel extends FlatPanel {
 	private class CheckmateHelper {
 		private ArrayList<MoveableRoute> checkmateRouteList = new ArrayList<>();
 		private ArrayList<MoveableRoute> moveableRouteList = new ArrayList<>();
+		private BoardSquare pawnCheckmateSquare = boardSquare[0][0];
 
 		// 계산된 체크메이트 가능 경로를 보여주는 메서드로 왕을 선택했을때와 다른 말을 골랐을때로 분리한 이유는
 		// 왕은 계산된 경로로 이동이 가능해도 이동이 불가해야되고 다른말은 계산된 경로와 움직일 수 있는 경로가 겹칠경우
@@ -477,13 +465,27 @@ public class BoardPanel extends FlatPanel {
 
 			for (int y = 0; y < 8; y++) {
 				for (int x = 0; x < 8; x++) {
-					if (isEnemy(x, y)) {
+					if (isEnemy(x, y) && !(boardSquare[x][y].getChessman() instanceof Pawn)) {
 						Chessman enemyChessman = boardSquare[x][y].getChessman();
 						moveableRouteList = MoveableRouteCalculator.selectChessman(enemyChessman, x, y);
 						checkEnemyCheckmateRoute();
+					} else if ((isEnemy(x, y) && boardSquare[x][y].getChessman() instanceof Pawn)) {
+						pawnAttackHelper.checkPawnAttackableSquare(x, y);
+						setPawnCheckmateSquare();
 					}
 				} // end of for x
 			} // end of for y
+		}
+		
+		private void setPawnCheckmateSquare() {
+			if(!pawnAttackHelper.pawnAttackableSquare.isEmpty()) {
+				for(BoardSquare boardSquare : pawnAttackHelper.pawnAttackableSquare) {
+					if(boardSquare.getChessman().isWhite() != isWhite && boardSquare.getChessman() instanceof King) {
+						pawnCheckmateSquare = boardSquare;
+						System.out.println("호이호이");
+					}
+				}
+			}
 		}
 
 		// 선택된 칸의 체스말이 적군인지 아닌지 검사한다.
@@ -573,8 +575,19 @@ public class BoardPanel extends FlatPanel {
 				enPassantSquare.setSquareOriginalColor();
 			}
 		}
-
+		
 		private void moveEnPassant(int x, int y) {
+			if (isEnPassantMove(x, y)) {
+				if (boardSquare[x][y].getChessman().isWhite()) {
+					boardSquare[x][y + 1].removeChessmanFromSquare();
+				} else {
+					boardSquare[x][y - 1].removeChessmanFromSquare();
+				}
+
+			}
+		}
+
+		private void checkEnPassant(int x, int y) {
 			if (boardSquare[x][y].getChessman() instanceof Pawn) {
 				// 만약에 폰의 이동이 기존위치에서 차가 2일때 만 앙파상 체크를 한다... 하면 괜찮을거같은ㄷ?
 				((Pawn) boardSquare[x][y].getChessman()).setIsMoved();
@@ -582,19 +595,12 @@ public class BoardPanel extends FlatPanel {
 				if (isPawnMoveTwoSquares(y)) {
 					setEnPassantSquare(boardSquare[x][y].getChessman().isWhite(), x, y);
 					return;
-
-				} else if (isEnPassantMove(x, y)) {
-					if (boardSquare[x][y].getChessman().isWhite()) {
-						boardSquare[x][y + 1].removeChessmanFromSquare();
-					} else {
-						boardSquare[x][y - 1].removeChessmanFromSquare();
-					}
-
 				}
-
+				
+				moveEnPassant(x, y);
+				
 				enPassantSquare.setSquareOriginalColor();
-				enPassantSquare = boardSquare[0][0];
-
+				initEnPassantSquare();
 			}
 		}
 
