@@ -138,9 +138,9 @@ public class BoardPanel extends FlatPanel {
 
 		moveHelper.showMoveableRoute(); // 위에서 계산된 움직일 수 있는 경로를 보여준다 : 경로보여주기
 		checkmateHelper.showCheckmateRoute(); // 체크메이트 가능한 경로가 있으면 체크메이트 가능한 경로를 보여준다. : 보여주기
-
+		
 		if (selectedSquare.getChessman() instanceof King) { // 선택된 말이 왕이면
-			castlingHelper.checkShowCastlingSquare(x, y); // 캐슬링이 가능한지 확인하고 캐슬링 가능한 칸을 보여준다 : 경로계산 + 보여주기
+			castlingHelper.setShowCastlingSquare(); // 캐슬링이 가능한지 확인하고 캐슬링 가능한 칸을 보여준다 : 경로계산 + 보여주기
 		}
 	}
 
@@ -151,7 +151,7 @@ public class BoardPanel extends FlatPanel {
 
 		pawnAttackHelper.disablePawnAttackableSquare(); // 폰이 공격할수있는 경로를 비활성화한다 : 보여주기(감추기)
 
-		castlingHelper.cancelCastling(); // 캐슬링 할 수 있는 경로를 비활성화 한다 : 보여주기(감추기)
+		castlingHelper.initCastlingSquareList(); // 캐슬링 할 수 있는 경로를 비활성화 한다 : 보여주기(감추기)
 
 		enPassantHelper.cancelEnPassant(); // 앙파상 할 수있는 경로를 비활성화 한다 : 보여주기(감추기)
 
@@ -168,7 +168,7 @@ public class BoardPanel extends FlatPanel {
 		}
 
 		// 캐슬링 관련 & 앙파상 관련
-		if (selectedSquare.getChessman() instanceof King && castlingHelper.castlingSquare.size() != 0) {
+		if (selectedSquare.getChessman() instanceof King && castlingHelper.castlingSquareList.size() != 0) {
 			// 선택된 체스말이 왕이고 캐슬링 할 수 있다면
 			castlingHelper.moveCastling(x, y); // 흠?
 			enPassantHelper.initEnPassantSquare(); // 앙파상이 활성화 되어있는 상태로 캐슬링을 하면 앙파상은 무효
@@ -244,7 +244,7 @@ public class BoardPanel extends FlatPanel {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-			setPawnOnBoard(ChessmanType.PAWN);
+//			setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
@@ -298,7 +298,7 @@ public class BoardPanel extends FlatPanel {
 			}
 		}
 	}
-
+////////////////////////////////////////////////////////////////////////////////////////////////
 	private class MoveHelper {
 		private ArrayList<MoveableRoute> moveableRouteList = new ArrayList<>();
 
@@ -362,7 +362,8 @@ public class BoardPanel extends FlatPanel {
 			boardSquare[x][y].setSquareMoveableColor();
 		}
 	}
-
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
 	private class PawnAttackHelper {
 		private ArrayList<BoardSquare> pawnAttackableSquare = new ArrayList<>(); // 내부클래스
 
@@ -412,7 +413,8 @@ public class BoardPanel extends FlatPanel {
 			}
 		}
 	}
-
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
 	private class CheckmateHelper {
 		private ArrayList<MoveableRoute> checkmateRouteList = new ArrayList<>();
 		private ArrayList<MoveableRoute> moveableRouteList = new ArrayList<>();
@@ -547,7 +549,8 @@ public class BoardPanel extends FlatPanel {
 			}
 		}
 	}
-
+////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
 	private class EnPassantHelper {
 		private BoardSquare enPassantSquare = boardSquare[0][0];
 		private int initY = -1;
@@ -655,128 +658,141 @@ public class BoardPanel extends FlatPanel {
 			}
 		}
 	}
-
+////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * CastlingHelper는 BoardPanel의 Chessman의 이동방법중 캐슬링을 구현하기 위하여 필요한 내부클래스이다.
+	 * CastlingHelper는 King이 선택되었을때 그 왕이 움직임이 있었는지 검사한다(움직임이 있었으면 캐슬링을 못하니까)
+	 * 움직임이 없었다면 CastilngSquare을 정하기위해 왕의 왼편과 오른쪽 룩 중 캐슬링의 조건을 만족하는 것이 있는지 검사한다.
+	 * 조건을 만족하는 룩이 있다면 그 룩의 BoardSquare를 캐슬링 가능한 목록에 추가한다.
+	 * 그리고 추가된 리스트를 보여줌으로써 캐슬링 가능한 칸을 표시한다.
+	 * 이는 기존의 MoveableRouteCalculator로 계산 할 수 없는 특수 케이스라 판단해서 따로 분리하였다. 
+	 */
+////////////////////////////////////////////////////////////////////////////////////////////////
 	private class CastlingHelper {
-		// 캐슬링 관련
-		private ArrayList<BoardSquare> castlingSquare = new ArrayList<>(); // 내부클래스
+		/**
+		 * castlingSquareList : 캐슬링 가능한 BoardSquare를 저장하고 있는 리스트,
+		 * 굳이 리스트로 선언한 이유는 좌 우 룩이 동시에 캐슬링 할 수 있는 대상일 경우도 처리해 주기 위함이다.
+		 */
+		private ArrayList<BoardSquare> castlingSquareList = new ArrayList<>(); // 내부클래스
 
-		private void checkShowCastlingSquare(int x, int y) {
-			// 캐슬링 관련
-			if ((boardSquare[x][y].getChessman() instanceof King
-					&& !((King) boardSquare[x][y].getChessman()).isMoved())) {
+		/**
+		 * 1.setShowCastlingSquare()를 호출하는 부분에서 selectedSquare가 King임을 이미 검증하였기 때문에 왕이 움직이지 않았는지만 확인하고
+		 * 2.움직이지 않았다면 캐슬링에 적합한 검증과정(1.킹과 룩 사이에 말들이 없고 2.룩이 움직인적이없어야 한다)을 거치고 검증과정에 맞으면 캐슬링 스퀘어에 추가한다.
+		 * 3.그리고 캐슬링 가능한 칸들을 보여준다. 
+		 */
+		private void setShowCastlingSquare() {
+			if (!((King) selectedSquare.getChessman()).isMoved()) {
 
-				setCastlingSquare(boardSquare[x][y].getChessman().isWhite());
+				validateAndSetCastlingSquareList();
+				
+				showCastlingSquareList();
+			}
+		}
+		
+		// 캐슬링에 적합한 검증과정(1.킹과 룩 사이에 말들이 없고 2.룩이 움직인적이없어야 한다)을 거치고 검증과정에 맞으면 캐슬링 스퀘어에 추가한다.
+		private void validateAndSetCastlingSquareList() {
+			castlingSquareList.clear();
+			if (isWhite) {
 
-				if (!castlingSquare.isEmpty()) {
-					for (BoardSquare square : castlingSquare) {
-						square.setSquareCastlingColor();
-					}
+				if (isXAndUpperSquareEmpty(5, 7) && isSquareContainRook(7, 7)) {
+					addCastlingSquareIfRookNotMoved(7, 7);
+				}
+
+				if (isXAndUpperTwoSquareEmpty(1, 7) && isSquareContainRook(0, 7)) {
+					addCastlingSquareIfRookNotMoved(0, 7);
+				}
+			} else {
+
+				if (isXAndUpperSquareEmpty(5, 0) && isSquareContainRook(7, 0)) {
+					addCastlingSquareIfRookNotMoved(7, 0);
+				}
+
+				if (isXAndUpperTwoSquareEmpty(1, 0) && isSquareContainRook(0, 0)) {
+					addCastlingSquareIfRookNotMoved(0, 0);
 				}
 			}
 		}
-
-		private void cancelCastling() {
-			// 캐슬링 관련
-			if (!castlingSquare.isEmpty()) {
-				for (BoardSquare square : castlingSquare) {
-					square.setSquareOriginalColor();
-				}
-			}
-		}
-
-		private void moveCastling(int x, int y) {
-			operateCastling(selectedSquare.getChessman().isWhite(), x, y);
-			for (BoardSquare square : castlingSquare) {
-				square.setSquareOriginalColor();
-			}
-			castlingSquare.clear();
-		}
-
-		private boolean isBetweenTwoSquareEmpty(int x, int y) {
+		// x, x + 1 의 칸이 비었는지 확인한다
+		private boolean isXAndUpperSquareEmpty(int x, int y) {
 			return !boardSquare[x][y].isContainChessman() && !boardSquare[x + 1][y].isContainChessman();
 		}
-
-		private boolean isBetweenThreeSquareEmpty(int x, int y) {
-			return isBetweenTwoSquareEmpty(x, y) && !boardSquare[x + 2][y].isContainChessman();
+		// x, x + 1, x + 2  의 칸이 비었는지 확인한다
+		private boolean isXAndUpperTwoSquareEmpty(int x, int y) {
+			return isXAndUpperSquareEmpty(x, y) && !boardSquare[x + 2][y].isContainChessman();
 		}
-
+		// 칸이 룩을 가지고있는지 확인한다.
 		private boolean isSquareContainRook(int x, int y) {
 			return boardSquare[x][y].isContainChessman() && boardSquare[x][y].getChessman() instanceof Rook;
 		}
-
-		// 캐슬링 관련
-		private void setCastlingSquare(boolean isWhite) {
-			castlingSquare.clear();
-			if (isWhite) {
-
-				if (isBetweenTwoSquareEmpty(5, 7) && isSquareContainRook(7, 7)) {
-					if (!((Rook) boardSquare[7][7].getChessman()).isMoved()) {
-						castlingSquare.add(boardSquare[7][7]);
-					}
-				}
-
-				if (isBetweenThreeSquareEmpty(1, 7) && isSquareContainRook(0, 7)) {
-					if (!((Rook) boardSquare[0][7].getChessman()).isMoved()) {
-						castlingSquare.add(boardSquare[0][7]);
-					}
-				}
-			} else {
-
-				if (isBetweenTwoSquareEmpty(5, 0) && isSquareContainRook(7, 0)) {
-					if (!((Rook) boardSquare[7][0].getChessman()).isMoved()) {
-						castlingSquare.add(boardSquare[7][0]);
-					}
-				}
-
-				if (isBetweenThreeSquareEmpty(1, 0) && isSquareContainRook(0, 0)) {
-					if (!((Rook) boardSquare[0][0].getChessman()).isMoved()) {
-						castlingSquare.add(boardSquare[0][0]);
-					}
+		// 룩이 움직이지 않았는지 확인한다.
+		private boolean isRookNotMoved(int x, int y) {
+			return !((Rook) boardSquare[x][y].getChessman()).isMoved();
+		}
+		// 룩이 움직이지 않았다면 캐슬링 가능한 좌표에 추가한다.
+		private void addCastlingSquareIfRookNotMoved(int x, int y) {
+			if (isRookNotMoved(x, y)) {
+				castlingSquareList.add(boardSquare[x][y]);
+			}
+		}
+		
+		// 캐슬링 가능한 칸들의 리스트가 비어있지않으면 칸들을 캐슬링 색으로 셋팅해준다
+		private void showCastlingSquareList() {
+			if (!castlingSquareList.isEmpty()) {
+				for (BoardSquare castlingSquare : castlingSquareList) {
+					castlingSquare.setSquareCastlingColor();
 				}
 			}
 		}
-
-		// 캐슬링 관련
-		private void operateCastling(boolean isWhite, int x, int y) {
-			if (isWhite) {
-				if (selectedSquare.getChessman() instanceof King && selectedSquare.getChessman().isWhite()
-						&& ((x == 7 && y == 7) || (x == 0 && y == 7))) {
-					operateCastlingMove(x, y);
-				} else {
-					boardSquare[x][y].setChessmanOnSquare(selectedSquare.getChessman());
+		
+		// 캐슬링 가능한 칸들을 초기화해준다.(캐슬링 가능 표시가 된 것들을 원래대로 돌리고 리스트릴 비운다)
+		private void initCastlingSquareList() {
+			if (!castlingSquareList.isEmpty()) {
+				for (BoardSquare castlingSquare : castlingSquareList) {
+					castlingSquare.setSquareOriginalColor();
 				}
+			}
+			castlingSquareList.clear();
+		}
 
+		/**
+		 * 킹을 클릭한 상태에서 캐슬링 표시가 된 룩을 클릭했을때 수행되는 메서드
+		 * 내부적으로 캐슬링을 수행해주는 메서드를 호출한다.
+		 * @param x : 캐슬링 표시가 된 룩을 클릭했을때 룩의 x 좌표
+		 * @param y : 캐슬링 표시가 된 룩을 클릭했을때 룩의 y 좌표
+		 * 각 좌표를 받는 이유는 룩이 x좌표 0 또는 7에 위치하고있을때 이동하는 칸이 다르기 때문이다.
+		 */
+		private void moveCastling(int x, int y) {
+			operateCastling(x, y);
+			initCastlingSquareList();
+		}
+
+		// 움직임으로써 클릭한 sqaure의 좌표가 룩의 좌표일 때 캐슬링 움직임을 실행한다. 그 이외라면 단순 움직임을 실행한다.
+		private void operateCastling(int x, int y) {
+			if((x == 7 && y == 7) || (x == 0 && y == 7) || (x == 7 && y == 0) || (x == 0 && y == 0)) {
+				operateCastlingMove(x, y);
 			} else {
-				if (selectedSquare.getChessman() instanceof King && !selectedSquare.getChessman().isWhite()
-						&& ((x == 7 && y == 0) || (x == 0 && y == 0))) {
-					operateCastlingMove(x, y);
-				} else {
-					boardSquare[x][y].setChessmanOnSquare(selectedSquare.getChessman());
-				}
+				boardSquare[x][y].setChessmanOnSquare(selectedSquare.getChessman());
 			}
 		}
 
-		// 캐슬링 관련
+		// 캐슬링 움직임을 실행해주는 메서드로써 선택된칸(왕) 그리고 움직임으로써 클릭한 square의 좌표에 대해 캐슬링 움직임을 수행한다.
 		private void operateCastlingMove(int x, int y) {
+			((King) selectedSquare.getChessman()).setIsMoved();
+			((Rook) boardSquare[x][y].getChessman()).setIsMoved();
+			
 			if (x == 0) {
-				if (boardSquare[x + 2][y].getBackground().equals(Color.GREEN))
-					boardSquare[x + 2][y].setSquareOriginalColor();
 
 				boardSquare[x + 2][y].setChessmanOnSquare(selectedSquare.getChessman());
 				boardSquare[x + 3][y].setChessmanOnSquare(boardSquare[x][y].getChessman());
 			} else if (x == 7) {
-				if (boardSquare[x - 1][y].getBackground().equals(Color.GREEN))
-					boardSquare[x - 1][y].setSquareOriginalColor();
-
+				
 				boardSquare[x - 1][y].setChessmanOnSquare(selectedSquare.getChessman());
 				boardSquare[x - 2][y].setChessmanOnSquare(boardSquare[x][y].getChessman());
 			}
-
-			((King) selectedSquare.getChessman()).setIsMoved();
-			((Rook) boardSquare[x][y].getChessman()).setIsMoved();
 
 			selectedSquare.removeChessmanFromSquare();
 			boardSquare[x][y].removeChessmanFromSquare();
 		}
 	}
+////////////////////////////////////////////////////////////////////////////////////////////////
 }
