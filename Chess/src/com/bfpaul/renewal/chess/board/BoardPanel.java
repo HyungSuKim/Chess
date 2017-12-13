@@ -138,7 +138,7 @@ public class BoardPanel extends FlatPanel {
 
 		moveHelper.showMoveableRoute(); // 위에서 계산된 움직일 수 있는 경로를 보여준다 : 경로보여주기
 		checkmateHelper.showCheckmateRoute(); // 체크메이트 가능한 경로가 있으면 체크메이트 가능한 경로를 보여준다. : 보여주기
-		
+
 		if (selectedSquare.getChessman() instanceof King) { // 선택된 말이 왕이면
 			castlingHelper.setShowCastlingSquare(); // 캐슬링이 가능한지 확인하고 캐슬링 가능한 칸을 보여준다 : 경로계산 + 보여주기
 		}
@@ -244,7 +244,7 @@ public class BoardPanel extends FlatPanel {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-//			setPawnOnBoard(ChessmanType.PAWN);
+			setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
@@ -298,7 +298,8 @@ public class BoardPanel extends FlatPanel {
 			}
 		}
 	}
-////////////////////////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	private class MoveHelper {
 		private ArrayList<MoveableRoute> moveableRouteList = new ArrayList<>();
 
@@ -362,8 +363,9 @@ public class BoardPanel extends FlatPanel {
 			boardSquare[x][y].setSquareMoveableColor();
 		}
 	}
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	private class PawnAttackHelper {
 		private ArrayList<BoardSquare> pawnAttackableSquare = new ArrayList<>(); // 내부클래스
 
@@ -413,8 +415,9 @@ public class BoardPanel extends FlatPanel {
 			}
 		}
 	}
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	private class CheckmateHelper {
 		private ArrayList<MoveableRoute> checkmateRouteList = new ArrayList<>();
 		private ArrayList<MoveableRoute> moveableRouteList = new ArrayList<>();
@@ -476,7 +479,7 @@ public class BoardPanel extends FlatPanel {
 			for (MoveableRoute moveableRoute : checkmateRouteList)
 				for (Coordinate coordinate : moveableRoute.getCoordinates())
 					boardSquare[coordinate.getX()][coordinate.getY()].setSquareOriginalColor();
-			
+
 			pawnCheckmateSquare.setSquareOriginalColor();
 		}
 
@@ -549,147 +552,156 @@ public class BoardPanel extends FlatPanel {
 			}
 		}
 	}
-////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * EnPassantHelper는 BoardPanel의 Pawn의 이동방법중 앙파상 잡기를 구현하기 위하여 필요한 내부클래스이다.
+	 * EnPassantHelper는
+	 * 
+	 * 이는 기존의 MoveableRouteCalculator로 계산 할 수 없는 특수 케이스라 판단해서 따로 분리하였다.
+	 */
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	private class EnPassantHelper {
+		// 앙파상을 할 수 있는 칸은 한번에 하나만 있을 수 있기 때문에 기존의 BoardSquare자료형을 이용하였고 초기 값을 null로 하는대신
+		// 기존의 [0][0]자료를 활용했다.
 		private BoardSquare enPassantSquare = boardSquare[0][0];
+		// 앙파상을 검사해야 되는경우는 폰의 초기 움직임이 2일때 뿐이기때문에 초기 움직임 Y를 변수로써 가지고있도록 했다.
 		private int initY = -1;
+		// 말이 앙파상 할 수있는 좌표에 있는지 검사하기위한 변수로써 앙파상을 할 수있는 경우는 위의 initY로써의 조건을 성립하면서 아래의 조건을
+		// 성립할 때이다.
+		// 예) 흰색폰의 위치 기준으로 왼쪽 또는 오른쪽에 검정폰이 위치했을 때 이다 그렇다면
+		// 흰색폰의 x기준으로 검정폰의 x와의 차가 절대값 1, y기준으로 검정폰의 y와의 차가 0인 위치에 있다면
+		// 앙파상을 할 수 있는 것이다.
 		private int enPassantX = -1;
 		private int enPassantY = -1;
 
+		// 한번 사용한 앙파상칸은 쓸필요가 없기때문에 기존의 초기값으로 정해둔 것으로 초기화한다.
 		private void initEnPassantSquare() {
 			enPassantSquare = boardSquare[0][0];
 		}
 
-		private boolean isEnPassantSquareEmpty() {
+		// 초기값으로 정해진 값이 있으면 비어있는 것이다.
+		private boolean isEnPassantSquareNotEmpty() {
 			return enPassantSquare != boardSquare[0][0];
 		}
 
+		// 앙파상 칸이 비어있지 않고 앙파상 스퀘어가 가진값과 움직이고자하는 보드스퀘어가 같다면 앙파상 움직임이다.
 		private boolean isEnPassantMove(int x, int y) {
-			return isEnPassantSquareEmpty() && boardSquare[x][y] == enPassantSquare;
+			return isEnPassantSquareNotEmpty() && boardSquare[x][y] == enPassantSquare;
 		}
 
+		// 초기 y값과 움직인 y의 차가 2인지 검사한다 ( 2라면 초기움직임 2를 했다고 보기위함이다. )
 		private boolean isPawnMoveTwoSquares(int y) {
 			return Math.abs(initY - y) == 2;
 		}
 
+		// 위에서 언급했던 앙파상이 가능한 위치에 있는지 확인하는 메서드
 		private boolean isAvailEnPassantCoordinate(int x, int y) {
-			return (Math.abs(enPassantX - x) == 1) && (Math.abs(enPassantY - y) == 0);
+			return (Math.abs(enPassantX - x) == 1) && (enPassantY - y == 0);
 		}
 
-		private boolean isEnemyPawnContain(boolean isWhite, int x, int y) {
-			return isSquareContainPawn(x, y) && (boardSquare[x][y].getChessman().isWhite() != isWhite);
-		}
-
-		private boolean isSquareContainPawn(int x, int y) {
-			return (boardSquare[x][y].isContainChessman() && boardSquare[x][y].getChessman() instanceof Pawn);
-		}
-
+		// 폰을 클릭했을때 호출되는 메서드로써 폰의 y위치를 저장하고 앙파상 할 수 있는 칸이 있다면 보여준다.
 		private void checkShowEnPassantSquare(int x, int y) {
 			initY = y;
-			if (isEnPassantSquareEmpty() && boardSquare[x][y].getChessman() instanceof Pawn) {
+			if (isEnPassantSquareNotEmpty() && boardSquare[x][y].getChessman() instanceof Pawn) {
 				if (isAvailEnPassantCoordinate(x, y)) {
 					enPassantSquare.setSquareAttackableColor();
 				}
 			}
 		}
 
+		// 앙파상을 취소한다.
 		private void cancelEnPassant() {
 			if (enPassantSquare != boardSquare[0][0]) {
 				enPassantSquare.setSquareOriginalColor();
 			}
 		}
 
+		// 움직인 좌표가 앙파상으로 설정된 좌표라면 앙파상위에 있는 체스말이 흰색인지 검은색인지 판단해서 그 뒤에 있는 말을 제거한다.
 		private void moveEnPassant(int x, int y) {
 			if (isEnPassantMove(x, y)) {
-				if (boardSquare[x][y].getChessman().isWhite()) {
+				if (enPassantSquare.getChessman().isWhite()) {
 					boardSquare[x][y + 1].removeChessmanFromSquare();
 				} else {
 					boardSquare[x][y - 1].removeChessmanFromSquare();
 				}
-
 			}
 		}
 
+		// 폰이 움직였을때 움직인 좌표의 폰이 앙파상 대상인지 확인한다. 앙파상 대상이라면 앙파상 스퀘어를 셋팅하고 메서드를 종료하고
+		// 앙파상 된 칸으로 이동하는 경우엔 앙파상 잡기를 실행한다.
 		private void checkEnPassant(int x, int y) {
-			if (boardSquare[x][y].getChessman() instanceof Pawn) {
-				// 만약에 폰의 이동이 기존위치에서 차가 2일때 만 앙파상 체크를 한다... 하면 괜찮을거같은ㄷ?
-				((Pawn) boardSquare[x][y].getChessman()).setIsMoved();
-
-				if (isPawnMoveTwoSquares(y)) {
-					setEnPassantSquare(boardSquare[x][y].getChessman().isWhite(), x, y);
-					return;
-				}
-
-				moveEnPassant(x, y);
-
-				enPassantSquare.setSquareOriginalColor();
-				initEnPassantSquare();
+			((Pawn) selectedSquare.getChessman()).setIsMoved();
+			// 폰이 2칸 움직였다면 앙파상 칸을 설정하고 메서드를 벗어난다.
+			if (isPawnMoveTwoSquares(y)) {
+				setEnPassantSquare(selectedSquare.getChessman().isWhite(), x, y);
+				return;
 			}
-		}
 
+			moveEnPassant(x, y);
+
+			enPassantSquare.setSquareOriginalColor();
+			initEnPassantSquare();
+		}
+		// 지정된 좌표의 square가 적 폰을 가지고있는지 확인한다.
+		private boolean isContainEnemyPawn(boolean isWhite, int x, int y) {
+			return Coordinate.isValidate(x, y) && isContainPawn(x, y)
+					&& (boardSquare[x][y].getChessman().isWhite() != isWhite);
+		}
+		// 지정된 좌표의 square가 폰을 가지고있는지 확인한다.
+		private boolean isContainPawn(int x, int y) {
+			return (boardSquare[x][y].isContainChessman() && boardSquare[x][y].getChessman() instanceof Pawn);
+		}
+		// 폰의 좌우에 적군 폰이 있는지 확인하고 있다면 앙파상 스퀘어를 셋팅한다.
 		private void setEnPassantSquare(boolean isWhite, int x, int y) {
 			enPassantX = x;
 			enPassantY = y;
 
 			if (isWhite) {
-				// boardSquare[y][x-1] 또는 boardSquare[y][x+1] 있는게 검정폰이냐? 를 검사하고
-				if (Coordinate.isValidate(x - 1, y))
-					if (isEnemyPawnContain(isWhite, x - 1, y)) {
-						enPassantSquare = boardSquare[x][y + 1];
-					}
-				// 맞으면 boardSquare[y-1][x]를 앙파상 스퀘어에 저장
-				if (Coordinate.isValidate(x + 1, y))
-					if (isEnemyPawnContain(isWhite, x + 1, y)) {
-						enPassantSquare = boardSquare[x][y + 1];
-					}
+				if (isContainEnemyPawn(isWhite, x - 1, y) || isContainEnemyPawn(isWhite, x + 1, y)) {
+					enPassantSquare = boardSquare[x][y + 1];
+				}
 
 			} else {
-				// boardSquare[y][x-1] 또는 boardSquare[y][x+1] 있는게 흰색폰이냐? 를 검사하고
-				if (Coordinate.isValidate(x - 1, y))
-					if (isEnemyPawnContain(isWhite, x - 1, y)) {
-						enPassantSquare = boardSquare[x][y - 1];
-					}
-				// 맞으면 boardSquare[y+1][x]를 앙파상 스퀘어에 저장
-				if (Coordinate.isValidate(x + 1, y))
-					if (isEnemyPawnContain(isWhite, x + 1, y)) {
-						enPassantSquare = boardSquare[x][y - 1];
-					}
+				if (isContainEnemyPawn(isWhite, x - 1, y) || isContainEnemyPawn(isWhite, x + 1, y)) {
+					enPassantSquare = boardSquare[x][y - 1];
+				}
 			}
 		}
 	}
-////////////////////////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * CastlingHelper는 BoardPanel의 Chessman의 이동방법중 캐슬링을 구현하기 위하여 필요한 내부클래스이다.
-	 * CastlingHelper는 King이 선택되었을때 그 왕이 움직임이 있었는지 검사한다(움직임이 있었으면 캐슬링을 못하니까)
-	 * 움직임이 없었다면 CastilngSquare을 정하기위해 왕의 왼편과 오른쪽 룩 중 캐슬링의 조건을 만족하는 것이 있는지 검사한다.
-	 * 조건을 만족하는 룩이 있다면 그 룩의 BoardSquare를 캐슬링 가능한 목록에 추가한다.
-	 * 그리고 추가된 리스트를 보여줌으로써 캐슬링 가능한 칸을 표시한다.
-	 * 이는 기존의 MoveableRouteCalculator로 계산 할 수 없는 특수 케이스라 판단해서 따로 분리하였다. 
+	 * CastlingHelper는 King이 선택되었을때 그 왕이 움직임이 있었는지 검사한다(움직임이 있었으면 캐슬링을 못하니까) 움직임이
+	 * 없었다면 CastilngSquare을 정하기위해 왕의 왼편과 오른쪽 룩 중 캐슬링의 조건을 만족하는 것이 있는지 검사한다. 조건을 만족하는
+	 * 룩이 있다면 그 룩의 BoardSquare를 캐슬링 가능한 목록에 추가한다. 그리고 추가된 리스트를 보여줌으로써 캐슬링 가능한 칸을
+	 * 표시한다. 이는 기존의 MoveableRouteCalculator로 계산 할 수 없는 특수 케이스라 판단해서 따로 분리하였다.
 	 */
-////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	private class CastlingHelper {
 		/**
-		 * castlingSquareList : 캐슬링 가능한 BoardSquare를 저장하고 있는 리스트,
-		 * 굳이 리스트로 선언한 이유는 좌 우 룩이 동시에 캐슬링 할 수 있는 대상일 경우도 처리해 주기 위함이다.
+		 * castlingSquareList : 캐슬링 가능한 BoardSquare를 저장하고 있는 리스트, 굳이 리스트로 선언한 이유는 좌 우 룩이
+		 * 동시에 캐슬링 할 수 있는 대상일 경우도 처리해 주기 위함이다.
 		 */
 		private ArrayList<BoardSquare> castlingSquareList = new ArrayList<>(); // 내부클래스
 
 		/**
-		 * 1.setShowCastlingSquare()를 호출하는 부분에서 selectedSquare가 King임을 이미 검증하였기 때문에 왕이 움직이지 않았는지만 확인하고
-		 * 2.움직이지 않았다면 캐슬링에 적합한 검증과정(1.킹과 룩 사이에 말들이 없고 2.룩이 움직인적이없어야 한다)을 거치고 검증과정에 맞으면 캐슬링 스퀘어에 추가한다.
-		 * 3.그리고 캐슬링 가능한 칸들을 보여준다. 
+		 * 1.setShowCastlingSquare()를 호출하는 부분에서 selectedSquare가 King임을 이미 검증하였기 때문에 왕이
+		 * 움직이지 않았는지만 확인하고 2.움직이지 않았다면 캐슬링에 적합한 검증과정(1.킹과 룩 사이에 말들이 없고 2.룩이 움직인적이없어야
+		 * 한다)을 거치고 검증과정에 맞으면 캐슬링 스퀘어에 추가한다. 3.그리고 캐슬링 가능한 칸들을 보여준다.
 		 */
 		private void setShowCastlingSquare() {
 			if (!((King) selectedSquare.getChessman()).isMoved()) {
 
 				validateAndSetCastlingSquareList();
-				
+
 				showCastlingSquareList();
 			}
 		}
-		
-		// 캐슬링에 적합한 검증과정(1.킹과 룩 사이에 말들이 없고 2.룩이 움직인적이없어야 한다)을 거치고 검증과정에 맞으면 캐슬링 스퀘어에 추가한다.
+
+		// 캐슬링에 적합한 검증과정(1.킹과 룩 사이에 말들이 없고 2.룩이 움직인적이없어야 한다)을 거치고 검증과정에 맞으면 캐슬링 스퀘어에
+		// 추가한다.
 		private void validateAndSetCastlingSquareList() {
 			castlingSquareList.clear();
 			if (isWhite) {
@@ -712,29 +724,34 @@ public class BoardPanel extends FlatPanel {
 				}
 			}
 		}
+
 		// x, x + 1 의 칸이 비었는지 확인한다
 		private boolean isXAndUpperSquareEmpty(int x, int y) {
 			return !boardSquare[x][y].isContainChessman() && !boardSquare[x + 1][y].isContainChessman();
 		}
-		// x, x + 1, x + 2  의 칸이 비었는지 확인한다
+
+		// x, x + 1, x + 2 의 칸이 비었는지 확인한다
 		private boolean isXAndUpperTwoSquareEmpty(int x, int y) {
 			return isXAndUpperSquareEmpty(x, y) && !boardSquare[x + 2][y].isContainChessman();
 		}
+
 		// 칸이 룩을 가지고있는지 확인한다.
 		private boolean isSquareContainRook(int x, int y) {
 			return boardSquare[x][y].isContainChessman() && boardSquare[x][y].getChessman() instanceof Rook;
 		}
+
 		// 룩이 움직이지 않았는지 확인한다.
 		private boolean isRookNotMoved(int x, int y) {
 			return !((Rook) boardSquare[x][y].getChessman()).isMoved();
 		}
+
 		// 룩이 움직이지 않았다면 캐슬링 가능한 좌표에 추가한다.
 		private void addCastlingSquareIfRookNotMoved(int x, int y) {
 			if (isRookNotMoved(x, y)) {
 				castlingSquareList.add(boardSquare[x][y]);
 			}
 		}
-		
+
 		// 캐슬링 가능한 칸들의 리스트가 비어있지않으면 칸들을 캐슬링 색으로 셋팅해준다
 		private void showCastlingSquareList() {
 			if (!castlingSquareList.isEmpty()) {
@@ -743,7 +760,7 @@ public class BoardPanel extends FlatPanel {
 				}
 			}
 		}
-		
+
 		// 캐슬링 가능한 칸들을 초기화해준다.(캐슬링 가능 표시가 된 것들을 원래대로 돌리고 리스트릴 비운다)
 		private void initCastlingSquareList() {
 			if (!castlingSquareList.isEmpty()) {
@@ -755,11 +772,13 @@ public class BoardPanel extends FlatPanel {
 		}
 
 		/**
-		 * 킹을 클릭한 상태에서 캐슬링 표시가 된 룩을 클릭했을때 수행되는 메서드
-		 * 내부적으로 캐슬링을 수행해주는 메서드를 호출한다.
-		 * @param x : 캐슬링 표시가 된 룩을 클릭했을때 룩의 x 좌표
-		 * @param y : 캐슬링 표시가 된 룩을 클릭했을때 룩의 y 좌표
-		 * 각 좌표를 받는 이유는 룩이 x좌표 0 또는 7에 위치하고있을때 이동하는 칸이 다르기 때문이다.
+		 * 킹을 클릭한 상태에서 캐슬링 표시가 된 룩을 클릭했을때 수행되는 메서드 내부적으로 캐슬링을 수행해주는 메서드를 호출한다.
+		 * 
+		 * @param x
+		 *            : 캐슬링 표시가 된 룩을 클릭했을때 룩의 x 좌표
+		 * @param y
+		 *            : 캐슬링 표시가 된 룩을 클릭했을때 룩의 y 좌표 각 좌표를 받는 이유는 룩이 x좌표 0 또는 7에 위치하고있을때
+		 *            이동하는 칸이 다르기 때문이다.
 		 */
 		private void moveCastling(int x, int y) {
 			operateCastling(x, y);
@@ -768,7 +787,7 @@ public class BoardPanel extends FlatPanel {
 
 		// 움직임으로써 클릭한 sqaure의 좌표가 룩의 좌표일 때 캐슬링 움직임을 실행한다. 그 이외라면 단순 움직임을 실행한다.
 		private void operateCastling(int x, int y) {
-			if((x == 7 && y == 7) || (x == 0 && y == 7) || (x == 7 && y == 0) || (x == 0 && y == 0)) {
+			if ((x == 7 && y == 7) || (x == 0 && y == 7) || (x == 7 && y == 0) || (x == 0 && y == 0)) {
 				operateCastlingMove(x, y);
 			} else {
 				boardSquare[x][y].setChessmanOnSquare(selectedSquare.getChessman());
@@ -779,13 +798,13 @@ public class BoardPanel extends FlatPanel {
 		private void operateCastlingMove(int x, int y) {
 			((King) selectedSquare.getChessman()).setIsMoved();
 			((Rook) boardSquare[x][y].getChessman()).setIsMoved();
-			
+
 			if (x == 0) {
 
 				boardSquare[x + 2][y].setChessmanOnSquare(selectedSquare.getChessman());
 				boardSquare[x + 3][y].setChessmanOnSquare(boardSquare[x][y].getChessman());
 			} else if (x == 7) {
-				
+
 				boardSquare[x - 1][y].setChessmanOnSquare(selectedSquare.getChessman());
 				boardSquare[x - 2][y].setChessmanOnSquare(boardSquare[x][y].getChessman());
 			}
@@ -794,5 +813,5 @@ public class BoardPanel extends FlatPanel {
 			boardSquare[x][y].removeChessmanFromSquare();
 		}
 	}
-////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
 }
