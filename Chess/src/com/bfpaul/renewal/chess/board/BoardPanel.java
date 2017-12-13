@@ -417,10 +417,23 @@ public class BoardPanel extends FlatPanel {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * CheckmateHelper는 BoardPanel의 Chessman이 이동하고 턴이 넘어가기 전 왕을 잡을수 있는 경로를 가진 체스말이 있는지 검사하는 기능을 구현한다.
+	 * 따라서 체크메이트 핼퍼는 턴이 넘어가기전 (흰색/검은색)색상의 체스말들의 경로를 계산하여 체크메이트 할 수 있는 유효한 경로만을 저장했다가
+	 * 턴이 넘어가 반대편 색상의 말을 클릭했을때 체스메이트 할 수 있는 경로를 보여주도록 설계되었다. 
+	 * 
+	 * 기존의 MoveableRouteCalculator의 계산된 경로에서 체크메이트 루트를 검사해서 추출하며
+	 * PawnAttackHelper를 이용해서 폰으로 왕을 체크메이트 할 수있는 경우에 대해서도 계산한다.
+	 *
+	 * CheckmateHelper는 MoveHelper와 다르게 경로를 보여주는 역할만 하는 것이고 경로도 특정 경로만 표시해야 되기에 분류하였다.
+	 */
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	private class CheckmateHelper {
+		// 체크메이트 할 수있는 경로들의 리스트
 		private ArrayList<MoveableRoute> checkmateRouteList = new ArrayList<>();
+		// 검사하는 체스말의 경로 리스트
 		private ArrayList<MoveableRoute> moveableRouteList = new ArrayList<>();
+		// 폰이 체크메이트를 할 수있다면 체크메이트 가능 칸를 담는 변수
 		private BoardSquare pawnCheckmateSquare = boardSquare[0][0];
 
 		// 계산된 체크메이트 가능 경로를 보여주는 메서드로 왕을 선택했을때와 다른 말을 골랐을때로 분리한 이유는
@@ -450,16 +463,13 @@ public class BoardPanel extends FlatPanel {
 			}
 		}
 
+		// 폰이 체크메이트 square를 가지고있는지 아닌지
 		private boolean isPawnHasCheckmateSquare() {
-			if (pawnCheckmateSquare != boardSquare[0][0]) {
-				return true;
-			} else {
-				return false;
-			}
+			return pawnCheckmateSquare != boardSquare[0][0];
 		}
 
+		// 왕을 선택했을때 체크메이트 루트를 보여주는 것인데 선택된 왕을 다시 누를수있도록 선택된 칸은 클릭이 가능하게 해준다.
 		private void showRouteWhenKingSelected(int x, int y) {
-
 			boardSquare[x][y].setSquareCheckmateColor(); // 체크메이트 경로를 체크메이트 색으로 바꾸고
 			selectedSquare.setSquareMoveableCheckmateColor(); // 누른말의 왕은 움직일수있는 체크메이트 색으로 바꾼다.
 		}
@@ -504,6 +514,7 @@ public class BoardPanel extends FlatPanel {
 			} // end of for y
 		}
 
+//		폰으로 부터 폰이 공격할 수있는 경로를 받아와서 폰이 공격 할 수있는 경로중 왕이 있는 경로만 뽑아서 pawnCheckmateSquare에 저장해준다.
 		private void setPawnCheckmateSquare() {
 			if (!pawnAttackHelper.pawnAttackableSquare.isEmpty()) {
 				for (BoardSquare boardSquare : pawnAttackHelper.pawnAttackableSquare) {
