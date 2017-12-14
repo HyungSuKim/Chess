@@ -1,13 +1,17 @@
 package com.bfpaul.renewal.chess.game;
 
+import java.awt.Component;
+import java.io.IOException;
+
 import javax.swing.border.EmptyBorder;
 
-import com.bfpaul.chess.timer.GameTimerView;
+import com.bfpaul.renewal.chess.timer.GameTimerView;
 import com.bfpaul.renewal.chess.Images;
 import com.bfpaul.renewal.chess.Theme;
 import com.bfpaul.renewal.chess.board.BoardPanel;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
+import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.frame.FlatFrame;
 import com.mommoo.flat.layout.linear.LinearLayout;
 import com.mommoo.flat.layout.linear.Orientation;
@@ -16,12 +20,18 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 import com.mommoo.util.ScreenManager;
 
 public class GameFrame {
-	
-	public GameFrame() {
-		FlatFrame frame = createFrame();
+	FlatFrame frame = createFrame();
+	public GameFrame(boolean isWhite) {
+//		FlatFrame frame = createFrame();
 		
 		frame.getContainer().add(createRelatedInfoPanel(), createCommonConstraints(2));
-		frame.getContainer().add(new BoardPanel(), createCommonConstraints(10));
+		frame.getContainer().add(new BoardPanel(isWhite), createCommonConstraints(10));
+		
+		if(isWhite) {
+			frame.setLocation(0, 0);
+		} else {
+			frame.setLocation(950, 0);
+		}
 		
 		frame.show();
 	}
@@ -36,7 +46,7 @@ public class GameFrame {
 		frame.setTitle("Chess Game");
 		frame.setSize(screenManager.dip2px(500), screenManager.dip2px(530));
 		frame.getContainer().setLayout(new LinearLayout(Orientation.VERTICAL, 0));
-		frame.setLocationOnScreenCenter();
+//		frame.setLocationOnScreenCenter();
 		frame.setIconImage(Images.ICON);
 		frame.setProcessIconImage(Images.ICON);
 		frame.setTitleBarColor(Theme.TITLE_BAR_COLOR);
@@ -73,6 +83,19 @@ public class GameFrame {
 		FlatButton ruleDescriptionButton = new FlatButton("규칙 설명");
 		ruleDescriptionButton.setBackground(Theme.LIGHT_BLUE_COLOR);
 		ruleDescriptionButton.setBorder(new EmptyBorder(0, 0, 0, 0));
+		ruleDescriptionButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(Component component) {
+				Runtime runtime = Runtime.getRuntime();
+				
+				try {
+					runtime.exec("explorer.exe https://ko.wikipedia.org/wiki/%EC%B2%B4%EC%8A%A4");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
 		return ruleDescriptionButton;
 	}
 	
@@ -80,6 +103,13 @@ public class GameFrame {
 		FlatButton giveUpButton = new FlatButton("기 권");
 		giveUpButton.setBackground(Theme.YELLOW_COLOR);
 		giveUpButton.setBorder(new EmptyBorder(0, 0, 0, 0));
+		giveUpButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(Component component) {
+				// TODO Auto-generated method stub
+				frame.hide();
+			}
+		});
 		return giveUpButton;
 	}
 }

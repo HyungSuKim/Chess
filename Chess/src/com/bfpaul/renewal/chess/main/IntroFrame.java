@@ -69,12 +69,14 @@ class IntroFrame {
 		doublePlayButton.setBackground(Theme.DARK_BLUE_COLOR);
 		doublePlayButton.setBorder(new EmptyBorder(0,0,0,0));
 		doublePlayButton.setOnClickListener(new OnClickListener() {
+			
 			@Override
 			public void onClick(Component component) {
-				new GameFrame();
+				new GameFrame(true);
+				new GameFrame(false);
 			}
-			
 		});
+		
 		return doublePlayButton;
 	}
 }

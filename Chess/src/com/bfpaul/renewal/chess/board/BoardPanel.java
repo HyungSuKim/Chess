@@ -42,43 +42,59 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 @SuppressWarnings("serial")
 public class BoardPanel extends FlatPanel {
 	// 체스 판의 하나하나의 square로써 체스말을 놓아준다던가 체스말을 제외해준다거나 이동가능범위를 표현해줄 최소단위의 칸이다.
-	private BoardSquare[][] boardSquare = new BoardSquare[8][8];
-	private BoardSquare selectedSquare = null;
-	private boolean isWhite = true;
+	private static BoardSquare[][] boardSquare = new BoardSquare[8][8];
+	private static BoardSquare selectedSquare = null;
+	private static boolean isWhite = true;
 
 	// 체스말이 보드위에서 일정 방법으로 움직이는 것을 도와주는 내부 클래스들로써
 	// 보드가 만들어지고 말이 놓여지고 행동을 할 때 이러한 것들이 필요하다고 판단해서
 	// BoardPanel의 생성자에서 각 내부클래스의 인스턴스를 생성한다.
-	private MoveHelper moveHelper;
-	private CastlingHelper castlingHelper;
-	private PawnAttackHelper pawnAttackHelper;
-	private EnPassantHelper enPassantHelper;
-	private CheckmateHelper checkmateHelper;
+	private static MoveHelper moveHelper;
+	private static CastlingHelper castlingHelper;
+	private static PawnAttackHelper pawnAttackHelper;
+	private static EnPassantHelper enPassantHelper;
+	private static CheckmateHelper checkmateHelper;
 
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
-	public BoardPanel() {
+	public BoardPanel(boolean isWhite) {
 		setLayout(new GridLayout(8, 8));
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Theme.BOARD_BORDER_COLOR);
 		setOpaque(true);
 
-		for (int y = 0; y < 8; y++) {
-			for (int x = 0; x < 8; x++) {
-				createBoardSquare(x, y);
-				add(boardSquare[x][y], createMatchParentConstraints(1));
-			}
-		}
+		createSquares();
+		setSquareLayoutByColor(isWhite);
 
-		// for (int y = 0; y < 8; y++) {
-		// for(int x = 0; x < 8; x++) {
-		// add(boardSquare[y][x], createMatchParentConstraints(1));
-		// }
-		// }
 		setWholeChessmanOnBoard();
 		createHelper();
 		disableSquareClickEvent();
 		enableSquareClickEvent(isWhite);
 
+	}
+	
+	private void setSquareLayoutByColor(boolean isWhite) {
+		if(isWhite) {
+			for (int y = 0; y < 8; y++) {
+				for (int x = 0; x < 8; x++) {
+					add(boardSquare[x][y], createMatchParentConstraints(1));
+				}
+			}
+			
+		} else {
+			for (int y = 7; y >= 0; y--) {
+				for (int x = 0; x < 8; x++) {
+					add(boardSquare[x][y], createMatchParentConstraints(1));
+				}
+			}
+		}
+	}
+	
+	private static void createSquares() {
+		for (int y = 0; y < 8; y++) {
+			for (int x = 0; x < 8; x++) {
+				createBoardSquare(x, y);
+			}
+		}
 	}
 
 	private void createHelper() {
@@ -97,16 +113,22 @@ public class BoardPanel extends FlatPanel {
 	// 정해진 좌표의 하나의 칸을 생성해서 하나의 square가 배열로써 저장되어 좌표의 의미를 갖도록 해서 추후 클래스의 설명에 적혀있는
 	// 이벤트를 처리할때
 	// 좌표의 값을 이용해서 square에 이벤트를 처리 할 수 있도록 하려고한다.
-	private BoardSquare createBoardSquare(int x, int y) { // ㅇ
+	private static BoardSquare createBoardSquare(int x, int y) { // ㅇ
 		boardSquare[x][y] = new BoardSquare(
 				(x + y) % 2 == 0 ? Theme.BOARD_LIGHT_SQUARE_COLOR : Theme.BOARD_DARK_SQUARE_COLOR);
-		boardSquare[x][y].setOnClickListener(new OnClickListener() {
+		boardSquare[x][y].setOnClickListener(getListenerToControlChessman(x, y));
+		System.out.println(boardSquare[x][y].hashCode());
+		return boardSquare[x][y];
+	}
+	
+	private static OnClickListener getListenerToControlChessman(int x, int y) {
+		return new OnClickListener() {
 			@Override
 			public void onClick(Component component) {
 				// 처음눌렀을때
 				if (boardSquare[x][y].isContainChessman() && selectedSquare == null) {
 					selectChessman(x, y);
-
+					System.out.println(boardSquare[x][y].hashCode());
 				} else if (selectedSquare == boardSquare[x][y]) {
 					deSelectChessman();
 
@@ -114,11 +136,10 @@ public class BoardPanel extends FlatPanel {
 					moveSelectedChessman(x, y);
 				}
 			}
-		});
-		return boardSquare[x][y];
+		};
 	}
 
-	private void selectChessman(int x, int y) {
+	private static void selectChessman(int x, int y) {
 		disableSquareClickEvent(); // 초기에 말을 골랐을때 모든 칸의 클릭 이벤트를 풀고
 
 		selectedSquare = boardSquare[x][y]; // 그 눌린말의 스퀘어 정보를 선택된 스퀘어에 저장하고
@@ -144,7 +165,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	private void deSelectChessman() {
+	private static void deSelectChessman() {
 		moveHelper.disableMoveableRoute(); // 움직일수 있는 경로를 비활성화한다 : 보여주기(감추기)
 
 		initSquareEvent(isWhite); // 클릭된 말 이외에 클릭이 비활성 되었던 것에서 현재 색상의 말들의 클릭이벤트를 활성화해준다. : 기능적
@@ -158,7 +179,7 @@ public class BoardPanel extends FlatPanel {
 		checkmateHelper.disableCheckmateRoute(); // 체크메이트 할 수 있는 경로를 비활성화 한다 : 보여주기(감추기)
 	}
 
-	private void moveSelectedChessman(int x, int y) {
+	private static void moveSelectedChessman(int x, int y) {
 		// 이동경로로 이동했을 때
 		if (boardSquare[x][y].isContainChessman()) {
 			// 잡 았을때 잡힌말을 추후에 CurrentChessmanView에 적용 시키기위해 테스트 하던 부분
@@ -205,7 +226,7 @@ public class BoardPanel extends FlatPanel {
 		initSquareEvent(isWhite);
 	}
 
-	private void initSquareEvent(boolean isWhite) {
+	private static void initSquareEvent(boolean isWhite) {
 		selectedSquare.setSquareOriginalColor();
 		enableSquareClickEvent(isWhite);
 		selectedSquare = null;
@@ -279,7 +300,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	private void disableSquareClickEvent() {
+	private static void disableSquareClickEvent() {
 		for (int y = 0; y < 8; y++) {
 			for (int x = 0; x < 8; x++) {
 				boardSquare[x][y].setEnableClickEvent(false);
@@ -287,7 +308,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	private void enableSquareClickEvent(boolean isWhite) {
+	private static void enableSquareClickEvent(boolean isWhite) {
 		for (int y = 0; y < 8; y++) {
 			for (int x = 0; x < 8; x++) {
 				if (boardSquare[x][y].isContainChessman() && boardSquare[x][y].getChessman().isWhite() == isWhite) {
@@ -298,7 +319,7 @@ public class BoardPanel extends FlatPanel {
 			}
 		}
 	}
-
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	private class MoveHelper {
 		private ArrayList<MoveableRoute> moveableRouteList = new ArrayList<>();
