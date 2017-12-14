@@ -68,7 +68,7 @@ public class BoardPanel extends FlatPanel {
 		setWholeChessmanOnBoard();
 		createHelper();
 		disableSquareClickEvent();
-		enableSquareClickEvent(isWhite);
+		enableSquareClickEvent(BoardPanel.isWhite);
 
 	}
 	
