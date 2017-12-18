@@ -323,6 +323,17 @@ public class BoardPanel extends FlatPanel {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * MoveHelper는 MoveableRouteCalculator로 부터 계산된 MoveableRouteList를 이용해서
+	 * BoardPanel 위 Chessman의 움직임(공격/이동)을 구현하기위해서 만들어진 내부클래스이다.
+	 * 
+	 * MoveHelper는 체스말이 선택되었을때 MoveableCalculator로 부터 계산된 MoveableRouteList를 받아 분석하여 움직일수 있는 경로를 표현한다.
+	 * 1. 체스말은 움직일 수 있는 경로상에 같은색의 말이 있으면 움직이지 못한다. (단, 나이트 제외)
+	 * 2. 체스말은 움직일 수 있는 경로상에 다른색의 말이 있으면 공격 할 수있다. (단, Pawn 제외)
+	 * 3. 1, 2번의 경우를 충족하면서 그 이후의 칸들을 더 움직일 수 있는 범위라고 해도 움직 일 수없다.
+	 * 
+	 * @author 김형수
+	 */
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	private class MoveHelper {
 		private ArrayList<MoveableRoute> moveableRouteList = new ArrayList<>();
