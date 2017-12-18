@@ -389,17 +389,27 @@ public class BoardPanel extends FlatPanel {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * PawnAttackHelper는 BoardPanel 위에서 Chessman Pawn의 공격을 구현하기위해서 만들어진 내부클래스이다.
+	 * 이 내부클래스는 폰의 현재 위치좌표와 색상을 이용해서 공격가능한 좌표에 다른색상의 말, 적이 있는지 체크한다
+	 * 그리고 체크결과를 pawnAttackableRouteList에 저장하여 폰의 공격가능경로(0 ~ 2가지)를 보여줄 수 있다.
+	 * 
+	 * 기존의 MoveableRouteCalculator의 계산된 경로와는 별도의 논리로 구성되어있다. 이유는 폰을 제외한 다른 말들은
+	 * 움직임과 공격의 경로가 똑같지만 폰의 경우 움직이는 경로와 공격의 경로가 같지 않기 때문이다.
+	 * 
+	 * @author 김형수
+	 */
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	private class PawnAttackHelper {
 		private ArrayList<MoveableRoute> pawnAttackableRouteList = new ArrayList<>();
-
+		// 폰이 공격가능한 칸을 원래 색상으로 바꾸어준다. 
 		private void disablePawnAttackableSquare() {
 			for (MoveableRoute attackableRoute : pawnAttackableRouteList) {
 				for (Coordinate attackableCoordinate : attackableRoute.getCoordinates())
 					BOARD_SQUARE[attackableCoordinate.getX()][attackableCoordinate.getY()].setSquareOriginalColor();
 			}
 		}
-
+		// 폰이 공격 가능한 칸이 있는 지 확인하고 가능한 칸이 있다면 공격가능 한 칸으로써 보여준다.
 		private void showPawnAttackableSquare(int x, int y) {
 			checkPawnAttackableSquare(x, y);
 
@@ -408,17 +418,29 @@ public class BoardPanel extends FlatPanel {
 					BOARD_SQUARE[attackableCoordinate.getX()][attackableCoordinate.getY()].setSquareAttackableColor();
 			}
 		}
-
+		// 적인지 아닌지
 		private boolean isEnemy(int x, int y) {
 			return BOARD_SQUARE[x][y].isContainChessman() && (BOARD_SQUARE[x][y].getChessman().isWhite() != isWhite);
 		}
-
+		/**
+		 * 폰이 공격할 수 있는 좌표를 파라미터로 입력받아 입력받은 좌표를 갖는 크기 1인 배열을 반환한다.
+		 * 
+		 * @param x : 폰이 공격 할 수 있는 x좌표 
+		 * @param y : 폰이 공격 할 수 있는 y좌표
+		 * @return : 폰이 공격 할 수있는 Coordinate(x, y)를 크기 1인 배열로 반환한다.
+		 */
 		private Coordinate[] getPawnAttackableCoordinate(int x, int y) {
 			Coordinate[] pawnAttackableCoordinate = new Coordinate[1];
 			pawnAttackableCoordinate[0] = new Coordinate(x, y);
 			return pawnAttackableCoordinate;
 		}
-
+		/**
+		 * 폰의 현재위치 좌표(x,y)와 isWhite 정보를 이용해서 폰이 공격 가능한 2가지 경로(좌표)상에 적체스말이 놓여있는지 확인한다
+		 * 확인 결과 적 체스말이 있다면 폰의 공격가능한 경로를 리스트에 추가한다.
+		 * 
+		 * @param x : 폰의 현재위치 x좌표
+		 * @param y : 폰의 현재위치 y좌표
+		 */
 		private void checkPawnAttackableSquare(int x, int y) {
 			pawnAttackableRouteList.clear();
 			if (isWhite) {
@@ -453,8 +475,9 @@ public class BoardPanel extends FlatPanel {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * CheckmateHelper는 BoardPanel의 Chessman이 이동하고 턴이 넘어가기 전 왕을 잡을수 있는 경로를 가진 체스말이
-	 * 있는지 검사하는 기능을 구현한다. 따라서 체크메이트 핼퍼는 턴이 넘어가기전 (흰색/검은색)색상의 체스말들의 경로를 계산하여 체크메이트 할
-	 * 수 있는 유효한 경로만을 저장했다가 턴이 넘어가 반대편 색상의 말을 클릭했을때 체스메이트 할 수 있는 경로를 보여주도록 설계되었다.
+	 * 있는지 검사하는 기능을 구현한다. 따라서 체크메이트 핼퍼는 턴이 넘어가기전 현재색상을 기준으로 현재색상의 체스말들의
+	 * 이동가능한 경로를 계산하고 이 계산한 경로 상에 반대색상의 왕이 있다면 해당 경로를 체크메이트경로리스트에 추가(저장)한다.
+	 * 턴이 넘어가고 반대색상의 말을 클릭했을때 체스메이트경로리스트에 저장된 경로를 보여주도록 설계되었다.
 	 * 
 	 * 기존의 MoveableRouteCalculator의 계산된 경로에서 체크메이트 루트를 검사해서 추출하며 PawnAttackHelper를
 	 * 이용해서 폰으로 왕을 체크메이트 할 수있는 경우에 대해서도 계산한다.
