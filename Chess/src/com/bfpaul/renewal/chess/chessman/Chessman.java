@@ -10,6 +10,8 @@ import java.awt.Image;
  */
 public abstract class Chessman {
 	
+	private static final Chessman INVALID_CHESSMAN = createInvalidChessman();
+	
 	public abstract Direction[] getDirection();
 	
 	public abstract boolean isWhite();
@@ -19,4 +21,48 @@ public abstract class Chessman {
 	public abstract Image getChessmanImage();
 	
 	public abstract ChessmanType getChessmanType();
+	
+	private static Chessman createInvalidChessman() {
+		return new Chessman() {
+
+			@Override
+			public Direction[] getDirection() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public boolean isWhite() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public int getMoveableSquareCount() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public Image getChessmanImage() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public ChessmanType getChessmanType() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+		};
+	}
+	
+	public static Chessman getInvalidChessman() {
+		return INVALID_CHESSMAN;
+	}
+	
+	public boolean isValid() {
+		return this != INVALID_CHESSMAN;
+	}
 }

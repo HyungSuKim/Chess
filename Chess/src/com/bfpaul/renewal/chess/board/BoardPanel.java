@@ -17,6 +17,7 @@ import com.bfpaul.renewal.chess.chessman.Rook;
 import com.bfpaul.renewal.chess.controller.Coordinate;
 import com.bfpaul.renewal.chess.controller.MoveableRoute;
 import com.bfpaul.renewal.chess.controller.chessman.MoveableRouteCalculator;
+import com.bfpaul.renewal.chess.game.GameHelper;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.layout.linear.constraints.LinearConstraints;
@@ -44,6 +45,7 @@ public class BoardPanel extends FlatPanel {
 	private static final BoardSquare[][] BOARD_SQUARE = new BoardSquare[8][8];
 	private static BoardSquare selectedSquare = null;
 	private static boolean isWhite = true;
+	private GameHelper gameHelper;
 
 	// 체스말이 보드위에서 일정 방법으로 움직이는 것을 도와주는 내부 클래스들로써
 	// 보드가 만들어지고 말이 놓여지고 행동을 할 때 이러한 것들이 필요하다고 판단해서
@@ -54,12 +56,10 @@ public class BoardPanel extends FlatPanel {
 	private static EnPassantHelper enPassantHelper;
 	private static CheckmateHelper checkmateHelper;
 
-	@SuppressWarnings("unused")
-	private BoardPanel() {
-	}
-
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
-	public BoardPanel(boolean isWhite) {
+	public BoardPanel(GameHelper gameHelper, boolean isWhite) {
+		this.gameHelper = gameHelper;
+		
 		setLayout(new GridLayout(8, 8));
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Theme.BOARD_BORDER_COLOR);
@@ -92,7 +92,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	private static void createSquares() {
+	private void createSquares() {
 		for (int y = 0; y < 8; y++) {
 			for (int x = 0; x < 8; x++) {
 				createBoardSquare(x, y);
@@ -116,13 +116,13 @@ public class BoardPanel extends FlatPanel {
 	// 정해진 좌표의 하나의 칸을 생성해서 하나의 square가 배열로써 저장되어 좌표의 의미를 갖도록 해서 추후 클래스의 설명에 적혀있는
 	// 이벤트를 처리할때
 	// 좌표의 값을 이용해서 square에 이벤트를 처리 할 수 있도록 하려고한다.
-	private static void createBoardSquare(int x, int y) { // ㅇ
+	private void createBoardSquare(int x, int y) { // ㅇ
 		BOARD_SQUARE[x][y] = new BoardSquare(
 				(x + y) % 2 == 0 ? Theme.BOARD_LIGHT_SQUARE_COLOR : Theme.BOARD_DARK_SQUARE_COLOR);
 		BOARD_SQUARE[x][y].setOnClickListener(getListenerToControlChessman(x, y));
 	}
 
-	private static OnClickListener getListenerToControlChessman(int x, int y) {
+	private OnClickListener getListenerToControlChessman(int x, int y) {
 		return new OnClickListener() {
 			@Override
 			public void onClick(Component component) {
@@ -139,7 +139,7 @@ public class BoardPanel extends FlatPanel {
 		};
 	}
 
-	private static void selectChessman(int x, int y) {
+	private void selectChessman(int x, int y) {
 		disableSquareClickEvent(); // 초기에 말을 골랐을때 모든 칸의 클릭 이벤트를 풀고
 
 		selectedSquare = BOARD_SQUARE[x][y]; // 그 눌린말의 스퀘어 정보를 선택된 스퀘어에 저장하고
@@ -165,7 +165,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	private static void deSelectChessman() {
+	private void deSelectChessman() {
 		moveHelper.disableMoveableRoute(); // 움직일수 있는 경로를 비활성화한다 : 보여주기(감추기)
 
 		initSquareEvent(isWhite); // 클릭된 말 이외에 클릭이 비활성 되었던 것에서 현재 색상의 말들의 클릭이벤트를 활성화해준다. : 기능적
@@ -181,14 +181,7 @@ public class BoardPanel extends FlatPanel {
 		selectedSquare = null;
 	}
 
-	private static void moveSelectedChessman(int x, int y) {
-		// 이동경로로 이동했을 때
-		if (BOARD_SQUARE[x][y].isContainChessman()) {
-			// 잡 았을때 잡힌말을 추후에 CurrentChessmanView에 적용 시키기위해 테스트 하던 부분
-			// 문제는 앙파상을 하는경우에 잡힌 폰이 표시되지 않는 다는 것과 캐슬링을 하는 경우 Rook이 잡힌걸로 표시된다는 것이다.
-			// 그래서 움직임이 끝날때마다 각 말을 세어줄까... 생각은 하고있는데 아직 미정이다.
-			// System.out.println(boardSquare[x][y].getChessman().getChessmanType().name());
-		}
+	private void moveSelectedChessman(int x, int y) {
 
 		// 캐슬링 관련 & 앙파상 관련
 		if (selectedSquare.getChessman() instanceof King && castlingHelper.castlingSquareList.size() != 0) {
@@ -196,6 +189,12 @@ public class BoardPanel extends FlatPanel {
 			castlingHelper.moveCastling(x, y); // 흠?
 			enPassantHelper.initEnPassantSquare(); // 앙파상이 활성화 되어있는 상태로 캐슬링을 하면 앙파상은 무효
 		} else {
+			
+			if(BOARD_SQUARE[x][y].isContainChessman()) {
+				Chessman chessman = BOARD_SQUARE[x][y].getChessman();
+				gameHelper.decreaseCurrentChessmanCount(chessman.isWhite(), chessman.getChessmanType());
+			}
+			
 			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman()); // 그 이외의 움직임을 실행했을때
 		}
 
@@ -213,7 +212,7 @@ public class BoardPanel extends FlatPanel {
 		}
 
 		if (BOARD_SQUARE[x][y].getChessman() instanceof Pawn && (y == 0 || y == 7)) {
-			new PawnPromotionSelectView(BOARD_SQUARE[x][y]);
+			new PawnPromotionSelectView(gameHelper, BOARD_SQUARE[x][y]);
 		}
 
 		selectedSquare.removeChessmanFromSquare();
@@ -267,7 +266,7 @@ public class BoardPanel extends FlatPanel {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-			setPawnOnBoard(ChessmanType.PAWN);
+//			setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
@@ -277,8 +276,17 @@ public class BoardPanel extends FlatPanel {
 	// 갖게 된다는 것을 알고
 	// 이러한 규칙을 이용해서 초기 갯수가 1개인 말을 한꺼번에 처리해서 Square에 올려주게되었다.
 	private void setSingleChessmanOnBoard(ChessmanType type) {
-		setChessmanOnSquare(type.createChessman(false), (type.ordinal() + 3), 0);
-		setChessmanOnSquare(type.createChessman(true), (type.ordinal() + 3), 7);
+		
+		int xCoordinate;
+		
+		if(type.equals(ChessmanType.KING)) {
+			xCoordinate = type.ordinal() + 4;
+		} else {
+			xCoordinate = type.ordinal() + 2;
+		}
+		
+		setChessmanOnSquare(type.createChessman(false), xCoordinate, 0);
+		setChessmanOnSquare(type.createChessman(true), xCoordinate, 7);
 	}
 
 	// 초기 갯수가 2개인 말(비숍, 나이트, 룩) 의 경우 enum의 ordinal이 2, 3, 4인데 여기서 3을 더한 값과 7에서 이 값을
@@ -622,7 +630,8 @@ public class BoardPanel extends FlatPanel {
 		private boolean isChessmanHasCheckmateRoute(MoveableRoute moveableRoute, Coordinate coordinate) {
 			if (isOppositeColorKing(coordinate.getX(), coordinate.getY())) {
 				checkmateRouteList.add(moveableRoute);
-				// new BoardEventInfoView(Images.CHECK);
+//				 new BoardEventInfoView(Images.CHECK);
+				
 				return true;
 
 			} else {
@@ -699,11 +708,14 @@ public class BoardPanel extends FlatPanel {
 		// 움직인 좌표가 앙파상으로 설정된 좌표라면 앙파상위에 있는 체스말이 흰색인지 검은색인지 판단해서 그 뒤에 있는 말을 제거한다.
 		private void moveEnPassant(int x, int y) {
 			if (isEnPassantMove(x, y)) {
-				if (enPassantSquare.getChessman().isWhite()) {
+				boolean movedPawnColor = enPassantSquare.getChessman().isWhite(); 
+				if (movedPawnColor) {
 					BOARD_SQUARE[x][y + 1].removeChessmanFromSquare();
 				} else {
 					BOARD_SQUARE[x][y - 1].removeChessmanFromSquare();
 				}
+				
+				gameHelper.decreaseCurrentChessmanCount(!movedPawnColor, ChessmanType.PAWN);
 			}
 		}
 

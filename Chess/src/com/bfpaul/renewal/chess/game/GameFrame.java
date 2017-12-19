@@ -5,10 +5,11 @@ import java.io.IOException;
 
 import javax.swing.border.EmptyBorder;
 
-import com.bfpaul.renewal.chess.timer.GameTimerView;
 import com.bfpaul.renewal.chess.Images;
 import com.bfpaul.renewal.chess.Theme;
 import com.bfpaul.renewal.chess.board.BoardPanel;
+import com.bfpaul.renewal.chess.chessman.ChessmanType;
+import com.bfpaul.renewal.chess.timer.GameTimerView;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
@@ -20,12 +21,15 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 import com.mommoo.util.ScreenManager;
 
 public class GameFrame {
-	FlatFrame frame = createFrame();
+	private FlatFrame frame = createFrame();
+	private CurrentChessmanView currentChessmanView = new CurrentChessmanView();
+	private GameTimerView gameTimerView = new GameTimerView();
+	private GameHelper gameHost = new GameHelper(currentChessmanView, gameTimerView);
+	
 	public GameFrame(boolean isWhite) {
-//		FlatFrame frame = createFrame();
 		
 		frame.getContainer().add(createRelatedInfoPanel(), createCommonConstraints(2));
-		frame.getContainer().add(new BoardPanel(isWhite), createCommonConstraints(10));
+		frame.getContainer().add(new BoardPanel(gameHost, isWhite), createCommonConstraints(10));
 		
 		if(isWhite) {
 			frame.setLocation(0, 0);
@@ -46,7 +50,6 @@ public class GameFrame {
 		frame.setTitle("Chess Game");
 		frame.setSize(screenManager.dip2px(500), screenManager.dip2px(530));
 		frame.getContainer().setLayout(new LinearLayout(Orientation.VERTICAL, 0));
-//		frame.setLocationOnScreenCenter();
 		frame.setIconImage(Images.ICON);
 		frame.setProcessIconImage(Images.ICON);
 		frame.setTitleBarColor(Theme.TITLE_BAR_COLOR);
@@ -62,9 +65,9 @@ public class GameFrame {
 		relatedInfoView.setBackground(Theme.DARK_BLUE_COLOR);
 		relatedInfoView.setOpaque(true);
 		
-		relatedInfoView.add(new CurrentChessmanView(), createCommonConstraints(4));
+		relatedInfoView.add(currentChessmanView, createCommonConstraints(4));
 		relatedInfoView.add(timerAndButtonPanel, createCommonConstraints(3));
-		timerAndButtonPanel.add(new GameTimerView(), createCommonConstraints(2));
+		timerAndButtonPanel.add(gameTimerView, createCommonConstraints(2));
 		timerAndButtonPanel.add(createButtonPanel(), createCommonConstraints(1));
 		return relatedInfoView;
 	}
@@ -112,4 +115,5 @@ public class GameFrame {
 		});
 		return giveUpButton;
 	}
+
 }

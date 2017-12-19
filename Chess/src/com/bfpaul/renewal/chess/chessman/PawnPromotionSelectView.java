@@ -5,6 +5,7 @@ import java.awt.Component;
 import com.bfpaul.chess.Images;
 import com.bfpaul.chess.Theme;
 import com.bfpaul.renewal.chess.board.BoardSquare;
+import com.bfpaul.renewal.chess.game.GameHelper;
 import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.frame.FlatDialog;
 import com.mommoo.flat.frame.FlatFrame;
@@ -16,8 +17,9 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 
 public class PawnPromotionSelectView {
 	FlatFrame frame = createFrame();
-	
-	public PawnPromotionSelectView(BoardSquare boardSquare) {
+	GameHelper gameHelper;
+	public PawnPromotionSelectView(GameHelper gameHelper, BoardSquare boardSquare) {
+		this.gameHelper = gameHelper;
 		
 		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.QUEEN),
 				new LinearConstraints(1, LinearSpace.MATCH_PARENT));
@@ -53,8 +55,7 @@ public class PawnPromotionSelectView {
 
 			@Override
 			public void onClick(Component component) {
-				// TODO Auto-generated method stub
-				System.out.println(type.name());
+
 				switch(type) {
 				case QUEEN : boardSquare.setChessmanOnSquare(new Queen(boardSquare.getChessman().isWhite()));
 				break;
@@ -66,6 +67,9 @@ public class PawnPromotionSelectView {
 				break;
 				default :
 				}
+				
+				gameHelper.increaseCurrentChessmanCount(boardSquare.getChessman().isWhite(), type);
+				
 				boardSquare.setEnabled(false);
 				
 				new FlatDialog.Builder()
