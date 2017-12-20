@@ -24,7 +24,7 @@ import com.mommoo.flat.text.textarea.alignment.FlatVerticalAlignment;
 public class CurrentChessmanView extends FlatPanel {
 	// 현재 체스말현황의 뷰를 생성해주는 생성자로 체스말현황뷰의 설명이 포함된 뷰인포라벨을 가장 상단에배치하고
 	// 그 밑으로 하얀말들과 검정말들의 현황을 보여쥬는 뷰를 배치하였다.
-	CurrentChessmanView() {
+	public CurrentChessmanView() {
 		setLayout(new LinearLayout(Orientation.VERTICAL, 0));
 		setBackground(Theme.LIGHT_BLUE_COLOR);
 		setOpaque(true);

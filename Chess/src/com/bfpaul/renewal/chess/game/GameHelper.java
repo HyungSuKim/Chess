@@ -1,7 +1,7 @@
 package com.bfpaul.renewal.chess.game;
 
+import com.bfpaul.renewal.chess.board.BoardPanel;
 import com.bfpaul.renewal.chess.chessman.ChessmanType;
-import com.bfpaul.renewal.chess.timer.GameTimerView;
 
 /**
  * GameHelper 클래스는 게임을 진행하는데 도움을 주기위해서 필요한 클래스이다
@@ -22,11 +22,10 @@ import com.bfpaul.renewal.chess.timer.GameTimerView;
  */
 public class GameHelper {
 	private CurrentChessmanView currentChessmanView = new CurrentChessmanView();
-	private GameTimerView gameTimerView = new GameTimerView();
+	private BoardPanel boardPanel;
 	
-	GameHelper(CurrentChessmanView currentChessmanView, GameTimerView gameTimerView) {
+	public GameHelper(CurrentChessmanView currentChessmanView) {
 		this.currentChessmanView = currentChessmanView;
-		this.gameTimerView = gameTimerView;
 	}
 	
 	public void decreaseCurrentChessmanCount(boolean isWhite, ChessmanType type) {
@@ -37,4 +36,15 @@ public class GameHelper {
 		currentChessmanView.increaseCurrentChessmanCount(isWhite, type);
 	}
 	
+	public void setBoardPanel(BoardPanel boardPanel) {
+		this.boardPanel = boardPanel;
+	}
+	
+	public void changePhaseOnBoardPanel() {
+		boardPanel.changePhase();
+	}
+	
+	public boolean getPlayerColor() {
+		return boardPanel.getPlayerColor();
+	}
 }

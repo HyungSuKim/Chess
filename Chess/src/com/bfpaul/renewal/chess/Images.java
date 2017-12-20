@@ -26,4 +26,6 @@ public class Images {
 	public static final Image WHITE_PAWN = Toolkit.getDefaultToolkit().getImage("..\\Chess\\lib\\Image\\WhiteChessman\\White_Pawn.png");
 	
 	public static final Image CHECK = Toolkit.getDefaultToolkit().getImage("..\\Chess\\lib\\Image\\check.png");
+	public static final Image CASTLING = Toolkit.getDefaultToolkit().getImage("..\\Chess\\lib\\Image\\castling.png");
+	public static final Image ENPASSANT = Toolkit.getDefaultToolkit().getImage("..\\Chess\\lib\\Image\\enpassant.png");
 }

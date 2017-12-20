@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 
+import com.bfpaul.renewal.chess.Images;
 import com.bfpaul.renewal.chess.Theme;
 import com.bfpaul.renewal.chess.chessman.Chessman;
 import com.bfpaul.renewal.chess.chessman.ChessmanType;
@@ -59,7 +60,7 @@ public class BoardPanel extends FlatPanel {
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
 	public BoardPanel(GameHelper gameHelper, boolean isWhite) {
 		this.gameHelper = gameHelper;
-		
+
 		setLayout(new GridLayout(8, 8));
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Theme.BOARD_BORDER_COLOR);
@@ -73,6 +74,7 @@ public class BoardPanel extends FlatPanel {
 		disableSquareClickEvent();
 		enableSquareClickEvent(BoardPanel.isWhite);
 
+		gameHelper.setBoardPanel(this);
 	}
 
 	private void setSquareLayoutByColor(boolean isWhite) {
@@ -168,6 +170,8 @@ public class BoardPanel extends FlatPanel {
 	private void deSelectChessman() {
 		moveHelper.disableMoveableRoute(); // 움직일수 있는 경로를 비활성화한다 : 보여주기(감추기)
 
+		selectedSquare.setSquareOriginalColor();
+
 		initSquareEvent(isWhite); // 클릭된 말 이외에 클릭이 비활성 되었던 것에서 현재 색상의 말들의 클릭이벤트를 활성화해준다. : 기능적
 
 		pawnAttackHelper.disablePawnAttackableSquare(); // 폰이 공격할수있는 경로를 비활성화한다 : 보여주기(감추기)
@@ -178,7 +182,6 @@ public class BoardPanel extends FlatPanel {
 
 		checkmateHelper.disableCheckmateRoute(); // 체크메이트 할 수 있는 경로를 비활성화 한다 : 보여주기(감추기)
 
-		selectedSquare = null;
 	}
 
 	private void moveSelectedChessman(int x, int y) {
@@ -189,12 +192,12 @@ public class BoardPanel extends FlatPanel {
 			castlingHelper.moveCastling(x, y); // 흠?
 			enPassantHelper.initEnPassantSquare(); // 앙파상이 활성화 되어있는 상태로 캐슬링을 하면 앙파상은 무효
 		} else {
-			
-			if(BOARD_SQUARE[x][y].isContainChessman()) {
+
+			if (BOARD_SQUARE[x][y].isContainChessman()) {
 				Chessman chessman = BOARD_SQUARE[x][y].getChessman();
 				gameHelper.decreaseCurrentChessmanCount(chessman.isWhite(), chessman.getChessmanType());
 			}
-			
+
 			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman()); // 그 이외의 움직임을 실행했을때
 		}
 
@@ -222,13 +225,27 @@ public class BoardPanel extends FlatPanel {
 		checkmateHelper.checkCurrentColorChessmanCheckmateRoute();
 
 		moveHelper.disableMoveableRoute();
+		selectedSquare.setSquareOriginalColor();
 
+		/* Test */
+		// disableSquareClickEvent();
+		isWhite = !isWhite; // 이동을 했을 때 움직인 색의 반대색으로 설정한다.
+		initSquareEvent(isWhite);
+		/* Test */
+
+	}
+
+	// test//
+	public void changePhase() {
 		isWhite = !isWhite; // 이동을 했을 때 움직인 색의 반대색으로 설정한다.
 		initSquareEvent(isWhite);
 	}
 
+	public boolean getPlayerColor() {
+		return isWhite;
+	}
+
 	private static void initSquareEvent(boolean isWhite) {
-		selectedSquare.setSquareOriginalColor();
 		enableSquareClickEvent(isWhite);
 		selectedSquare = null;
 	}
@@ -266,7 +283,7 @@ public class BoardPanel extends FlatPanel {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-//			setPawnOnBoard(ChessmanType.PAWN);
+			 setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
@@ -276,15 +293,15 @@ public class BoardPanel extends FlatPanel {
 	// 갖게 된다는 것을 알고
 	// 이러한 규칙을 이용해서 초기 갯수가 1개인 말을 한꺼번에 처리해서 Square에 올려주게되었다.
 	private void setSingleChessmanOnBoard(ChessmanType type) {
-		
+
 		int xCoordinate;
-		
-		if(type.equals(ChessmanType.KING)) {
+
+		if (type.equals(ChessmanType.KING)) {
 			xCoordinate = type.ordinal() + 4;
 		} else {
 			xCoordinate = type.ordinal() + 2;
 		}
-		
+
 		setChessmanOnSquare(type.createChessman(false), xCoordinate, 0);
 		setChessmanOnSquare(type.createChessman(true), xCoordinate, 7);
 	}
@@ -335,10 +352,10 @@ public class BoardPanel extends FlatPanel {
 	 * MoveHelper는 MoveableRouteCalculator로 부터 계산된 MoveableRouteList를 이용해서
 	 * BoardPanel 위 Chessman의 움직임(공격/이동)을 구현하기위해서 만들어진 내부클래스이다.
 	 * 
-	 * MoveHelper는 체스말이 선택되었을때 MoveableCalculator로 부터 계산된 MoveableRouteList를 받아 분석하여 움직일수 있는 경로를 표현한다.
-	 * 1. 체스말은 움직일 수 있는 경로상에 같은색의 말이 있으면 움직이지 못한다. (단, 나이트 제외)
-	 * 2. 체스말은 움직일 수 있는 경로상에 다른색의 말이 있으면 공격 할 수있다. (단, Pawn 제외)
-	 * 3. 1, 2번의 경우를 충족하면서 그 이후의 칸들을 더 움직일 수 있는 범위라고 해도 움직 일 수없다.
+	 * MoveHelper는 체스말이 선택되었을때 MoveableCalculator로 부터 계산된 MoveableRouteList를 받아 분석하여
+	 * 움직일수 있는 경로를 표현한다. 1. 체스말은 움직일 수 있는 경로상에 같은색의 말이 있으면 움직이지 못한다. (단, 나이트 제외) 2.
+	 * 체스말은 움직일 수 있는 경로상에 다른색의 말이 있으면 공격 할 수있다. (단, Pawn 제외) 3. 1, 2번의 경우를 충족하면서 그
+	 * 이후의 칸들을 더 움직일 수 있는 범위라고 해도 움직 일 수없다.
 	 * 
 	 * @author 김형수
 	 */
@@ -409,25 +426,27 @@ public class BoardPanel extends FlatPanel {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
-	 * PawnAttackHelper는 BoardPanel 위에서 Chessman Pawn의 공격을 구현하기위해서 만들어진 내부클래스이다.
-	 * 이 내부클래스는 폰의 현재 위치좌표와 색상을 이용해서 공격가능한 좌표에 다른색상의 말, 적이 있는지 체크한다
-	 * 그리고 체크결과를 pawnAttackableRouteList에 저장하여 폰의 공격가능경로(0 ~ 2가지)를 보여줄 수 있다.
+	 * PawnAttackHelper는 BoardPanel 위에서 Chessman Pawn의 공격을 구현하기위해서 만들어진 내부클래스이다. 이
+	 * 내부클래스는 폰의 현재 위치좌표와 색상을 이용해서 공격가능한 좌표에 다른색상의 말, 적이 있는지 체크한다 그리고 체크결과를
+	 * pawnAttackableRouteList에 저장하여 폰의 공격가능경로(0 ~ 2가지)를 보여줄 수 있다.
 	 * 
-	 * 기존의 MoveableRouteCalculator의 계산된 경로와는 별도의 논리로 구성되어있다. 이유는 폰을 제외한 다른 말들은
-	 * 움직임과 공격의 경로가 똑같지만 폰의 경우 움직이는 경로와 공격의 경로가 같지 않기 때문이다.
+	 * 기존의 MoveableRouteCalculator의 계산된 경로와는 별도의 논리로 구성되어있다. 이유는 폰을 제외한 다른 말들은 움직임과
+	 * 공격의 경로가 똑같지만 폰의 경우 움직이는 경로와 공격의 경로가 같지 않기 때문이다.
 	 * 
 	 * @author 김형수
 	 */
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	private class PawnAttackHelper {
 		private ArrayList<MoveableRoute> pawnAttackableRouteList = new ArrayList<>();
-		// 폰이 공격가능한 칸을 원래 색상으로 바꾸어준다. 
+
+		// 폰이 공격가능한 칸을 원래 색상으로 바꾸어준다.
 		private void disablePawnAttackableSquare() {
 			for (MoveableRoute attackableRoute : pawnAttackableRouteList) {
 				for (Coordinate attackableCoordinate : attackableRoute.getCoordinates())
 					BOARD_SQUARE[attackableCoordinate.getX()][attackableCoordinate.getY()].setSquareOriginalColor();
 			}
 		}
+
 		// 폰이 공격 가능한 칸이 있는 지 확인하고 가능한 칸이 있다면 공격가능 한 칸으로써 보여준다.
 		private void showPawnAttackableSquare(int x, int y) {
 			checkPawnAttackableSquare(x, y);
@@ -437,15 +456,19 @@ public class BoardPanel extends FlatPanel {
 					BOARD_SQUARE[attackableCoordinate.getX()][attackableCoordinate.getY()].setSquareAttackableColor();
 			}
 		}
+
 		// 적인지 아닌지
 		private boolean isEnemy(int x, int y) {
 			return BOARD_SQUARE[x][y].isContainChessman() && (BOARD_SQUARE[x][y].getChessman().isWhite() != isWhite);
 		}
+
 		/**
 		 * 폰이 공격할 수 있는 좌표를 파라미터로 입력받아 입력받은 좌표를 갖는 크기 1인 배열을 반환한다.
 		 * 
-		 * @param x : 폰이 공격 할 수 있는 x좌표 
-		 * @param y : 폰이 공격 할 수 있는 y좌표
+		 * @param x
+		 *            : 폰이 공격 할 수 있는 x좌표
+		 * @param y
+		 *            : 폰이 공격 할 수 있는 y좌표
 		 * @return : 폰이 공격 할 수있는 Coordinate(x, y)를 크기 1인 배열로 반환한다.
 		 */
 		private Coordinate[] getPawnAttackableCoordinate(int x, int y) {
@@ -453,12 +476,15 @@ public class BoardPanel extends FlatPanel {
 			pawnAttackableCoordinate[0] = new Coordinate(x, y);
 			return pawnAttackableCoordinate;
 		}
+
 		/**
-		 * 폰의 현재위치 좌표(x,y)와 isWhite 정보를 이용해서 폰이 공격 가능한 2가지 경로(좌표)상에 적체스말이 놓여있는지 확인한다
-		 * 확인 결과 적 체스말이 있다면 폰의 공격가능한 경로를 리스트에 추가한다.
+		 * 폰의 현재위치 좌표(x,y)와 isWhite 정보를 이용해서 폰이 공격 가능한 2가지 경로(좌표)상에 적체스말이 놓여있는지 확인한다 확인
+		 * 결과 적 체스말이 있다면 폰의 공격가능한 경로를 리스트에 추가한다.
 		 * 
-		 * @param x : 폰의 현재위치 x좌표
-		 * @param y : 폰의 현재위치 y좌표
+		 * @param x
+		 *            : 폰의 현재위치 x좌표
+		 * @param y
+		 *            : 폰의 현재위치 y좌표
 		 */
 		private void checkPawnAttackableSquare(int x, int y) {
 			pawnAttackableRouteList.clear();
@@ -494,9 +520,9 @@ public class BoardPanel extends FlatPanel {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * CheckmateHelper는 BoardPanel의 Chessman이 이동하고 턴이 넘어가기 전 왕을 잡을수 있는 경로를 가진 체스말이
-	 * 있는지 검사하는 기능을 구현한다. 따라서 체크메이트 핼퍼는 턴이 넘어가기전 현재색상을 기준으로 현재색상의 체스말들의
-	 * 이동가능한 경로를 계산하고 이 계산한 경로 상에 반대색상의 왕이 있다면 해당 경로를 체크메이트경로리스트에 추가(저장)한다.
-	 * 턴이 넘어가고 반대색상의 말을 클릭했을때 체스메이트경로리스트에 저장된 경로를 보여주도록 설계되었다.
+	 * 있는지 검사하는 기능을 구현한다. 따라서 체크메이트 핼퍼는 턴이 넘어가기전 현재색상을 기준으로 현재색상의 체스말들의 이동가능한 경로를
+	 * 계산하고 이 계산한 경로 상에 반대색상의 왕이 있다면 해당 경로를 체크메이트경로리스트에 추가(저장)한다. 턴이 넘어가고 반대색상의 말을
+	 * 클릭했을때 체스메이트경로리스트에 저장된 경로를 보여주도록 설계되었다.
 	 * 
 	 * 기존의 MoveableRouteCalculator의 계산된 경로에서 체크메이트 루트를 검사해서 추출하며 PawnAttackHelper를
 	 * 이용해서 폰으로 왕을 체크메이트 할 수있는 경우에 대해서도 계산한다.
@@ -572,37 +598,37 @@ public class BoardPanel extends FlatPanel {
 
 						} else {
 							checkChessmanHasCheckmateRoute(chessman, x, y);
-							
+
 						}
 
 					}
 				} // end of for x
 			} // end of for y
 		}
-		
+
 		// 폰인지 아닌지
 		private boolean isPawn(Chessman chessman) {
 			return chessman instanceof Pawn;
 		}
 
 		// PawnAttackHelper의 checkPawnAttackableSquare x, y에 위치하고있는 폰의 공격 가능한 경로를 구하고
-		//	공격가능한 경로를 가진 pawnAttackableRouteList를 이용해서 공격가능한 경로에 반대색상의 킹이 있는 지 검사한다.
+		// 공격가능한 경로를 가진 pawnAttackableRouteList를 이용해서 공격가능한 경로에 반대색상의 킹이 있는 지 검사한다.
 		private void checkPawnHasCheckmateRoute(int x, int y) {
 			pawnAttackHelper.checkPawnAttackableSquare(x, y);
-			
+
 			for (MoveableRoute pawnAttackableRoute : pawnAttackHelper.pawnAttackableRouteList) {
 				for (Coordinate attackableCoordinate : pawnAttackableRoute.getCoordinates())
 					isChessmanHasCheckmateRoute(pawnAttackableRoute, attackableCoordinate);
 			}
 		}
-		
+
 		// 현재 색상의 체스말, x, y를 이용하여 계산된 움직 일 수있는 경로 리스트를 받는다.
 		// 그 경로리스트중 경로와 좌표를 이용해서 반대색상의 왕이 있는지 검사하는 isChssmanHasCheckmateRoute를 호출하는데
 		// 만약 반대색상의 왕을 찾으면 true를 반환해서 break한다.
 		private void checkChessmanHasCheckmateRoute(Chessman chessman, int x, int y) {
-			ArrayList<MoveableRoute>moveableRouteList =
-					MoveableRouteCalculator.getChessmanMoveableRouteList(chessman, x, y);
-			
+			ArrayList<MoveableRoute> moveableRouteList = MoveableRouteCalculator.getChessmanMoveableRouteList(chessman,
+					x, y);
+
 			for (MoveableRoute moveableRoute : moveableRouteList) {
 				for (Coordinate coordinate : moveableRoute.getCoordinates()) {
 					if (isChessmanHasCheckmateRoute(moveableRoute, coordinate))
@@ -626,16 +652,24 @@ public class BoardPanel extends FlatPanel {
 			return isOppositeColorChessman(x, y) && BOARD_SQUARE[x][y].getChessman() instanceof King;
 		}
 
-		// 현재 색의 체스말이 이동가능한 경로와 좌표를 받아와서 받아온 좌표에 반대색상의 왕이 있으면 이동가능한 경로를 체크메이트 가능 경로로써 추가한다.
+		// 현재 색의 체스말이 이동가능한 경로와 좌표를 받아와서 받아온 좌표에 반대색상의 왕이 있으면 이동가능한 경로를 체크메이트 가능 경로로써
+		// 추가한다.
 		private boolean isChessmanHasCheckmateRoute(MoveableRoute moveableRoute, Coordinate coordinate) {
 			if (isOppositeColorKing(coordinate.getX(), coordinate.getY())) {
 				checkmateRouteList.add(moveableRoute);
-//				 new BoardEventInfoView(Images.CHECK);
 				
+				new BoardEventInfoView(Images.CHECK)
+				.setLocation((int)(BoardPanel.super.getWidth()/3.3), (int)(BoardPanel.super.getHeight()/2));
+
+				return true;
+			} else if (isOppositeColorChessman(coordinate.getX(), coordinate.getY())) {
+
 				return true;
 
 			} else {
+
 				return false;
+
 			}
 		}
 	}
@@ -708,13 +742,14 @@ public class BoardPanel extends FlatPanel {
 		// 움직인 좌표가 앙파상으로 설정된 좌표라면 앙파상위에 있는 체스말이 흰색인지 검은색인지 판단해서 그 뒤에 있는 말을 제거한다.
 		private void moveEnPassant(int x, int y) {
 			if (isEnPassantMove(x, y)) {
-				boolean movedPawnColor = enPassantSquare.getChessman().isWhite(); 
+				boolean movedPawnColor = enPassantSquare.getChessman().isWhite();
 				if (movedPawnColor) {
 					BOARD_SQUARE[x][y + 1].removeChessmanFromSquare();
 				} else {
 					BOARD_SQUARE[x][y - 1].removeChessmanFromSquare();
 				}
-				
+				new BoardEventInfoView(Images.ENPASSANT)
+				.setLocation((int)(BoardPanel.super.getWidth()/3.3), (int)(BoardPanel.super.getHeight()/2));
 				gameHelper.decreaseCurrentChessmanCount(!movedPawnColor, ChessmanType.PAWN);
 			}
 		}
@@ -886,6 +921,7 @@ public class BoardPanel extends FlatPanel {
 		private void operateCastling(int x, int y) {
 			if ((x == 7 && y == 7) || (x == 0 && y == 7) || (x == 7 && y == 0) || (x == 0 && y == 0)) {
 				operateCastlingMove(x, y);
+
 			} else {
 				BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
 			}
@@ -908,6 +944,9 @@ public class BoardPanel extends FlatPanel {
 
 			selectedSquare.removeChessmanFromSquare();
 			BOARD_SQUARE[x][y].removeChessmanFromSquare();
+
+			new BoardEventInfoView(Images.CASTLING)
+			.setLocation((int)(BoardPanel.super.getWidth()/3.3), (int)(BoardPanel.super.getHeight()/2));
 		}
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////

@@ -5,6 +5,7 @@ import java.awt.Component;
 import javax.swing.border.EmptyBorder;
 
 import com.bfpaul.chess.Theme;
+import com.bfpaul.renewal.chess.game.GameHelper;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
@@ -18,8 +19,11 @@ import com.mommoo.flat.text.textarea.alignment.FlatVerticalAlignment;
 // 게임 시작시 플레이어(흰색과 검정색)의 타이머를 보여주고 버튼을 이용해서 턴을 넘겨주고자 구현하였다.
 @SuppressWarnings("serial")
 public class GameTimerView extends FlatPanel {
+	private GameHelper gameHelper; 
 	
-	public GameTimerView() {
+	public GameTimerView(GameHelper gameHelper) {
+		this.gameHelper = gameHelper;
+		
 		setLayout(new LinearLayout(10));
 		setBackground(Theme.DARK_BLUE_COLOR);
 		setOpaque(true);
@@ -63,6 +67,8 @@ public class GameTimerView extends FlatPanel {
 			public void onClick(Component component) {
 				((TimerView)getComponent(0)).timerOperateSwitch();
 				((TimerView)getComponent(1)).timerOperateSwitch();
+				
+				gameHelper.changePhaseOnBoardPanel();
 			}
 			
 		});

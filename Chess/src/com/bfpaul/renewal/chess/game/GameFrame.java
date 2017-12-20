@@ -13,6 +13,7 @@ import com.bfpaul.renewal.chess.timer.GameTimerView;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
+import com.mommoo.flat.frame.FlatDialog;
 import com.mommoo.flat.frame.FlatFrame;
 import com.mommoo.flat.layout.linear.LinearLayout;
 import com.mommoo.flat.layout.linear.Orientation;
@@ -23,13 +24,13 @@ import com.mommoo.util.ScreenManager;
 public class GameFrame {
 	private FlatFrame frame = createFrame();
 	private CurrentChessmanView currentChessmanView = new CurrentChessmanView();
-	private GameTimerView gameTimerView = new GameTimerView();
-	private GameHelper gameHost = new GameHelper(currentChessmanView, gameTimerView);
+	private GameHelper gameHelper = new GameHelper(currentChessmanView);
+	private GameTimerView gameTimerView = new GameTimerView(gameHelper);
 	
 	public GameFrame(boolean isWhite) {
 		
 		frame.getContainer().add(createRelatedInfoPanel(), createCommonConstraints(2));
-		frame.getContainer().add(new BoardPanel(gameHost, isWhite), createCommonConstraints(10));
+		frame.getContainer().add(new BoardPanel(gameHelper, isWhite), createCommonConstraints(10));
 		
 		if(isWhite) {
 			frame.setLocation(0, 0);
@@ -107,10 +108,36 @@ public class GameFrame {
 		giveUpButton.setBackground(Theme.YELLOW_COLOR);
 		giveUpButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		giveUpButton.setOnClickListener(new OnClickListener() {
-			@Override
+			
+			private String giveUpPlayer;
+			private String winngPlayer;
+			
 			public void onClick(Component component) {
-				// TODO Auto-generated method stub
-				frame.hide();
+				
+				if(gameHelper.getPlayerColor()) {
+					giveUpPlayer = "흰색 플레이어";
+					winngPlayer = "검은색 플레이어";
+				} else {
+					giveUpPlayer = "검은색 플레이어";
+					winngPlayer = "흰색 플레이어";
+				}
+				
+				new FlatDialog.Builder()
+				.setTitle("기권").setTitleBackgroundColor(Theme.LIGHT_BLUE_COLOR)
+				.setContent(giveUpPlayer + "가 기권하였습니다." + System.lineSeparator()
+				+ winngPlayer + "승리!" + System.lineSeparator() + "확인 시 게임을 종료합니다.")
+				.setContentBackgroundColor(Theme.LIGHT_BLUE_COLOR)
+				.setButtonAreaBackgroundColor(Theme.LIGHT_BLUE_COLOR)
+				.setButtonBackgroundColor(Theme.LIGHT_BLUE_COLOR)
+				.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(Component component) {
+						frame.hide();
+					}
+					
+				}).setLocationRelativeTo(frame.getContainer()).build().show();
+				
 			}
 		});
 		return giveUpButton;
