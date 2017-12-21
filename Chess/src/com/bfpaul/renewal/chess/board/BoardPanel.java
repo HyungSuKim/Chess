@@ -1,5 +1,6 @@
 package com.bfpaul.renewal.chess.board;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import com.bfpaul.renewal.chess.controller.Coordinate;
 import com.bfpaul.renewal.chess.controller.MoveableRoute;
 import com.bfpaul.renewal.chess.controller.chessman.MoveableRouteCalculator;
 import com.bfpaul.renewal.chess.game.GameHelper;
+import com.bfpaul.renewal.chess.game.GameResultManager;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.layout.linear.constraints.LinearConstraints;
@@ -46,6 +48,7 @@ public class BoardPanel extends FlatPanel {
 	private static final BoardSquare[][] BOARD_SQUARE = new BoardSquare[8][8];
 	private static BoardSquare selectedSquare = null;
 	private static boolean isWhite = true;
+	
 	private GameHelper gameHelper;
 
 	// 체스말이 보드위에서 일정 방법으로 움직이는 것을 도와주는 내부 클래스들로써
@@ -164,6 +167,9 @@ public class BoardPanel extends FlatPanel {
 
 		if (selectedSquare.getChessman() instanceof King) { // 선택된 말이 왕이면
 			castlingHelper.setShowCastlingSquare(); // 캐슬링이 가능한지 확인하고 캐슬링 가능한 칸을 보여준다 : 경로계산 + 보여주기
+			/* Test */
+			
+			/* Test */
 		}
 	}
 
@@ -227,12 +233,14 @@ public class BoardPanel extends FlatPanel {
 		moveHelper.disableMoveableRoute();
 		selectedSquare.setSquareOriginalColor();
 
-		/* Test */
 		// disableSquareClickEvent();
+		
+		/* Test */
 		isWhite = !isWhite; // 이동을 했을 때 움직인 색의 반대색으로 설정한다.
 		initSquareEvent(isWhite);
 		/* Test */
-
+		GameResultManager.fiftyCountManager(isWhite).setLocationRelativeTo(this);
+		/* Test */
 	}
 
 	// test//
@@ -283,7 +291,7 @@ public class BoardPanel extends FlatPanel {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-			 setPawnOnBoard(ChessmanType.PAWN);
+//			 setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}

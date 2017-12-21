@@ -109,34 +109,8 @@ public class GameFrame {
 		giveUpButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		giveUpButton.setOnClickListener(new OnClickListener() {
 			
-			private String giveUpPlayer;
-			private String winngPlayer;
-			
 			public void onClick(Component component) {
-				
-				if(gameHelper.getPlayerColor()) {
-					giveUpPlayer = "흰색 플레이어";
-					winngPlayer = "검은색 플레이어";
-				} else {
-					giveUpPlayer = "검은색 플레이어";
-					winngPlayer = "흰색 플레이어";
-				}
-				
-				new FlatDialog.Builder()
-				.setTitle("기권").setTitleBackgroundColor(Theme.LIGHT_BLUE_COLOR)
-				.setContent(giveUpPlayer + "가 기권하였습니다." + System.lineSeparator()
-				+ winngPlayer + "승리!" + System.lineSeparator() + "확인 시 게임을 종료합니다.")
-				.setContentBackgroundColor(Theme.LIGHT_BLUE_COLOR)
-				.setButtonAreaBackgroundColor(Theme.LIGHT_BLUE_COLOR)
-				.setButtonBackgroundColor(Theme.LIGHT_BLUE_COLOR)
-				.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(Component component) {
-						frame.hide();
-					}
-					
-				}).setLocationRelativeTo(frame.getContainer()).build().show();
+				GameResultManager.resignManager(!gameHelper.getPlayerColor()).setLocationRelativeTo(frame.getContainer());
 				
 			}
 		});

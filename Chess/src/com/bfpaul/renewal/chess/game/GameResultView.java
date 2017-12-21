@@ -104,10 +104,11 @@ public class GameResultView extends JDialog {
 	private String getResultContent(boolean isWhite, GameResultType resultType) {
 		switch(resultType) {
 		case CHECKMATE : return getWinContent(isWhite);
-		case STALEMATE : return getWinContent(isWhite);
+		case STALEMATE : return getDrawContent();
 		case RESIGN : return getWinContent(isWhite);
 		case FIFTY_COUNT : return getDrawContent();
 		case THREE_FOLD_REPETITION : return getDrawContent();
+		case TIMER_OUT : return getWinContent(isWhite);
 		default : return new String();
 		}
 	}

@@ -2,6 +2,8 @@ package com.bfpaul.renewal.chess.timer;
 
 import java.time.LocalTime;
 
+import com.bfpaul.renewal.chess.game.GameResultManager;
+
 // TimerView에서 시간속성을 가지고 Timer로써의 역할을 하며 TimerView의 timerLabel에 시간을 보여주기위해 작성하였다.
 class Timer extends Thread {
 	// 초기값을 30분으로 설정하였다.
@@ -37,7 +39,12 @@ class Timer extends Thread {
 
 	// 남은시간에서 1초씩 흐르게해준다.
 	private void minusSecond() {
-		remainTime = remainTime.minusSeconds(1);
+		if(remainTime.getMinute() == 0 && remainTime.getSecond() == 0) {
+			GameResultManager.timerOutManager(!timerView.getIsWhite()).setLocationRelativeTo(timerView);
+			interrupt();
+		} else {
+			remainTime = remainTime.minusSeconds(1);
+		}
 	}
 
 	// GameTimerView에서 버튼이벤트 발생시 타이머의 작동을 스위치해서 하나의 타이머를 멈추고 다른 하나를 동작시켜준다.
