@@ -1,12 +1,10 @@
-package com.bfpaul.renewal.chess.controller.chessman;
+package com.bfpaul.renewal.chess.controller.route;
 
 import java.util.ArrayList;
 
 import com.bfpaul.renewal.chess.chessman.Chessman;
 import com.bfpaul.renewal.chess.chessman.Direction;
 import com.bfpaul.renewal.chess.chessman.Knight;
-import com.bfpaul.renewal.chess.controller.Coordinate;
-import com.bfpaul.renewal.chess.controller.MoveableRoute;
 
 /**
  * MoveableRouteCalculator는 체스말이 움직일 수 있는 경로를 계산해주기위한 클래스이다.

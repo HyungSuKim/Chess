@@ -1,11 +1,15 @@
-package com.bfpaul.renewal.chess.chessman;
+package com.bfpaul.renewal.chess.board;
 
 import java.awt.Component;
 
 import com.bfpaul.chess.Images;
 import com.bfpaul.chess.Theme;
-import com.bfpaul.renewal.chess.board.BoardSquare;
-import com.bfpaul.renewal.chess.game.GameHelper;
+import com.bfpaul.renewal.chess.chessman.Bishop;
+import com.bfpaul.renewal.chess.chessman.ChessmanImage;
+import com.bfpaul.renewal.chess.chessman.ChessmanType;
+import com.bfpaul.renewal.chess.chessman.Knight;
+import com.bfpaul.renewal.chess.chessman.Queen;
+import com.bfpaul.renewal.chess.chessman.Rook;
 import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.frame.FlatDialog;
 import com.mommoo.flat.frame.FlatFrame;
@@ -15,12 +19,14 @@ import com.mommoo.flat.layout.linear.LinearLayout;
 import com.mommoo.flat.layout.linear.constraints.LinearConstraints;
 import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 
-public class PawnPromotionSelectView {
-	FlatFrame frame = createFrame();
-	GameHelper gameHelper;
-	public PawnPromotionSelectView(GameHelper gameHelper, BoardSquare boardSquare) {
-		this.gameHelper = gameHelper;
-		
+class PawnPromotionSelectOnBoardFrame {
+	
+	private FlatFrame frame = createFrame();
+
+	private OnClickListener callBack = comp -> {};
+	
+	PawnPromotionSelectOnBoardFrame(BoardSquare boardSquare) {
+
 		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.QUEEN),
 				new LinearConstraints(1, LinearSpace.MATCH_PARENT));
 		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.BISHOP),
@@ -30,6 +36,10 @@ public class PawnPromotionSelectView {
 		frame.getContainer().add(createImagePanel(boardSquare, ChessmanType.ROOK),
 				new LinearConstraints(1, LinearSpace.MATCH_PARENT));
 		frame.show();
+	}
+	
+	void setCallBack(OnClickListener onClickListener) {
+		this.callBack = onClickListener;
 	}
 	
 	private FlatFrame createFrame() {
@@ -68,7 +78,7 @@ public class PawnPromotionSelectView {
 				default :
 				}
 				
-				gameHelper.increaseCurrentChessmanCount(boardSquare.getChessman().isWhite(), type);
+				callBack.onClick(component);
 				
 				boardSquare.setEnabled(false);
 				

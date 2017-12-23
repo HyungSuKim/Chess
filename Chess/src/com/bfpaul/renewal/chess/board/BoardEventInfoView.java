@@ -2,12 +2,10 @@ package com.bfpaul.renewal.chess.board;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Image;
 
 import javax.swing.JDialog;
 
-import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.image.FlatImagePanel;
 import com.mommoo.flat.image.ImageOption;
 
@@ -25,7 +23,7 @@ import com.mommoo.flat.image.ImageOption;
  */
 
 @SuppressWarnings("serial")
-public class BoardEventInfoView extends JDialog {
+class BoardEventInfoView extends JDialog {
 	BoardEventInfoView(Image image) {
 		FlatImagePanel imagePanel = new FlatImagePanel(image, ImageOption.MATCH_PARENT);
 		
@@ -37,20 +35,15 @@ public class BoardEventInfoView extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(imagePanel, BorderLayout.CENTER);
 		
+		imagePanel.setOnClickListener( component -> { setVisible(false); } );
+		
 		setVisible(true);
 		
-		imagePanel.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(Component component) {
-				setVisible(false);
-			}
-			
-		});
+//		this.run();
 	}
 	
 //	@SuppressWarnings("static-access")
-//	public void run() {
+//	void run() {
 //		try {
 //			Thread timerThread = new Thread();
 //			timerThread.sleep(500);

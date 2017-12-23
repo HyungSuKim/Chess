@@ -1,10 +1,10 @@
-package com.bfpaul.renewal.chess.controller;
+package com.bfpaul.renewal.chess.controller.route;
 
 import com.bfpaul.renewal.chess.chessman.Direction;
 
 public class MoveableRoute {
-	Direction direction;
-	Coordinate[] coordinates;
+	private Direction direction;
+	private Coordinate[] coordinates;
 	
 	public MoveableRoute(Direction direction, Coordinate[] coordinates) {
 		this.direction = direction;

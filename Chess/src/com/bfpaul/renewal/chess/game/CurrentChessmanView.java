@@ -1,12 +1,14 @@
 package com.bfpaul.renewal.chess.game;
 
 import java.awt.Image;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 
 import com.bfpaul.renewal.chess.Theme;
 import com.bfpaul.renewal.chess.chessman.ChessmanImage;
 import com.bfpaul.renewal.chess.chessman.ChessmanType;
+import com.bfpaul.renewal.chess.controller.layer.Layer;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.image.FlatImagePanel;
 import com.mommoo.flat.image.ImageOption;
@@ -21,7 +23,7 @@ import com.mommoo.flat.text.textarea.alignment.FlatVerticalAlignment;
 //게임 진행중 현재 살아있는 체스말들을 보여주는(View)로써의 역할을 하는 패널이다.
 //흰색말들과 검정색말들의 현황을 이미지와 숫자로써 표현해준다.
 @SuppressWarnings("serial")
-public class CurrentChessmanView extends FlatPanel {
+public class CurrentChessmanView extends FlatPanel implements Layer{
 	// 현재 체스말현황의 뷰를 생성해주는 생성자로 체스말현황뷰의 설명이 포함된 뷰인포라벨을 가장 상단에배치하고
 	// 그 밑으로 하얀말들과 검정말들의 현황을 보여쥬는 뷰를 배치하였다.
 	public CurrentChessmanView() {
@@ -104,40 +106,42 @@ public class CurrentChessmanView extends FlatPanel {
 	}
 
 	private FlatLabel getCountLabelByColorAndType(boolean isWhite, ChessmanType type) {
+		int componentIndex = 0;
 		switch (type) {
-		case KING:
-			return (FlatLabel) getChessmanViewByColor(isWhite).getComponent(1);
-		case QUEEN:
-			return (FlatLabel) getChessmanViewByColor(isWhite).getComponent(3);
-		case BISHOP:
-			return (FlatLabel) getChessmanViewByColor(isWhite).getComponent(5);
-		case KNIGHT:
-			return (FlatLabel) getChessmanViewByColor(isWhite).getComponent(7);
-		case ROOK:
-			return (FlatLabel) getChessmanViewByColor(isWhite).getComponent(9);
-		case PAWN:
-			return (FlatLabel) getChessmanViewByColor(isWhite).getComponent(11);
-		default:
-			return new FlatLabel();
+		case KING: componentIndex = 1; break;
+		case QUEEN: componentIndex = 3; break;
+		case BISHOP: componentIndex = 5; break;
+		case KNIGHT: componentIndex = 7; break;
+		case ROOK: componentIndex = 9; break;
+		case PAWN: componentIndex = 11; break;
+		default: break;
 		}
+		
+		return (FlatLabel) getChessmanViewByColor(isWhite).getComponent(componentIndex);
 	}
-
-	private boolean isPromotionChessman(ChessmanType type) {
-		return (type.equals(ChessmanType.QUEEN) || type.equals(ChessmanType.BISHOP) || type.equals(ChessmanType.KNIGHT)
-				|| type.equals(ChessmanType.ROOK));
-	}
-
-	public void decreaseCurrentChessmanCount(boolean isWhite, ChessmanType type) {
-		int result = Integer.parseInt(getCountLabelByColorAndType(isWhite, type).getText()) - 1;
-		getCountLabelByColorAndType(isWhite, type).setText("" + result);
-	}
-
-	public void increaseCurrentChessmanCount(boolean isWhite, ChessmanType type) {
-		if (isPromotionChessman(type)) {
-			decreaseCurrentChessmanCount(isWhite, ChessmanType.PAWN);
+	
+	@Override
+	public void execute(Object[] object) {
+		HashMap<Boolean, HashMap<ChessmanType, Integer>> chessmanCountMap
+			= (HashMap<Boolean, HashMap<ChessmanType, Integer>>)object[0];
+		
+		for(ChessmanType type : ChessmanType.values()) {
+			int whiteChessmanCount = chessmanCountMap.get(true).get(type);
+			int blackChessmanCount = chessmanCountMap.get(false).get(type);
 			
-			int result = Integer.parseInt(getCountLabelByColorAndType(isWhite, type).getText()) + 1;
-			getCountLabelByColorAndType(isWhite, type).setText("" + result);
+			getCountLabelByColorAndType(true, type).setText(whiteChessmanCount + "");
+			getCountLabelByColorAndType(false, type).setText(blackChessmanCount + "");
 		}
+		
+	}
+
+	@Override
+	public boolean isFinish() {
+		return true;
+	}
+
+	@Override
+	public Object[] getDatas() {
+		return new Object[0];
 	}
 }

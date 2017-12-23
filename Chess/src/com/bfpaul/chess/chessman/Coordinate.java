@@ -1,4 +1,4 @@
-package com.bfpaul.chess.board;
+package com.bfpaul.chess.chessman;
 
 public class Coordinate {
 	final static int MINIMUM_X = 0;

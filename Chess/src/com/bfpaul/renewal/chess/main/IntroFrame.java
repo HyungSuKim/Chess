@@ -73,7 +73,7 @@ class IntroFrame {
 			@Override
 			public void onClick(Component component) {
 				new GameFrame(true);
-//				new GameFrame(false);
+				new GameFrame(false);
 			}
 		});
 		

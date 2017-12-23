@@ -8,12 +8,11 @@ import javax.swing.border.EmptyBorder;
 import com.bfpaul.renewal.chess.Images;
 import com.bfpaul.renewal.chess.Theme;
 import com.bfpaul.renewal.chess.board.BoardPanel;
-import com.bfpaul.renewal.chess.chessman.ChessmanType;
+import com.bfpaul.renewal.chess.controller.layer.LayerHandler;
 import com.bfpaul.renewal.chess.timer.GameTimerView;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
-import com.mommoo.flat.frame.FlatDialog;
 import com.mommoo.flat.frame.FlatFrame;
 import com.mommoo.flat.layout.linear.LinearLayout;
 import com.mommoo.flat.layout.linear.Orientation;
@@ -24,13 +23,20 @@ import com.mommoo.util.ScreenManager;
 public class GameFrame {
 	private FlatFrame frame = createFrame();
 	private CurrentChessmanView currentChessmanView = new CurrentChessmanView();
-	private GameHelper gameHelper = new GameHelper(currentChessmanView);
-	private GameTimerView gameTimerView = new GameTimerView(gameHelper);
+	private GameTimerView gameTimerView = new GameTimerView();
 	
 	public GameFrame(boolean isWhite) {
+		BoardPanel boardPanel = new BoardPanel(isWhite);
 		
 		frame.getContainer().add(createRelatedInfoPanel(), createCommonConstraints(2));
-		frame.getContainer().add(new BoardPanel(gameHelper, isWhite), createCommonConstraints(10));
+		frame.getContainer().add(boardPanel, createCommonConstraints(10));
+		
+		
+		new LayerHandler()
+		.addLayer(boardPanel)
+		.addLayer(currentChessmanView)
+		.addLayer(gameTimerView)
+		.execute();
 		
 		if(isWhite) {
 			frame.setLocation(0, 0);
@@ -110,7 +116,7 @@ public class GameFrame {
 		giveUpButton.setOnClickListener(new OnClickListener() {
 			
 			public void onClick(Component component) {
-				GameResultManager.resignManager(!gameHelper.getPlayerColor()).setLocationRelativeTo(frame.getContainer());
+//				GameResultManager.resignManager(!gameHelper.getPlayerColor()).setLocationRelativeTo(frame.getContainer());
 				
 			}
 		});

@@ -12,6 +12,7 @@ class Timer extends Thread {
 	private TimerView timerView;
 	// Timer가 작동하고있는지 아닌지를 나타낸다
 	private boolean isTimerOperating;
+	private boolean runTimer = true;
 
 	Timer(TimerView timerView) {
 		this.timerView = timerView;
@@ -40,6 +41,8 @@ class Timer extends Thread {
 	// 남은시간에서 1초씩 흐르게해준다.
 	private void minusSecond() {
 		if(remainTime.getMinute() == 0 && remainTime.getSecond() == 0) {
+			runTimer = false;
+			System.out.println("시간초과");
 			GameResultManager.timerOutManager(!timerView.getIsWhite()).setLocationRelativeTo(timerView);
 			interrupt();
 		} else {
@@ -60,7 +63,7 @@ class Timer extends Thread {
 			
 			checkTimerIsOperating();
 
-			while (true) {
+			while (runTimer) {
 				timerOperation();
 			}
 			

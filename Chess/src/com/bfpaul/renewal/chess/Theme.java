@@ -20,8 +20,4 @@ public class Theme {
 	
 	public static final Font BOLD_FONT_15PT = FontManager.getNanumGothicFont(Font.BOLD, 15);
 	public static final Font BOLD_FONT_30PT = FontManager.getNanumGothicFont(Font.BOLD, 30);
-//	255, 182, 42 (´©¸®³¢¸®ÇÑ»ö)
-//	75, 106, 150 (ÁøÇÑ Çª¸£µùµù)
-//	192, 219, 255 (¹àÀº Çª¸£µùµù)
-//	private static final Color PROCESS_BAR_COLOR = new Color()
 }

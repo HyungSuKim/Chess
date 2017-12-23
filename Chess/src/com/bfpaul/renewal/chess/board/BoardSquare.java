@@ -40,7 +40,7 @@ public class BoardSquare extends FlatImagePanel {
 	}
 
 	// 체스말을 네모칸위에 올려준다.
-	public void setChessmanOnSquare(Chessman chessman) {
+	void setChessmanOnSquare(Chessman chessman) {
 		this.chessman = chessman;
 		isContain = true;
 		setEnableClickEvent(true);
@@ -76,14 +76,14 @@ public class BoardSquare extends FlatImagePanel {
 	}
 
 	// 해당 칸이 체크메이트 경로임을 표현해준다.
-	void setSquareCheckmateColor() {
+	void setSquareCheckColor() {
 		setBackground(Color.GREEN);
 		setEnableClickEvent(false);
 		setAlpha(0.6f);
 	}
 	
 	// 해당 칸이 움직일 수 있는 체크메이트 칸임을 표현해준다.
-	void setSquareMoveableCheckmateColor() {
+	void setSquareMoveableCheckColor() {
 		setBackground(Color.GREEN);
 		setEnableClickEvent(true);
 		setAlpha(0.6f);
@@ -116,7 +116,7 @@ public class BoardSquare extends FlatImagePanel {
 	// 고민되는 부분은 chessman이 없을때는 null을 반환하는데
 	// 그러다보니 BoardPanel에서 이를 검사할때 1. isContain이 true인지, 2. chessman이 null이 아닌지
 	// 한단계 더 나아가면 3. 체스맨이 킹인지 룩인지 등등... 기본 3단계의 논리검사를 시행해야되서 이를 처리하는데 고민이 된다.
-	public Chessman getChessman() {
+	Chessman getChessman() {
 		return chessman;
 	}
 }

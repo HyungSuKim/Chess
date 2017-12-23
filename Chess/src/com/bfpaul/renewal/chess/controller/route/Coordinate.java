@@ -1,10 +1,10 @@
-package com.bfpaul.renewal.chess.controller;
+package com.bfpaul.renewal.chess.controller.route;
 
 public class Coordinate {
-	final static int MINIMUM_X = 0;
-	final static int MAXIMUM_X = 7;
-	final static int MINIMUM_Y = 0;
-	final static int MAXIMUM_Y = 7;
+	private final static int MINIMUM_X = 0;
+	private final static int MAXIMUM_X = 7;
+	private final static int MINIMUM_Y = 0;
+	private final static int MAXIMUM_Y = 7;
 
 	private int x, y;
 
@@ -39,10 +39,5 @@ public class Coordinate {
 
 	public int getY() {
 		return y;
-	}
-	
-	@Override
-	public String toString() {
-		return "(" + x + ", " + y + ")";
 	}
 }

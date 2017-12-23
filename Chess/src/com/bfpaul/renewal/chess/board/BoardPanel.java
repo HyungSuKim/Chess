@@ -1,9 +1,10 @@
 package com.bfpaul.renewal.chess.board;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 
@@ -14,12 +15,11 @@ import com.bfpaul.renewal.chess.chessman.ChessmanType;
 import com.bfpaul.renewal.chess.chessman.Direction;
 import com.bfpaul.renewal.chess.chessman.King;
 import com.bfpaul.renewal.chess.chessman.Pawn;
-import com.bfpaul.renewal.chess.chessman.PawnPromotionSelectView;
 import com.bfpaul.renewal.chess.chessman.Rook;
-import com.bfpaul.renewal.chess.controller.Coordinate;
-import com.bfpaul.renewal.chess.controller.MoveableRoute;
-import com.bfpaul.renewal.chess.controller.chessman.MoveableRouteCalculator;
-import com.bfpaul.renewal.chess.game.GameHelper;
+import com.bfpaul.renewal.chess.controller.layer.Layer;
+import com.bfpaul.renewal.chess.controller.route.Coordinate;
+import com.bfpaul.renewal.chess.controller.route.MoveableRoute;
+import com.bfpaul.renewal.chess.controller.route.MoveableRouteCalculator;
 import com.bfpaul.renewal.chess.game.GameResultManager;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
@@ -43,26 +43,25 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 // BoardPanel에서 체스말의 이동을 내부 클래스들이 담당하도록 하기위함이다.
 // 내부클래스로 구현함으로써 각 내부클래스는 자기 자신의 역할만 하게 되고 서로 연관성이 없어지게 된다. 
 @SuppressWarnings("serial")
-public class BoardPanel extends FlatPanel {
+public class BoardPanel extends FlatPanel implements Layer {
 	// 체스 판의 하나하나의 square로써 체스말을 놓아준다던가 체스말을 제외해준다거나 이동가능범위를 표현해줄 최소단위의 칸이다.
-	private static final BoardSquare[][] BOARD_SQUARE = new BoardSquare[8][8];
+	private final BoardSquare[][] BOARD_SQUARE = new BoardSquare[8][8];
 	private static BoardSquare selectedSquare = null;
 	private static boolean isWhite = true;
-	
-	private GameHelper gameHelper;
 
 	// 체스말이 보드위에서 일정 방법으로 움직이는 것을 도와주는 내부 클래스들로써
 	// 보드가 만들어지고 말이 놓여지고 행동을 할 때 이러한 것들이 필요하다고 판단해서
 	// BoardPanel의 생성자에서 각 내부클래스의 인스턴스를 생성한다.
-	private static MoveHelper moveHelper;
-	private static CastlingHelper castlingHelper;
-	private static PawnAttackHelper pawnAttackHelper;
-	private static EnPassantHelper enPassantHelper;
-	private static CheckmateHelper checkmateHelper;
+	private MoveHelper moveHelper;
+	private CastlingHelper castlingHelper;
+	private PawnAttackHelper pawnAttackHelper;
+	private EnPassantHelper enPassantHelper;
+	private MateHelper checkmateHelper;
+
+	private boolean isFinish;
 
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
-	public BoardPanel(GameHelper gameHelper, boolean isWhite) {
-		this.gameHelper = gameHelper;
+	public BoardPanel(boolean isWhite) {
 
 		setLayout(new GridLayout(8, 8));
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -74,10 +73,6 @@ public class BoardPanel extends FlatPanel {
 
 		setWholeChessmanOnBoard();
 		createHelper();
-		disableSquareClickEvent();
-		enableSquareClickEvent(BoardPanel.isWhite);
-
-		gameHelper.setBoardPanel(this);
 	}
 
 	private void setSquareLayoutByColor(boolean isWhite) {
@@ -110,7 +105,7 @@ public class BoardPanel extends FlatPanel {
 		castlingHelper = new CastlingHelper();
 		pawnAttackHelper = new PawnAttackHelper();
 		enPassantHelper = new EnPassantHelper();
-		checkmateHelper = new CheckmateHelper();
+		checkmateHelper = new MateHelper();
 	}
 
 	// 입력된 무게와 부모의 크기만큼 영역을 차지하는 제약조건을 생성하여 반환한다.
@@ -136,7 +131,6 @@ public class BoardPanel extends FlatPanel {
 					selectChessman(x, y);
 				} else if (selectedSquare == BOARD_SQUARE[x][y]) {
 					deSelectChessman();
-
 				} else {
 					moveSelectedChessman(x, y);
 				}
@@ -162,23 +156,22 @@ public class BoardPanel extends FlatPanel {
 			enPassantHelper.showEnPassantSquare(x, y); // 앙파상 할 수있는 칸이 있는지 체크하고 가능하다면 앙파상 경로를 보여주고 : 경로계산 + 보여주기
 		}
 
-		moveHelper.showMoveableRoute(); // 위에서 계산된 움직일 수 있는 경로를 보여준다 : 경로보여주기
-		checkmateHelper.showCheckmateRoute(); // 체크메이트 가능한 경로가 있으면 체크메이트 가능한 경로를 보여준다. : 보여주기
-
 		if (selectedSquare.getChessman() instanceof King) { // 선택된 말이 왕이면
 			castlingHelper.setShowCastlingSquare(); // 캐슬링이 가능한지 확인하고 캐슬링 가능한 칸을 보여준다 : 경로계산 + 보여주기
-			/* Test */
-			
-			/* Test */
 		}
+
+		moveHelper.showMoveableRoute(); // 위에서 계산된 움직일 수 있는 경로를 보여준다 : 경로보여주기
+		checkmateHelper.showCheckRoute(); // 체크메이트 가능한 경로가 있으면 체크메이트 가능한 경로를 보여준다. : 보여주기
 	}
 
 	private void deSelectChessman() {
-		moveHelper.disableMoveableRoute(); // 움직일수 있는 경로를 비활성화한다 : 보여주기(감추기)
-
 		selectedSquare.setSquareOriginalColor();
 
-		initSquareEvent(isWhite); // 클릭된 말 이외에 클릭이 비활성 되었던 것에서 현재 색상의 말들의 클릭이벤트를 활성화해준다. : 기능적
+		selectedSquare = null;
+		
+		enableSquareClickEvent();
+
+		moveHelper.disableMoveableRoute(); // 움직일수 있는 경로를 비활성화한다 : 보여주기(감추기)
 
 		pawnAttackHelper.disablePawnAttackableSquare(); // 폰이 공격할수있는 경로를 비활성화한다 : 보여주기(감추기)
 
@@ -186,7 +179,7 @@ public class BoardPanel extends FlatPanel {
 
 		enPassantHelper.cancelEnPassant(); // 앙파상 할 수있는 경로를 비활성화 한다 : 보여주기(감추기)
 
-		checkmateHelper.disableCheckmateRoute(); // 체크메이트 할 수 있는 경로를 비활성화 한다 : 보여주기(감추기)
+		checkmateHelper.disableCheckRoute(); // 체크메이트 할 수 있는 경로를 비활성화 한다 : 보여주기(감추기)
 
 	}
 
@@ -199,63 +192,50 @@ public class BoardPanel extends FlatPanel {
 			enPassantHelper.initEnPassantSquare(); // 앙파상이 활성화 되어있는 상태로 캐슬링을 하면 앙파상은 무효
 		} else {
 
-			if (BOARD_SQUARE[x][y].isContainChessman()) {
-				Chessman chessman = BOARD_SQUARE[x][y].getChessman();
-				gameHelper.decreaseCurrentChessmanCount(chessman.isWhite(), chessman.getChessmanType());
-			}
-
 			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman()); // 그 이외의 움직임을 실행했을때
 		}
-
+		
 		if (selectedSquare.getChessman() instanceof Pawn) { // 선택된 말이 폰이면
 			pawnAttackHelper.disablePawnAttackableSquare();
 			enPassantHelper.checkEnPassant(x, y); // 흠?
 		}
-
+		
 		if (selectedSquare.getChessman() instanceof King) {
 			((King) selectedSquare.getChessman()).setIsMoved();
 		}
-
-		if (BOARD_SQUARE[x][y].getChessman() instanceof Rook) {
-			((Rook) BOARD_SQUARE[x][y].getChessman()).setIsMoved();
-		}
-
-		if (BOARD_SQUARE[x][y].getChessman() instanceof Pawn && (y == 0 || y == 7)) {
-			new PawnPromotionSelectView(gameHelper, BOARD_SQUARE[x][y]);
+		
+		if (selectedSquare.getChessman() instanceof Rook) {
+			((Rook) selectedSquare.getChessman()).setIsMoved();
 		}
 
 		selectedSquare.removeChessmanFromSquare();
 
-		checkmateHelper.disableCheckmateRoute();
+		checkmateHelper.disableCheckRoute();
 
-		checkmateHelper.checkCurrentColorChessmanCheckmateRoute();
+		checkmateHelper.checkCurrentColorChessmanCheckRoute();
 
 		moveHelper.disableMoveableRoute();
-		selectedSquare.setSquareOriginalColor();
-
-		// disableSquareClickEvent();
 		
-		/* Test */
-		isWhite = !isWhite; // 이동을 했을 때 움직인 색의 반대색으로 설정한다.
-		initSquareEvent(isWhite);
+		selectedSquare.setSquareOriginalColor();
+		selectedSquare = null;
+		
+		disableSquareClickEvent();
+
 		/* Test */
 		GameResultManager.fiftyCountManager(isWhite).setLocationRelativeTo(this);
 		/* Test */
-	}
-
-	// test//
-	public void changePhase() {
-		isWhite = !isWhite; // 이동을 했을 때 움직인 색의 반대색으로 설정한다.
-		initSquareEvent(isWhite);
-	}
-
-	public boolean getPlayerColor() {
-		return isWhite;
-	}
-
-	private static void initSquareEvent(boolean isWhite) {
-		enableSquareClickEvent(isWhite);
-		selectedSquare = null;
+		if (BOARD_SQUARE[x][y].getChessman() instanceof Pawn && (y == 0 || y == 7)) {
+			PawnPromotionSelectOnBoardFrame selectView = new PawnPromotionSelectOnBoardFrame(BOARD_SQUARE[x][y]);
+			selectView.setCallBack(new OnClickListener() {
+				@Override
+				public void onClick(Component component) {
+					// TODO Auto-generated method stub
+					isFinish = true;
+				}
+			});
+		} else {
+			isFinish = true;
+		}
 	}
 
 	// chessman(King, Queen, Bishop, Knight, Rook, Pawn)을 원하는 좌표값(x,y)의 square에
@@ -291,7 +271,7 @@ public class BoardPanel extends FlatPanel {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-//			 setPawnOnBoard(ChessmanType.PAWN);
+			setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
@@ -335,7 +315,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	private static void disableSquareClickEvent() {
+	private void disableSquareClickEvent() {
 		for (int y = 0; y < 8; y++) {
 			for (int x = 0; x < 8; x++) {
 				BOARD_SQUARE[x][y].setEnableClickEvent(false);
@@ -343,7 +323,7 @@ public class BoardPanel extends FlatPanel {
 		}
 	}
 
-	private static void enableSquareClickEvent(boolean isWhite) {
+	private void enableSquareClickEvent() {
 		for (int y = 0; y < 8; y++) {
 			for (int x = 0; x < 8; x++) {
 				if (BOARD_SQUARE[x][y].isContainChessman() && BOARD_SQUARE[x][y].getChessman().isWhite() == isWhite) {
@@ -457,7 +437,7 @@ public class BoardPanel extends FlatPanel {
 
 		// 폰이 공격 가능한 칸이 있는 지 확인하고 가능한 칸이 있다면 공격가능 한 칸으로써 보여준다.
 		private void showPawnAttackableSquare(int x, int y) {
-			checkPawnAttackableSquare(x, y);
+			checkPawnAttackableRoute(x, y);
 
 			for (MoveableRoute atttackableRoute : pawnAttackableRouteList) {
 				for (Coordinate attackableCoordinate : atttackableRoute.getCoordinates())
@@ -484,6 +464,28 @@ public class BoardPanel extends FlatPanel {
 			pawnAttackableCoordinate[0] = new Coordinate(x, y);
 			return pawnAttackableCoordinate;
 		}
+		
+		/**
+		 * 폰의 공격가능한 루트에 적이 있으면 리스트에 경로를 추가해주는 메서드
+		 * 폰의 공격 가능한 방향에 왼쪽 좌표(x-1)와 오른쪽 좌표(x+1)에 적이 있는지 검사하고
+		 * 적이 있다면 공격가능한 경로로써 List에 추가한다. 
+		 * @param direction : 적이 있는지 확인 해야 할 방향
+		 * @param x : 폰의 현재 x좌표 에서 x - 1, x + 1에 적이있는지 확인하기 위한 파라미터
+		 * @param y : 메서드 호출부에서 입력된 방향에 따른 y좌표
+		 */
+		private void addAvailablePawnAttackableRoute(Direction direction, int x, int y) {
+			if (Coordinate.isValidate(x - 1, y) && isEnemy(x - 1, y)) {
+
+				pawnAttackableRouteList
+						.add(new MoveableRoute(direction, getPawnAttackableCoordinate(x - 1, y)));
+			}
+
+			if (Coordinate.isValidate(x + 1, y) && isEnemy(x + 1, y)) {
+
+				pawnAttackableRouteList
+						.add(new MoveableRoute(direction, getPawnAttackableCoordinate(x + 1, y)));
+			}
+		}
 
 		/**
 		 * 폰의 현재위치 좌표(x,y)와 isWhite 정보를 이용해서 폰이 공격 가능한 2가지 경로(좌표)상에 적체스말이 놓여있는지 확인한다 확인
@@ -494,33 +496,14 @@ public class BoardPanel extends FlatPanel {
 		 * @param y
 		 *            : 폰의 현재위치 y좌표
 		 */
-		private void checkPawnAttackableSquare(int x, int y) {
+		private void checkPawnAttackableRoute(int x, int y) {
 			pawnAttackableRouteList.clear();
 			if (isWhite) {
-				if (Coordinate.isValidate(x - 1, y - 1) && isEnemy(x - 1, y - 1)) {
-
-					pawnAttackableRouteList
-							.add(new MoveableRoute(Direction.UP, getPawnAttackableCoordinate(x - 1, y - 1)));
-				}
-
-				if (Coordinate.isValidate(x + 1, y - 1) && isEnemy(x + 1, y - 1)) {
-
-					pawnAttackableRouteList
-							.add(new MoveableRoute(Direction.UP, getPawnAttackableCoordinate(x + 1, y - 1)));
-				}
-
+				addAvailablePawnAttackableRoute(Direction.UP, x, y - 1);
+				
 			} else {
-				if (Coordinate.isValidate(x + 1, y + 1) && isEnemy(x + 1, y + 1)) {
-
-					pawnAttackableRouteList
-							.add(new MoveableRoute(Direction.DOWN, getPawnAttackableCoordinate(x + 1, y + 1)));
-				}
-
-				if (Coordinate.isValidate(x - 1, y + 1) && isEnemy(x - 1, y + 1)) {
-
-					pawnAttackableRouteList
-							.add(new MoveableRoute(Direction.UP, getPawnAttackableCoordinate(x - 1, y + 1)));
-				}
+				addAvailablePawnAttackableRoute(Direction.DOWN, x, y + 1);
+				
 			}
 		}
 	}
@@ -539,18 +522,19 @@ public class BoardPanel extends FlatPanel {
 	 * 분류하였다.
 	 */
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	private class CheckmateHelper {
+	private class MateHelper {
 		// 체크메이트 할 수있는 경로들의 리스트
-		private ArrayList<MoveableRoute> checkmateRouteList = new ArrayList<>();
+		private ArrayList<MoveableRoute> checkRouteList = new ArrayList<>();
+		private boolean eventInfoNotShowed = true;
 
 		// 계산된 체크메이트 가능 경로를 보여주는 메서드로 왕을 선택했을때와 다른 말을 골랐을때로 분리한 이유는
 		// 왕은 계산된 경로로 이동이 가능해도 이동이 불가해야되고 다른말은 계산된 경로와 움직일 수 있는 경로가 겹칠경우
 		// 해당경로로 이동해서 왕의 체크메이트 경로를 차단 할 수 있어야 되기에 분리하였다.
-		private void showCheckmateRoute() {
-			for (MoveableRoute checkmateRoute : checkmateRouteList) {
-				for (Coordinate checkmateCoordinate : checkmateRoute.getCoordinates()) {
-					int x = checkmateCoordinate.getX();
-					int y = checkmateCoordinate.getY();
+		private void showCheckRoute() {
+			for (MoveableRoute checkRoute : checkRouteList) {
+				for (Coordinate checkCoordinate : checkRoute.getCoordinates()) {
+					int x = checkCoordinate.getX();
+					int y = checkCoordinate.getY();
 
 					if (selectedSquare.getChessman() instanceof King) { // 선택된 말이 왕일때
 						showRouteWhenKingSelected(x, y);
@@ -565,53 +549,64 @@ public class BoardPanel extends FlatPanel {
 		// 왕을 선택했을때 체크메이트 루트를 보여주는 것인데 선택된 왕을 다시 누를수있도록 선택된 칸은 클릭이 가능하게 해준다.
 		private void showRouteWhenKingSelected(int x, int y) {
 			if (BOARD_SQUARE[x][y] == selectedSquare) {
-				BOARD_SQUARE[x][y].setSquareMoveableCheckmateColor();
+				BOARD_SQUARE[x][y].setSquareMoveableCheckColor();
 			} else {
-				BOARD_SQUARE[x][y].setSquareCheckmateColor();
+				BOARD_SQUARE[x][y].setSquareCheckColor();
 			}
 		}
 
 		private void showRouteWhenOthersSeleted(int x, int y) {
 			// 다른 말을 눌렀을 때 다른말의 이동경로가 체크에이트 경로와 같을 때
 			if (BOARD_SQUARE[x][y].getBackground().equals(Theme.LIGHT_BLUE_COLOR)) {
-				BOARD_SQUARE[x][y].setSquareMoveableCheckmateColor();
+				BOARD_SQUARE[x][y].setSquareMoveableCheckColor();
 			} else {
 				// 다른 말을 눌렀을 때 다른말의 이동경로가 체크에이트 경로와 다를 때
-				BOARD_SQUARE[x][y].setSquareCheckmateColor();
+				BOARD_SQUARE[x][y].setSquareCheckColor();
 			}
 		}
 
 		// 보여진 체크메이트 경로를 안보이게(원래대로) 바꾸어준다.
-		private void disableCheckmateRoute() {
-			for (MoveableRoute checkmateRoute : checkmateRouteList)
-				for (Coordinate checkmateCoordinate : checkmateRoute.getCoordinates())
-					BOARD_SQUARE[checkmateCoordinate.getX()][checkmateCoordinate.getY()].setSquareOriginalColor();
+		private void disableCheckRoute() {
+			for (MoveableRoute checkRoute : checkRouteList)
+				for (Coordinate checkCoordinate : checkRoute.getCoordinates())
+					BOARD_SQUARE[checkCoordinate.getX()][checkCoordinate.getY()].setSquareOriginalColor();
 
 		}
 
 		// 말이 움직인 뒤에 체스말들 중에 체크메이트가 가능한 말이 있는지 검사하는 메서드로써
 		// 검사 결과 적의 왕을 체크가 가능한 말이 있다면 그말의의 경로를 받아서 저장한다.
-		private void checkCurrentColorChessmanCheckmateRoute() {
-			checkmateRouteList.clear();
+		private void checkCurrentColorChessmanCheckRoute() {
+			eventInfoNotShowed = true;
+			checkRouteList.clear();
 
 			for (int y = 0; y < 8; y++) {
 				for (int x = 0; x < 8; x++) {
+					checkCurrentColorChessmanCheckRoute(x, y);
 
-					if (isCurrentColorChessman(x, y)) {
-
-						Chessman chessman = BOARD_SQUARE[x][y].getChessman();
-
-						if (isPawn(chessman)) {
-							checkPawnHasCheckmateRoute(x, y);
-
-						} else {
-							checkChessmanHasCheckmateRoute(chessman, x, y);
-
-						}
-
-					}
 				} // end of for x
 			} // end of for y
+		}
+		
+		/**
+		 * 현재 색상의 체스말이 체스메이트 루트를 가지고있는지 검사하는 메서드로써
+		 * 검사하는 x, y좌표에 체스말이 있고 그 체스말이 현재차례 색상의 체스말이면
+		 * 그 체스말이 체크 할 수 있는 경로를 가지고있는지 검사한다. 
+		 * @param x : 검사하는 BOARD_SQUARE의 x좌표
+		 * @param y : 검사하는 BOARD_SQUARE의 y좌표
+		 */
+		private void checkCurrentColorChessmanCheckRoute(int x, int y) {
+			if (isCurrentColorChessman(x, y)) {
+
+				Chessman chessman = BOARD_SQUARE[x][y].getChessman();
+
+				if (isPawn(chessman)) {
+					checkPawnHasCheckRoute(x, y);
+
+				} else {
+					checkChessmanHasCheckRoute(chessman, x, y);
+				}
+
+			}
 		}
 
 		// 폰인지 아닌지
@@ -621,25 +616,25 @@ public class BoardPanel extends FlatPanel {
 
 		// PawnAttackHelper의 checkPawnAttackableSquare x, y에 위치하고있는 폰의 공격 가능한 경로를 구하고
 		// 공격가능한 경로를 가진 pawnAttackableRouteList를 이용해서 공격가능한 경로에 반대색상의 킹이 있는 지 검사한다.
-		private void checkPawnHasCheckmateRoute(int x, int y) {
-			pawnAttackHelper.checkPawnAttackableSquare(x, y);
+		private void checkPawnHasCheckRoute(int x, int y) {
+			pawnAttackHelper.checkPawnAttackableRoute(x, y);
 
 			for (MoveableRoute pawnAttackableRoute : pawnAttackHelper.pawnAttackableRouteList) {
 				for (Coordinate attackableCoordinate : pawnAttackableRoute.getCoordinates())
-					isChessmanHasCheckmateRoute(pawnAttackableRoute, attackableCoordinate);
+					isChessmanHasCheckRoute(pawnAttackableRoute, attackableCoordinate);
 			}
 		}
 
 		// 현재 색상의 체스말, x, y를 이용하여 계산된 움직 일 수있는 경로 리스트를 받는다.
 		// 그 경로리스트중 경로와 좌표를 이용해서 반대색상의 왕이 있는지 검사하는 isChssmanHasCheckmateRoute를 호출하는데
 		// 만약 반대색상의 왕을 찾으면 true를 반환해서 break한다.
-		private void checkChessmanHasCheckmateRoute(Chessman chessman, int x, int y) {
-			ArrayList<MoveableRoute> moveableRouteList = MoveableRouteCalculator.getChessmanMoveableRouteList(chessman,
-					x, y);
+		private void checkChessmanHasCheckRoute(Chessman chessman, int x, int y) {
+			ArrayList<MoveableRoute> moveableRouteList
+			= MoveableRouteCalculator.getChessmanMoveableRouteList(chessman, x, y);
 
 			for (MoveableRoute moveableRoute : moveableRouteList) {
 				for (Coordinate coordinate : moveableRoute.getCoordinates()) {
-					if (isChessmanHasCheckmateRoute(moveableRoute, coordinate))
+					if (isChessmanHasCheckRoute(moveableRoute, coordinate))
 						break;
 				}
 			}
@@ -662,12 +657,16 @@ public class BoardPanel extends FlatPanel {
 
 		// 현재 색의 체스말이 이동가능한 경로와 좌표를 받아와서 받아온 좌표에 반대색상의 왕이 있으면 이동가능한 경로를 체크메이트 가능 경로로써
 		// 추가한다.
-		private boolean isChessmanHasCheckmateRoute(MoveableRoute moveableRoute, Coordinate coordinate) {
+		private boolean isChessmanHasCheckRoute(MoveableRoute moveableRoute, Coordinate coordinate) {
 			if (isOppositeColorKing(coordinate.getX(), coordinate.getY())) {
-				checkmateRouteList.add(moveableRoute);
-				
-				new BoardEventInfoView(Images.CHECK)
-				.setLocation((int)(BoardPanel.super.getWidth()/3.3), (int)(BoardPanel.super.getHeight()/2));
+				checkRouteList.add(moveableRoute);
+
+				if (eventInfoNotShowed) {
+					new BoardEventInfoView(Images.CHECK).setLocation((int) (BoardPanel.super.getWidth() / 3.3),
+							(int) (BoardPanel.super.getHeight() / 2));
+
+					eventInfoNotShowed = false;
+				}
 
 				return true;
 			} else if (isOppositeColorChessman(coordinate.getX(), coordinate.getY())) {
@@ -680,6 +679,7 @@ public class BoardPanel extends FlatPanel {
 
 			}
 		}
+
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -707,6 +707,10 @@ public class BoardPanel extends FlatPanel {
 
 		// 한번 사용한 앙파상칸은 쓸필요가 없기때문에 기존의 초기값으로 정해둔 것으로 초기화한다.
 		private void initEnPassantSquare() {
+			if (isEnPassantSquareNotEmpty()) {
+				enPassantSquare.setSquareOriginalColor();
+			}
+
 			enPassantSquare = null;
 		}
 
@@ -756,9 +760,10 @@ public class BoardPanel extends FlatPanel {
 				} else {
 					BOARD_SQUARE[x][y - 1].removeChessmanFromSquare();
 				}
-				new BoardEventInfoView(Images.ENPASSANT)
-				.setLocation((int)(BoardPanel.super.getWidth()/3.3), (int)(BoardPanel.super.getHeight()/2));
-				gameHelper.decreaseCurrentChessmanCount(!movedPawnColor, ChessmanType.PAWN);
+
+				new BoardEventInfoView(Images.ENPASSANT).setLocation((int) (BoardPanel.super.getWidth() / 3.3),
+						(int) (BoardPanel.super.getHeight() / 2));
+				// gameHelper.decreaseCurrentChessmanCount(!movedPawnColor, ChessmanType.PAWN);
 			}
 		}
 
@@ -773,10 +778,6 @@ public class BoardPanel extends FlatPanel {
 			}
 
 			moveEnPassant(x, y);
-
-			if (isEnPassantSquareNotEmpty()) {
-				enPassantSquare.setSquareOriginalColor();
-			}
 
 			initEnPassantSquare();
 		}
@@ -953,9 +954,54 @@ public class BoardPanel extends FlatPanel {
 			selectedSquare.removeChessmanFromSquare();
 			BOARD_SQUARE[x][y].removeChessmanFromSquare();
 
-			new BoardEventInfoView(Images.CASTLING)
-			.setLocation((int)(BoardPanel.super.getWidth()/3.3), (int)(BoardPanel.super.getHeight()/2));
+			new BoardEventInfoView(Images.CASTLING).setLocation((int) (BoardPanel.super.getWidth() / 3.3),
+					(int) (BoardPanel.super.getHeight() / 2));
 		}
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public void execute(Object[] object) {
+		isWhite = (boolean) object[0];
+		isFinish = false;
+		enableSquareClickEvent();
+	}
+
+	/**
+	 * BoardPanel에서 말을 옮기고 더이상 아무것도 할 수 없을 때, BoardPanel의 Datas를 반환한다.
+	 * 
+	 * @return
+	 */
+	@Override
+	public Object[] getDatas() {
+		Map<Boolean, Map<ChessmanType, Integer>> chessmanCountMap = new HashMap<>();
+		chessmanCountMap.put(true, new HashMap<>());
+		chessmanCountMap.put(false, new HashMap<>());
+
+		for (ChessmanType type : ChessmanType.values()) {
+			chessmanCountMap.get(true).put(type, 0);
+			chessmanCountMap.get(false).put(type, 0);
+		}
+
+		for (int x = 0; x < 8; x++) {
+			for (int y = 0; y < 8; y++) {
+				if (BOARD_SQUARE[x][y].isContainChessman()) {
+					Chessman chessman = BOARD_SQUARE[x][y].getChessman();
+
+					int result = chessmanCountMap.get(chessman.isWhite()).get(chessman.getChessmanType()) + 1;
+
+					chessmanCountMap.get(chessman.isWhite()).put(chessman.getChessmanType(), result);
+
+				}
+			}
+		}
+
+		return new Object[] { chessmanCountMap };
+	}
+
+	@Override
+	public boolean isFinish() {
+		return isFinish;
+	}
+
 }
