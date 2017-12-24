@@ -45,6 +45,7 @@ public class GameResultView extends JDialog {
 		getContentPane().add(createContentLabel(isWhite, resultType), getMatchParentConstraints(4));
 		
 		getContentPane().add(createContainButtonPanel(), getMatchParentConstraints(1));
+		
 		setVisible(true);
 	}
 	

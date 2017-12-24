@@ -7,6 +7,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.bfpaul.renewal.chess.Images;
 import com.bfpaul.renewal.chess.Theme;
+import com.bfpaul.renewal.chess.board.BoardEventInfoView;
 import com.bfpaul.renewal.chess.board.BoardPanel;
 import com.bfpaul.renewal.chess.controller.layer.LayerHandler;
 import com.bfpaul.renewal.chess.timer.GameTimerView;
@@ -21,6 +22,7 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 import com.mommoo.util.ScreenManager;
 
 public class GameFrame {
+	
 	private FlatFrame frame = createFrame();
 	private CurrentChessmanView currentChessmanView = new CurrentChessmanView();
 	private GameTimerView gameTimerView = new GameTimerView();
@@ -44,14 +46,24 @@ public class GameFrame {
 			frame.setLocation(950, 0);
 		}
 		
+		System.out.println(frame.getContainer().getSize().toString());
+		System.out.println(frame.getContainer().getLocation().toString());
+		System.out.println(frame.getContainer().getBounds().toString());
+
 		frame.show();
+
+		System.out.println(frame.getContainer().getSize().toString());
+		System.out.println(frame.getContainer().getLocation().toString());
+		System.out.println(frame.getContainer().getBounds().toString());
+
 	}
 	
+
 	private LinearConstraints createCommonConstraints(int weight) {
 		return new LinearConstraints().setWeight(weight).setLinearSpace(LinearSpace.MATCH_PARENT);
 	}
 	
-	private FlatFrame createFrame() {
+	private static FlatFrame createFrame() {
 		FlatFrame frame = new FlatFrame();
 		ScreenManager screenManager = ScreenManager.getInstance();
 		frame.setTitle("Chess Game");

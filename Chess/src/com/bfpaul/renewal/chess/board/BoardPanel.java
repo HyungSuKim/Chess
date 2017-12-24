@@ -42,6 +42,20 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 // 이 클래스들을 내부클래스로 분류한 이유는 BoardPanel의 내부에서 체스말이 이동하는 경우, 특수한 이동의 경우를 내부클래스로 따로 구현하여
 // BoardPanel에서 체스말의 이동을 내부 클래스들이 담당하도록 하기위함이다.
 // 내부클래스로 구현함으로써 각 내부클래스는 자기 자신의 역할만 하게 되고 서로 연관성이 없어지게 된다. 
+
+/* 클래스 작성 간 점검요소
+ * 1. 올바른 클래스 이름인가? : 
+ * 2. 멤버변수의 존재 여부 : 
+ * 3. 클래스의 역할(Data/Controller/View) : 
+ * 4. Data 공정과 공통로직의 분리 : 
+ * 5. 접근제어자/한정자/자료형 : 
+ * 6. inner class / abstract / interface : 
+ * 7. 프로그램의 구조 : 
+ * 8. class간의 연관관계 및 필요조건 : 
+ * 9. 시점 : 
+ * 10.중복 동일 구조가 반복되지 않는가 : 
+ * */
+
 @SuppressWarnings("serial")
 public class BoardPanel extends FlatPanel implements Layer {
 	// 체스 판의 하나하나의 square로써 체스말을 놓아준다던가 체스말을 제외해준다거나 이동가능범위를 표현해줄 최소단위의 칸이다.
@@ -662,8 +676,8 @@ public class BoardPanel extends FlatPanel implements Layer {
 				checkRouteList.add(moveableRoute);
 
 				if (eventInfoNotShowed) {
-					new BoardEventInfoView(Images.CHECK).setLocation((int) (BoardPanel.super.getWidth() / 3.3),
-							(int) (BoardPanel.super.getHeight() / 2));
+//					new BoardEventInfoView(Images.CHECK).setLocation((int) (BoardPanel.super.getWidth() / 3.3),
+//							(int) (BoardPanel.super.getHeight() / 2));
 
 					eventInfoNotShowed = false;
 				}
@@ -760,10 +774,9 @@ public class BoardPanel extends FlatPanel implements Layer {
 				} else {
 					BOARD_SQUARE[x][y - 1].removeChessmanFromSquare();
 				}
-
-				new BoardEventInfoView(Images.ENPASSANT).setLocation((int) (BoardPanel.super.getWidth() / 3.3),
-						(int) (BoardPanel.super.getHeight() / 2));
-				// gameHelper.decreaseCurrentChessmanCount(!movedPawnColor, ChessmanType.PAWN);
+				new BoardEventInfoView(Images.ENPASSANT);
+//				new BoardEventInfoView(Images.ENPASSANT).setLocation((int) (BoardPanel.super.getWidth() / 3.3),
+//						(int) (BoardPanel.super.getHeight() / 2));
 			}
 		}
 
@@ -954,8 +967,8 @@ public class BoardPanel extends FlatPanel implements Layer {
 			selectedSquare.removeChessmanFromSquare();
 			BOARD_SQUARE[x][y].removeChessmanFromSquare();
 
-			new BoardEventInfoView(Images.CASTLING).setLocation((int) (BoardPanel.super.getWidth() / 3.3),
-					(int) (BoardPanel.super.getHeight() / 2));
+//			new BoardEventInfoView(Images.CASTLING).setLocation((int) (BoardPanel.super.getWidth() / 3.3),
+//					(int) (BoardPanel.super.getHeight() / 2));
 		}
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////
