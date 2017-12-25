@@ -1,4 +1,4 @@
-package com.bfpaul.renewal.chess.main;
+package com.bfpaul.renewal.chess.game;
 
 import java.awt.Component;
 
@@ -6,7 +6,6 @@ import javax.swing.border.EmptyBorder;
 
 import com.bfpaul.renewal.chess.Images;
 import com.bfpaul.renewal.chess.Theme;
-import com.bfpaul.renewal.chess.game.GameFrame;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.frame.FlatFrame;
@@ -19,9 +18,9 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 import com.mommoo.util.ScreenManager;
 
 // 체스프로그램의 시작화면으로써 게임을 혼자할지 두명이서 할지 선택하게한다. 
-class IntroFrame {
+public class IntroFrame {
 	
-	IntroFrame() {
+	public IntroFrame() {
 		FlatFrame frame = createFrame();
 		
 		frame.getContainer().add(createImageView(), createMatchParentConstraints(3));

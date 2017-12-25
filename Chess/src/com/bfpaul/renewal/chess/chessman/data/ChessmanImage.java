@@ -1,4 +1,4 @@
-package com.bfpaul.renewal.chess.chessman;
+package com.bfpaul.renewal.chess.chessman.data;
 
 import java.awt.Image;
 

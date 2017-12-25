@@ -1,15 +1,15 @@
-package com.bfpaul.renewal.chess.game;
+package com.bfpaul.renewal.chess.event;
 
 /**
  *  체스게임에서 승리/패배/무승부의 경우의 수는 6가지이다.
  *  이 GameResultType는 이 승리/패배/무승부의 6가지 경우를 표현하는 지표로써 필요하다.
  *  GameResultView와 연관되어 게임의 승리/패배/무승부의 각각의 경우를 표현하는데 지표로써 도움을 준다. 
  * 
- *  @see GameResultView
+ *  @see GameResultEventView
  *	@author 김형수
  */
 
-public enum GameResultType {
+public enum GameResultEventType {
 	CHECKMATE("체크메이트"),
 	STALEMATE("스테일메이트"),
 	RESIGN("기권"),
@@ -19,7 +19,7 @@ public enum GameResultType {
 	
 	private final String RESULT;
 	
-	private GameResultType(String result) {
+	private GameResultEventType(String result) {
 		this.RESULT = result;
 	}
 	

@@ -1,19 +1,19 @@
-package com.bfpaul.renewal.chess.game;
+package com.bfpaul.renewal.chess.event;
 
 import javax.swing.JDialog;
 
-public class GameResultManager {
+public class GameResultEventManager {
 	private static int whiteCount = 0;
 	private static int blackCount = 0;
 	
-	private GameResultManager() {	}
+	private GameResultEventManager() {	}
 	
 	public static JDialog checkmateManager(boolean isWhite) {
-		return new GameResultView(isWhite, GameResultType.CHECKMATE);
+		return new GameResultEventView(isWhite, GameResultEventType.CHECKMATE);
 	}
 	
 	public static JDialog stalemateManager() {
-		return new GameResultView(true, GameResultType.STALEMATE);
+		return new GameResultEventView(true, GameResultEventType.STALEMATE);
 	}
 	
 	public static void increaseCount(boolean isWhite) {
@@ -21,14 +21,14 @@ public class GameResultManager {
 			whiteCount += 1;
 		} else {
 			blackCount += 1;
-		}		
+		}
 	}
 	
 	public static JDialog fiftyCountManager(boolean isWhite) {
 		increaseCount(isWhite);
 		
 		if(whiteCount == 50 || blackCount == 50 ) {
-			return new GameResultView(isWhite, GameResultType.FIFTY_COUNT);
+			return new GameResultEventView(isWhite, GameResultEventType.FIFTY_COUNT);
 		} else {
 			return new JDialog();
 		}
@@ -36,14 +36,14 @@ public class GameResultManager {
 	}
 	
 	public static JDialog threeFoldReptitionManager() {
-		return new GameResultView(true, GameResultType.THREE_FOLD_REPETITION);
+		return new GameResultEventView(true, GameResultEventType.THREE_FOLD_REPETITION);
 	}
 	
 	public static JDialog resignManager(boolean isWhite) {
-		return new GameResultView(isWhite, GameResultType.RESIGN);
+		return new GameResultEventView(isWhite, GameResultEventType.RESIGN);
 	}
 	
 	public static JDialog timerOutManager(boolean isWhite) {
-		return new GameResultView(isWhite, GameResultType.TIMER_OUT);
+		return new GameResultEventView(isWhite, GameResultEventType.TIMER_OUT);
 	}
 }

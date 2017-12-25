@@ -1,6 +1,8 @@
-package com.bfpaul.renewal.chess.chessman;
+package com.bfpaul.renewal.chess.chessman.data;
 
 import java.awt.Image;
+
+import com.bfpaul.renewal.chess.route.Direction;
 /* 
  * 각각 다른 체스말들을 하나의 공통된 것으로 처리하기 위해서 만들어졌다.
  * 보드에 체스말을 놓거나 사라지게 하기위해서는 이미지가 필요하다. Chessman을 구현하는 하위 클래스들은 그 필요한 이미지 데이터를 가지고있다.

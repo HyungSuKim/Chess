@@ -1,4 +1,4 @@
-package com.bfpaul.renewal.chess.board;
+package com.bfpaul.renewal.chess.event;
 
 import java.awt.Component;
 
@@ -6,13 +6,14 @@ import javax.swing.JPanel;
 
 import com.bfpaul.chess.Images;
 import com.bfpaul.chess.Theme;
-import com.bfpaul.renewal.chess.chessman.Bishop;
-import com.bfpaul.renewal.chess.chessman.Chessman;
-import com.bfpaul.renewal.chess.chessman.ChessmanImage;
-import com.bfpaul.renewal.chess.chessman.ChessmanType;
-import com.bfpaul.renewal.chess.chessman.Knight;
-import com.bfpaul.renewal.chess.chessman.Queen;
-import com.bfpaul.renewal.chess.chessman.Rook;
+import com.bfpaul.renewal.chess.board.BoardSquare;
+import com.bfpaul.renewal.chess.chessman.data.Bishop;
+import com.bfpaul.renewal.chess.chessman.data.Chessman;
+import com.bfpaul.renewal.chess.chessman.data.ChessmanImage;
+import com.bfpaul.renewal.chess.chessman.data.ChessmanType;
+import com.bfpaul.renewal.chess.chessman.data.Knight;
+import com.bfpaul.renewal.chess.chessman.data.Queen;
+import com.bfpaul.renewal.chess.chessman.data.Rook;
 import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.frame.FlatDialog;
 import com.mommoo.flat.frame.FlatFrame;
@@ -46,13 +47,13 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
  * 9. 시점 : BoardPanel에서 폰이 정해진 좌표에 도달하면 생성되고 프로모션 할 말을 선택하면 사라진다.
  * 10.중복 동일 구조가 반복되지 않는가 : 해당없음
  * */
-class PawnPromotionSelectOnBoardFrame {
+public class PawnPromotionSelectEventFrame {
 	
 	private FlatFrame frame = createFrame();
 
 	private OnClickListener callBack = comp -> {};
 	
-	PawnPromotionSelectOnBoardFrame(BoardSquare boardSquare) {
+	public PawnPromotionSelectEventFrame(BoardSquare boardSquare) {
 		
 		JPanel container = frame.getContainer(); 
 
@@ -68,7 +69,7 @@ class PawnPromotionSelectOnBoardFrame {
 		return new LinearConstraints().setWeight(weight).setLinearSpace(LinearSpace.MATCH_PARENT);
 	}
 	
-	void setCallBack(OnClickListener onClickListener) {
+	public void setCallBack(OnClickListener onClickListener) {
 		this.callBack = onClickListener;
 	}
 	

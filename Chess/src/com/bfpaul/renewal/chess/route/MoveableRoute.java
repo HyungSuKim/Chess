@@ -1,6 +1,4 @@
-package com.bfpaul.renewal.chess.controller.route;
-
-import com.bfpaul.renewal.chess.chessman.Direction;
+package com.bfpaul.renewal.chess.route;
 
 public class MoveableRoute {
 	private Direction direction;

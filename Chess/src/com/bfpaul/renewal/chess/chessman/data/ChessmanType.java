@@ -1,4 +1,4 @@
-package com.bfpaul.renewal.chess.chessman;
+package com.bfpaul.renewal.chess.chessman.data;
 
 // Chessman(체스말)의 타입과 각 타입의 말의 게임 시작 시 초기 말의 수를 정해준다.
 public enum ChessmanType{

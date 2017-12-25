@@ -10,17 +10,19 @@ import javax.swing.BorderFactory;
 
 import com.bfpaul.renewal.chess.Images;
 import com.bfpaul.renewal.chess.Theme;
-import com.bfpaul.renewal.chess.chessman.Chessman;
-import com.bfpaul.renewal.chess.chessman.ChessmanType;
-import com.bfpaul.renewal.chess.chessman.Direction;
-import com.bfpaul.renewal.chess.chessman.King;
-import com.bfpaul.renewal.chess.chessman.Pawn;
-import com.bfpaul.renewal.chess.chessman.Rook;
-import com.bfpaul.renewal.chess.controller.layer.Layer;
-import com.bfpaul.renewal.chess.controller.route.Coordinate;
-import com.bfpaul.renewal.chess.controller.route.MoveableRoute;
-import com.bfpaul.renewal.chess.controller.route.MoveableRouteCalculator;
-import com.bfpaul.renewal.chess.game.GameResultManager;
+import com.bfpaul.renewal.chess.chessman.data.Chessman;
+import com.bfpaul.renewal.chess.chessman.data.ChessmanType;
+import com.bfpaul.renewal.chess.chessman.data.King;
+import com.bfpaul.renewal.chess.chessman.data.Pawn;
+import com.bfpaul.renewal.chess.chessman.data.Rook;
+import com.bfpaul.renewal.chess.event.BoardEventInfoView;
+import com.bfpaul.renewal.chess.event.GameResultEventManager;
+import com.bfpaul.renewal.chess.event.PawnPromotionSelectEventFrame;
+import com.bfpaul.renewal.chess.layer.Layer;
+import com.bfpaul.renewal.chess.route.Coordinate;
+import com.bfpaul.renewal.chess.route.Direction;
+import com.bfpaul.renewal.chess.route.MoveableRoute;
+import com.bfpaul.renewal.chess.route.MoveableRouteCalculator;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;
 import com.mommoo.flat.layout.linear.constraints.LinearConstraints;
@@ -236,10 +238,10 @@ public class BoardPanel extends FlatPanel implements Layer {
 		disableSquareClickEvent();
 
 		/* Test */
-		GameResultManager.fiftyCountManager(isWhite).setLocationRelativeTo(this);
+		GameResultEventManager.fiftyCountManager(isWhite).setLocationRelativeTo(this);
 		/* Test */
 		if (BOARD_SQUARE[x][y].getChessman() instanceof Pawn && (y == 0 || y == 7)) {
-			PawnPromotionSelectOnBoardFrame selectView = new PawnPromotionSelectOnBoardFrame(BOARD_SQUARE[x][y]);
+			PawnPromotionSelectEventFrame selectView = new PawnPromotionSelectEventFrame(BOARD_SQUARE[x][y]);
 			selectView.setCallBack(new OnClickListener() {
 				@Override
 				public void onClick(Component component) {

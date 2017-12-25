@@ -1,4 +1,4 @@
-package com.bfpaul.renewal.chess.board;
+package com.bfpaul.renewal.chess.event;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -46,7 +46,7 @@ import com.mommoo.flat.image.ImageOption;
 @SuppressWarnings("serial")
 public class BoardEventInfoView extends JDialog {
 	
-	BoardEventInfoView(Image image) {
+	public BoardEventInfoView(Image image) {
 		FlatImagePanel imagePanel = new FlatImagePanel(image, ImageOption.MATCH_PARENT);
 		
 		setSize(400, 200);
@@ -60,10 +60,7 @@ public class BoardEventInfoView extends JDialog {
 		imagePanel.setOnClickListener( component -> { setVisible(false); } );
 		
 		setVisible(true);
-		
-		System.out.println(getSize().toString());
-		System.out.println(getLocation().toString());
-		System.out.println(getBounds().toString());
+
 //		this.run();
 	}
 	

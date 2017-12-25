@@ -5,7 +5,7 @@ import java.awt.Color;
 import javax.swing.BorderFactory;
 
 import com.bfpaul.chess.Theme;
-import com.bfpaul.renewal.chess.chessman.Chessman;
+import com.bfpaul.renewal.chess.chessman.data.Chessman;
 import com.mommoo.flat.image.FlatImagePanel;
 import com.mommoo.flat.image.ImageOption;
 import com.mommoo.flat.layout.linear.LinearLayout;
@@ -40,7 +40,7 @@ public class BoardSquare extends FlatImagePanel {
 	}
 
 	// 체스말을 네모칸위에 올려준다.
-	void setChessmanOnSquare(Chessman chessman) {
+	public void setChessmanOnSquare(Chessman chessman) {
 		this.chessman = chessman;
 		isContain = true;
 		setEnableClickEvent(true);
@@ -116,7 +116,7 @@ public class BoardSquare extends FlatImagePanel {
 	// 고민되는 부분은 chessman이 없을때는 null을 반환하는데
 	// 그러다보니 BoardPanel에서 이를 검사할때 1. isContain이 true인지, 2. chessman이 null이 아닌지
 	// 한단계 더 나아가면 3. 체스맨이 킹인지 룩인지 등등... 기본 3단계의 논리검사를 시행해야되서 이를 처리하는데 고민이 된다.
-	Chessman getChessman() {
+	public Chessman getChessman() {
 		return chessman;
 	}
 }

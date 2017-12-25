@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.border.EmptyBorder;
 
 import com.bfpaul.chess.Theme;
-import com.bfpaul.renewal.chess.controller.layer.Layer;
+import com.bfpaul.renewal.chess.layer.Layer;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.component.OnClickListener;

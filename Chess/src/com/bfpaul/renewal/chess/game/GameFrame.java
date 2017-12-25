@@ -7,9 +7,10 @@ import javax.swing.border.EmptyBorder;
 
 import com.bfpaul.renewal.chess.Images;
 import com.bfpaul.renewal.chess.Theme;
-import com.bfpaul.renewal.chess.board.BoardEventInfoView;
 import com.bfpaul.renewal.chess.board.BoardPanel;
-import com.bfpaul.renewal.chess.controller.layer.LayerHandler;
+import com.bfpaul.renewal.chess.chessman.CurrentChessmanView;
+import com.bfpaul.renewal.chess.event.BoardEventInfoView;
+import com.bfpaul.renewal.chess.layer.LayerHandler;
 import com.bfpaul.renewal.chess.timer.GameTimerView;
 import com.mommoo.flat.button.FlatButton;
 import com.mommoo.flat.component.FlatPanel;

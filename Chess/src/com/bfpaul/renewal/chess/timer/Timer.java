@@ -2,7 +2,7 @@ package com.bfpaul.renewal.chess.timer;
 
 import java.time.LocalTime;
 
-import com.bfpaul.renewal.chess.game.GameResultManager;
+import com.bfpaul.renewal.chess.event.GameResultEventManager;
 
 // TimerView에서 시간속성을 가지고 Timer로써의 역할을 하며 TimerView의 timerLabel에 시간을 보여주기위해 작성하였다.
 class Timer extends Thread {
@@ -43,7 +43,7 @@ class Timer extends Thread {
 		if(remainTime.getMinute() == 0 && remainTime.getSecond() == 0) {
 			runTimer = false;
 			System.out.println("시간초과");
-			GameResultManager.timerOutManager(!timerView.getIsWhite()).setLocationRelativeTo(timerView);
+			GameResultEventManager.timerOutManager(!timerView.getIsWhite()).setLocationRelativeTo(timerView);
 			interrupt();
 		} else {
 			remainTime = remainTime.minusSeconds(1);

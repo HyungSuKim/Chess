@@ -1,4 +1,4 @@
-package com.bfpaul.renewal.chess.controller.route;
+package com.bfpaul.renewal.chess.route;
 
 public class Coordinate {
 	private final static int MINIMUM_X = 0;

@@ -1,4 +1,4 @@
-package com.bfpaul.renewal.chess.game;
+package com.bfpaul.renewal.chess.chessman;
 
 import java.awt.Image;
 import java.util.HashMap;
@@ -6,9 +6,9 @@ import java.util.HashMap;
 import javax.swing.BorderFactory;
 
 import com.bfpaul.renewal.chess.Theme;
-import com.bfpaul.renewal.chess.chessman.ChessmanImage;
-import com.bfpaul.renewal.chess.chessman.ChessmanType;
-import com.bfpaul.renewal.chess.controller.layer.Layer;
+import com.bfpaul.renewal.chess.chessman.data.ChessmanImage;
+import com.bfpaul.renewal.chess.chessman.data.ChessmanType;
+import com.bfpaul.renewal.chess.layer.Layer;
 import com.mommoo.flat.component.FlatPanel;
 import com.mommoo.flat.image.FlatImagePanel;
 import com.mommoo.flat.image.ImageOption;

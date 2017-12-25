@@ -1,6 +1,8 @@
-package com.bfpaul.renewal.chess.chessman;
+package com.bfpaul.renewal.chess.chessman.data;
 
 import java.awt.Image;
+
+import com.bfpaul.renewal.chess.route.Direction;
 /*
  * Knight의 특성을 가진 체스말로써 역할 하기위해서 만들어졌다.   
  * Knight의 표현을 위한 이미지와 이동을 위한 정보를 제공한다.

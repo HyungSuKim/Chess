@@ -1,4 +1,4 @@
-package com.bfpaul.renewal.chess.controller.layer;
+package com.bfpaul.renewal.chess.layer;
 
 public interface Layer {
 	public void execute(Object[] object);

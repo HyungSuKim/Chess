@@ -1,4 +1,4 @@
-package com.bfpaul.renewal.chess.game;
+package com.bfpaul.renewal.chess.event;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -28,12 +28,12 @@ import com.mommoo.util.FontManager;
  * @author ±èÇü¼ö
  */
 @SuppressWarnings("serial")
-public class GameResultView extends JDialog {
+public class GameResultEventView extends JDialog {
 	
 	private static final Font PLAIN_FONT_20PT = FontManager.getNanumGothicFont(Font.PLAIN, 20);
 	private static final Font BOLD_FONT_30PT = FontManager.getNanumGothicFont(Font.BOLD, 30);
 	
-	public GameResultView(boolean isWhite, GameResultType resultType) {
+	public GameResultEventView(boolean isWhite, GameResultEventType resultType) {
 		
 		setSize(400, 300);
 		setUndecorated(true);
@@ -81,7 +81,7 @@ public class GameResultView extends JDialog {
 		return okButton;
 	}
 	
-	private FlatLabel createTitleLabel(GameResultType resultType) {
+	private FlatLabel createTitleLabel(GameResultEventType resultType) {
 		FlatLabel resultTitle = new FlatLabel(resultType.getResult());
 		
 		resultTitle.setHorizontalAlignment(FlatHorizontalAlignment.CENTER);
@@ -92,7 +92,7 @@ public class GameResultView extends JDialog {
 		return resultTitle;
 	}
 	
-	private FlatLabel createContentLabel(boolean isWhite, GameResultType resultType) {
+	private FlatLabel createContentLabel(boolean isWhite, GameResultEventType resultType) {
 		FlatLabel resultContent = new FlatLabel(getResultContent(isWhite, resultType));
 		
 		resultContent.setHorizontalAlignment(FlatHorizontalAlignment.CENTER);
@@ -102,7 +102,7 @@ public class GameResultView extends JDialog {
 		return resultContent;
 	}
 	
-	private String getResultContent(boolean isWhite, GameResultType resultType) {
+	private String getResultContent(boolean isWhite, GameResultEventType resultType) {
 		switch(resultType) {
 		case CHECKMATE : return getWinContent(isWhite);
 		case STALEMATE : return getDrawContent();
