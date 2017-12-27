@@ -6,6 +6,7 @@ import javax.swing.BorderFactory;
 
 import com.bfpaul.chess.Theme;
 import com.bfpaul.renewal.chess.chessman.data.Chessman;
+import com.bfpaul.renewal.chess.chessman.data.ChessmanType;
 import com.mommoo.flat.image.FlatImagePanel;
 import com.mommoo.flat.image.ImageOption;
 import com.mommoo.flat.layout.linear.LinearLayout;
@@ -50,8 +51,10 @@ public class BoardSquare extends FlatImagePanel {
 	// 칸의 색을 원래대로 돌려주는데 말이 없는 곳은 클릭이 되면 안된다고 생각했기 때문에 말이 있으면 클릭 가능하게하고 아니면 불가능하게 하도록
 	// 했다.
 	void setSquareOriginalColor() {
+		
 		setBackground(ORIGINAL_COLOR);
 		setAlpha(1.0f);
+		
 		if (isContain) {
 			setEnableClickEvent(true);
 		} else {
@@ -63,37 +66,32 @@ public class BoardSquare extends FlatImagePanel {
 	// 이때 체크메이트 경로임을 확인하는 이유는 다른말의 이동경로가
 	// 체크메이트 경로와 겹칠경우 체크메이트 경로 위로 이동하여 경로를 차단하는 것을 생각했기 때문이다.
 	void setSquareMoveableColor() {
-		setBackground(Theme.LIGHT_BLUE_COLOR);
+		setBackgroundColorWithAlpha(Theme.LIGHT_BLUE_COLOR);
 		setEnableClickEvent(true);
-		setAlpha(0.6f);
 	}
 
 	// 해당 칸이 공격이 가능하다고 표현해준다
 	void setSquareAttackableColor() {
 		setBackground(Color.RED);
 		setEnableClickEvent(true);
-		setAlpha(0.6f);
 	}
 
 	// 해당 칸이 체크메이트 경로임을 표현해준다.
 	void setSquareCheckColor() {
-		setBackground(Color.GREEN);
+		setBackgroundColorWithAlpha(Color.GREEN);
 		setEnableClickEvent(false);
-		setAlpha(0.6f);
 	}
 	
 	// 해당 칸이 움직일 수 있는 체크메이트 칸임을 표현해준다.
 	void setSquareMoveableCheckColor() {
-		setBackground(Color.GREEN);
+		setBackgroundColorWithAlpha(Color.GREEN);
 		setEnableClickEvent(true);
-		setAlpha(0.6f);
 	}
 
 	// 해당 칸이 캐슬링이 가능하다고 표현해준다
 	void setSquareCastlingColor() {
-		setBackground(Color.YELLOW);
+		setBackgroundColorWithAlpha(Color.YELLOW);
 		setEnableClickEvent(true);
-		setAlpha(0.6f);
 	}
 
 	// 체스말을 가지고있으면 체스말을 네모칸위에서 제거한다.
@@ -107,6 +105,14 @@ public class BoardSquare extends FlatImagePanel {
 	boolean isContainChessman() {
 		return isContain;
 	}
+	
+	boolean isContainChessmanWhite() {
+		return chessman.isWhite();
+	}
+	
+	ChessmanType getContainChessmanType() {
+		return chessman.getChessmanType();
+	}
 
 	void setEnableClickEvent(boolean enable) {
 		setEnabled(enable);
@@ -118,5 +124,11 @@ public class BoardSquare extends FlatImagePanel {
 	// 한단계 더 나아가면 3. 체스맨이 킹인지 룩인지 등등... 기본 3단계의 논리검사를 시행해야되서 이를 처리하는데 고민이 된다.
 	public Chessman getChessman() {
 		return chessman;
+	}
+	
+	
+	private void setBackgroundColorWithAlpha(Color color) {
+		setBackground(color);
+		setAlpha(0.6f);
 	}
 }
