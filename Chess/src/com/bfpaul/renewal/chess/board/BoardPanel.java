@@ -1,5 +1,6 @@
 package com.bfpaul.renewal.chess.board;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.ArrayList;
@@ -125,11 +126,20 @@ public class BoardPanel extends FlatPanel implements Layer {
 					selectChessman(x, y);
 				} else if (selectedSquare == BOARD_SQUARE[x][y]) {
 					deSelectChessman();
+				} else if (isSameColorChessmanClicked(x, y)) {
+					selectChessman(x, y);
 				} else {
 					moveSelectedChessman(x, y);
 				}
 			}
 		};
+	}
+	
+	private boolean isSameColorChessmanClicked(int x, int y) {
+		return BOARD_SQUARE[x][y].isContainChessman() 
+				&& selectedSquare.isContainChessmanWhite() == BOARD_SQUARE[x][y].isContainChessmanWhite()
+				&& BOARD_SQUARE[x][y].getBackground() != Color.YELLOW;
+		
 	}
 
 	private void selectChessman(int x, int y) {
@@ -139,8 +149,8 @@ public class BoardPanel extends FlatPanel implements Layer {
 		helperList.add(new CastlingHelper());
 		helperList.add(new MateHelper());
 		helperList.add(new EnPassantHelper());
-
-		disableSquareClickEvent(); // 초기에 말을 골랐을때 모든 칸의 클릭 이벤트를 풀고
+		
+		clearSquaresEventColor();
 
 		selectedSquare = BOARD_SQUARE[x][y]; // 그 눌린말의 스퀘어 정보를 선택된 스퀘어에 저장하고
 		for (Helper helper : helperList) {
@@ -156,8 +166,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 	}
 
 	private void deSelectChessman() {
-		Helper helper = new MoveHelper();
-		helper.clear();
+		clearSquaresEventColor();
 
 		selectedSquare.setSquareOriginalColor();
 
@@ -169,19 +178,27 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 	private void moveSelectedChessman(int x, int y) {
 
-		BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
-		
-		if(BOARD_SQUARE[x][y].getContainChessmanType() == ChessmanType.PAWN) {
-			Pawn pawn = ((Pawn)(BOARD_SQUARE[x][y].getChessman()));
+		if (selectedSquare.getContainChessmanType() == ChessmanType.KING) {
+			King king = ((King) (selectedSquare.getChessman()));
+			king.setIsMoved();
+			new CastlingHelper().operateCastling(x, y);
+		} else if (selectedSquare.getContainChessmanType() == ChessmanType.ROOK) {
+			Rook rook = ((Rook) (selectedSquare.getChessman()));
+			rook.setIsMoved();
+			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
+		} else if (selectedSquare.getContainChessmanType() == ChessmanType.PAWN) {
+			Pawn pawn = ((Pawn) (selectedSquare.getChessman()));
 			pawn.setIsMoved();
+			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
+		} else {
+			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
 		}
-		
+
 		selectedSquare.removeChessmanFromSquare();
 		selectedSquare.setSquareOriginalColor();
 		selectedSquare = null;
 
-		Helper helper = new MoveHelper();
-		helper.clear();
+		clearSquaresEventColor();
 
 		new MateHelper().checkMateRoute();
 
@@ -237,7 +254,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-			setPawnOnBoard(ChessmanType.PAWN);
+//			setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
@@ -301,17 +318,17 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 	}
 
+	private void clearSquaresEventColor() {
+		for (int y = 0; y < 8; y++) {
+			for (int x = 0; x < 8; x++) {
+				BOARD_SQUARE[x][y].setSquareOriginalColor();
+			}
+		}
+	}
+
 	private abstract class Helper {
 
 		abstract void show(Chessman chessman, int x, int y);
-
-		void clear() {
-			for (int y = 0; y < 8; y++) {
-				for (int x = 0; x < 8; x++) {
-					BOARD_SQUARE[x][y].setSquareOriginalColor();
-				}
-			}
-		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
