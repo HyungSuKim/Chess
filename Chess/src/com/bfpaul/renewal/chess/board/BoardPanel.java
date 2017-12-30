@@ -60,6 +60,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 	// 체스 판의 하나하나의 square로써 체스말을 놓아준다던가 체스말을 제외해준다거나 이동가능범위를 표현해줄 최소단위의 칸이다.
 	private final BoardSquare[][] BOARD_SQUARE = new BoardSquare[8][8];
 	private BoardSquare selectedSquare = null;
+	private BoardSquare beforeMovedSquare = null;
 	private boolean isWhite = true;
 
 	private boolean isFinish;
@@ -143,14 +144,14 @@ public class BoardPanel extends FlatPanel implements Layer {
 	}
 
 	private void selectChessman(int x, int y) {
+		clearSquaresEventColor();
+		
 		ArrayList<Helper> helperList = new ArrayList<Helper>();
 		helperList.add(new MoveHelper());
 		helperList.add(new PawnAttackHelper());
 		helperList.add(new CastlingHelper());
 		helperList.add(new MateHelper());
 		helperList.add(new EnPassantHelper());
-
-		clearSquaresEventColor();
 
 		selectedSquare = BOARD_SQUARE[x][y]; // 그 눌린말의 스퀘어 정보를 선택된 스퀘어에 저장하고
 		for (Helper helper : helperList) {
@@ -206,7 +207,9 @@ public class BoardPanel extends FlatPanel implements Layer {
 		} else {
 			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
 		}
-
+		
+		beforeMovedSquare = BOARD_SQUARE[x][y];
+		
 		selectedSquare.removeChessmanFromSquare();
 		selectedSquare.setSquareOriginalColor();
 		selectedSquare = null;
@@ -267,7 +270,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-			setPawnOnBoard(ChessmanType.PAWN);
+//			setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
@@ -595,12 +598,12 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 		private void showEnPassantSquare(int x, int y) {
 			if (Coordinate.isValidate(x - 1, y) && BOARD_SQUARE[x - 1][y].isContainChessman()
-					&& isAvailToEnPassent(x - 1, y)) {
+					&& isAvailToEnPassent(x - 1, y) && beforeMovedSquare == BOARD_SQUARE[x - 1][y]) {
 				showEnPassantSquareByColor(x - 1, y);
 			}
 
 			if (Coordinate.isValidate(x + 1, y) && BOARD_SQUARE[x + 1][y].isContainChessman()
-					&& isAvailToEnPassent(x + 1, y)) {
+					&& isAvailToEnPassent(x + 1, y) && beforeMovedSquare == BOARD_SQUARE[x + 1][y]) {
 				showEnPassantSquareByColor(x + 1, y);
 			}
 		}
