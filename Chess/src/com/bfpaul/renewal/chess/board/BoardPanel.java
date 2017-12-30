@@ -134,12 +134,12 @@ public class BoardPanel extends FlatPanel implements Layer {
 			}
 		};
 	}
-	
+
 	private boolean isSameColorChessmanClicked(int x, int y) {
-		return BOARD_SQUARE[x][y].isContainChessman() 
+		return BOARD_SQUARE[x][y].isContainChessman()
 				&& selectedSquare.isContainChessmanWhite() == BOARD_SQUARE[x][y].isContainChessmanWhite()
 				&& BOARD_SQUARE[x][y].getBackground() != Color.YELLOW;
-		
+
 	}
 
 	private void selectChessman(int x, int y) {
@@ -149,7 +149,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 		helperList.add(new CastlingHelper());
 		helperList.add(new MateHelper());
 		helperList.add(new EnPassantHelper());
-		
+
 		clearSquaresEventColor();
 
 		selectedSquare = BOARD_SQUARE[x][y]; // 그 눌린말의 스퀘어 정보를 선택된 스퀘어에 저장하고
@@ -188,6 +188,19 @@ public class BoardPanel extends FlatPanel implements Layer {
 			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
 		} else if (selectedSquare.getContainChessmanType() == ChessmanType.PAWN) {
 			Pawn pawn = ((Pawn) (selectedSquare.getChessman()));
+
+			/* DataSetting for Pawn EnPassant */
+			if (!pawn.isMoved() && (y == 4 || y == 3)) {
+				pawn.setMovedSquareCount(2);
+				System.out.println(pawn.getMovedSquareCount());
+			} else {
+				pawn.setMovedSquareCount(1);
+				System.out.println(pawn.getMovedSquareCount());
+				if(BOARD_SQUARE[x][y].getBackground() == Color.RED) {
+					new EnPassantHelper().moveEnPassant(x, y);
+				}
+			}
+
 			pawn.setIsMoved();
 			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
 		} else {
@@ -254,7 +267,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 			setPairChessmanOnBoard(ChessmanType.ROOK);
 			break;
 		case PAWN:
-//			setPawnOnBoard(ChessmanType.PAWN);
+			setPawnOnBoard(ChessmanType.PAWN);
 			break;
 		default:
 		}
@@ -327,7 +340,6 @@ public class BoardPanel extends FlatPanel implements Layer {
 	}
 
 	private abstract class Helper {
-
 		abstract void show(Chessman chessman, int x, int y);
 	}
 
@@ -551,30 +563,45 @@ public class BoardPanel extends FlatPanel implements Layer {
 				showEnPassantSquare(x, y);
 			}
 		}
+		
+		private void moveEnPassant(int x, int y) {
+			if(isWhite) {
+				BOARD_SQUARE[x][y + 1].removeChessmanFromSquare();
+			} else {
+				BOARD_SQUARE[x][y - 1].removeChessmanFromSquare();
+			}
+		}
+
+		private void showEnPassantSquareByColor(int x, int y) {
+			if (isWhite) {
+				BOARD_SQUARE[x][y - 1].setSquareAttackableColor();
+			} else {
+				BOARD_SQUARE[x][y + 1].setSquareAttackableColor();
+			}
+		}
+
+		private boolean isBoardSquareContainsEnemyPawn(int x, int y) {
+			return  BOARD_SQUARE[x][y].getContainChessmanType() == ChessmanType.PAWN
+					&& selectedSquare.isContainChessmanWhite() != BOARD_SQUARE[x][y].isContainChessmanWhite();
+		}
+
+		private boolean isEnemyPawnMovedTwoSquare(int x, int y) {
+			return ((Pawn) BOARD_SQUARE[x][y].getChessman()).getMovedSquareCount() == 2;
+		}
+
+		private boolean isAvailToEnPassent(int x, int y) {
+			return isBoardSquareContainsEnemyPawn(x, y) && isEnemyPawnMovedTwoSquare(x, y);
+		}
 
 		private void showEnPassantSquare(int x, int y) {
-			if (Coordinate.isValidate(x - 1, y)) {
-				if (BOARD_SQUARE[x - 1][y].isContainChessman()
-						&& BOARD_SQUARE[x - 1][y].getContainChessmanType() == ChessmanType.PAWN && BOARD_SQUARE[x][y]
-								.isContainChessmanWhite() != BOARD_SQUARE[x - 1][y].isContainChessmanWhite()) {
-					if (isWhite) {
-						BOARD_SQUARE[x - 1][y - 1].setSquareAttackableColor();
-					} else {
-						BOARD_SQUARE[x - 1][y + 1].setSquareAttackableColor();
-					}
-				}
+			if (Coordinate.isValidate(x - 1, y) && BOARD_SQUARE[x - 1][y].isContainChessman()
+					&& isAvailToEnPassent(x - 1, y)) {
+				showEnPassantSquareByColor(x - 1, y);
 			}
 
-			if (Coordinate.isValidate(x + 1, y)) {
-				if (BOARD_SQUARE[x + 1][y].isContainChessman()
-						&& BOARD_SQUARE[x + 1][y].getContainChessmanType() == ChessmanType.PAWN && BOARD_SQUARE[x][y]
-								.isContainChessmanWhite() != BOARD_SQUARE[x + 1][y].isContainChessmanWhite()) {
-					if (isWhite) {
-						BOARD_SQUARE[x + 1][y - 1].setSquareAttackableColor();
-					} else {
-						BOARD_SQUARE[x + 1][y + 1].setSquareAttackableColor();
-					}
-				}
+			if (Coordinate.isValidate(x + 1, y) && BOARD_SQUARE[x + 1][y].isContainChessman()
+					&& isAvailToEnPassent(x + 1, y)) {
+				showEnPassantSquareByColor(x + 1, y);
 			}
 		}
 	}

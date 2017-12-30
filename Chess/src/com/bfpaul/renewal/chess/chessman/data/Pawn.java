@@ -12,6 +12,7 @@ import com.bfpaul.renewal.chess.route.Direction;
 public class Pawn extends Chessman {
 	private final boolean IS_WHITE;
 	private boolean isMoved;
+	private int movedSquareCount;
 	
 	public Pawn(boolean isWhite) {
 		IS_WHITE = isWhite;
@@ -51,6 +52,14 @@ public class Pawn extends Chessman {
 	
 	public void setIsMoved() {
 		isMoved = true;
+	}
+	
+	public void setMovedSquareCount(int count) {
+		movedSquareCount = count;
+	}
+	
+	public int getMovedSquareCount() {
+		return movedSquareCount;
 	}
 
 	@Override
