@@ -12,8 +12,8 @@ import javax.swing.BorderFactory;
 import com.bfpaul.renewal.chess.Theme;
 import com.bfpaul.renewal.chess.chessman.data.Chessman;
 import com.bfpaul.renewal.chess.chessman.data.ChessmanType;
-import com.bfpaul.renewal.chess.chessman.data.Pawn;
 import com.bfpaul.renewal.chess.chessman.data.King;
+import com.bfpaul.renewal.chess.chessman.data.Pawn;
 import com.bfpaul.renewal.chess.chessman.data.Rook;
 import com.bfpaul.renewal.chess.event.PawnPromotionSelectEventFrame;
 import com.bfpaul.renewal.chess.layer.Layer;
@@ -29,18 +29,19 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 // 이 Board를 View가 아닌 Panel로 정의 한 것은 Board가 내부의 데이터 변화에 따라서 뷰가 바뀌는 것이 아니라
 // 외부의 사용자 및 클래스들로 인해 그 때 그 때 처리 한 결과를 이용하여 상태가 바뀌기 때문에 Panel로써 정의하였다. 
 //
-// 하나의 보드로써 64칸의 boardSquare를 가지고 체스말과 각각의 boardSquare간의 관계를 맺어주는 역할을 한다.
-// boardSquare에 체스말을 놓거나 제외하거나, 체스말을 선택했을때 이동경로를 계산해서 경로상의 다른 Square들에게 표시를 해준다거나
-// 어떤 위치의 boardSquare에 잡을 수 있는 체스말이 있다 던가.
-//
-// 이렇게 boardSquare와 Chessman 그리고 MoveableRouteCalculator의 관계를 맺어주고 그 데이터들을 이용하여 데이터에 걸맞는 것을 표현하기위하여 필요하다.
-//
-// BoardPanel의 주요 기능은 아래와 같다.
-// 1. 체스말을 집어서 이동경로를 보여준다(공격가능경로 포함) 2. 해당경로로 말을 이동시킨다. 3. 말의 이동 후 다음 이동시 체크가 가능한지 판단한다.
-// BoardPanel은 내부클래스로 MoveHelper, CastlingHelper, PawnAttackHelper, EnPassantHelper, CheckmateHelper를 가지고있는데
-// 이 클래스들을 내부클래스로 분류한 이유는 BoardPanel의 내부에서 체스말이 이동하는 경우, 특수한 이동의 경우를 내부클래스로 따로 구현하여
-// BoardPanel에서 체스말의 이동을 내부 클래스들이 담당하도록 하기위함이다.
-// 내부클래스로 구현함으로써 각 내부클래스는 자기 자신의 역할만 하게 되고 서로 연관성이 없어지게 된다. 
+// 이 BoardPanel클래스는
+// 1. 64개 각각의 BoardSquare들을 체스판의 칸들로써 기능할 수 있도록하기 위해 존재한다.
+//		각각의 BoardSquare들의 좌표와 색상을 정해 배치하여 체스판의 칸들로써 기능하고 연관되게 해준다.
+//		(BoardPanel과 BoardSquare간의 관계를 맺어주어 각 BoardSquare들이 체스판에서 좌표를 가진 Square로써 역할 하도록 해준다.)
+// 2. 하나의 BoardSquare에서 다른 BoardSquare로 체스말의 정보(인스턴스)를 이동시키는 역할을 하기 위해 존재한다.
+// 3. 각각의 BoardSquare들의 상태(색상)를 변경해서 의미있는 정보(Square에 대해 할 수 있는 행위)를 표현하기 위해서 존재한다.
+//		그 기능적 예로 움직 일 수 있는 좌표들의 BoardSquare들의 색상을 움직 일 수 있는 색으로 변경해 준다.
+//		위와 동일하게 원래의 색, 공격 할 수 있는 색, 캐슬링 할 수 있는 색, 체크당하고 있는 색으로 변경해 준다.
+//    기능적 설명 : MoveableRouteCalculator에서 만들어진 data를 이용하여 BoardSquare의 색상을 변경 하거나 하지 않거나, 변경한다면 어떤 색으로
+//				변경할지 처리하는 로직이 있다.(필요하다)
+// 4. (이건 맞는지 모르겠...) Board위의 체스말들의 수량을 파악하기 위해 존재한다. -> 파악하기 위해서 존재하는게 아니고 BoardSquare들을
+//   연관 지어서 가지고 있기 때문에 파악 할 수 있는 것이다. 4번은 BoardPanel이 필요한 이유는 아니다. 
+// 5. 생각중... 더 있는지 생각중...
 
 /* 클래스 작성 간 점검요소
  * 1. 올바른 클래스 이름인가? : 
@@ -60,7 +61,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 	// 체스 판의 하나하나의 square로써 체스말을 놓아준다던가 체스말을 제외해준다거나 이동가능범위를 표현해줄 최소단위의 칸이다.
 	private final BoardSquare[][] BOARD_SQUARE = new BoardSquare[8][8];
 	private BoardSquare selectedSquare = null;
-	private BoardSquare beforeMovedSquare = null;
+	private BoardSquare movedSquare = null;
 	private boolean isWhite = true;
 
 	private boolean isFinish;
@@ -131,6 +132,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 					selectChessman(x, y);
 				} else {
 					moveSelectedChessman(x, y);
+					
 				}
 			}
 		};
@@ -154,12 +156,9 @@ public class BoardPanel extends FlatPanel implements Layer {
 		helperList.add(new EnPassantHelper());
 
 		selectedSquare = BOARD_SQUARE[x][y]; // 그 눌린말의 스퀘어 정보를 선택된 스퀘어에 저장하고
+		
 		for (Helper helper : helperList) {
 			helper.show(selectedSquare.getChessman(), x, y);
-		}
-
-		if (selectedSquare.getContainChessmanType() == ChessmanType.PAWN) {
-
 		}
 
 		selectedSquare.setSquareMoveableColor(); // 눌린말의 칸은 움직일수있는 색상으로 표시해주고
@@ -178,39 +177,41 @@ public class BoardPanel extends FlatPanel implements Layer {
 	}
 
 	private void moveSelectedChessman(int x, int y) {
-
-		if (selectedSquare.getContainChessmanType() == ChessmanType.KING) {
+		/*210 ~ 212 이전에 움직인 칸을 넣는 코드 위치, 표현 이상함 '표현' 에 신경안쓰고, '기능'에 집중한듯*/
+		// 움직였던 칸 으로써의 정보를 저장하는 것이므로 movedSelectedChessman의 메서드가 호출되는 시점에 이미 움직였다고 가정하는 것이 맞다고 생각했다.
+		// 따라서 메서드의 시작부에서 데이터를 저장한다.
+		movedSquare = BOARD_SQUARE[x][y];
+		
+		ChessmanType selectedChessmanType = selectedSquare.getContainChessmanType(); 
+		/*if ~ else-if ~ else 각기 로직의 일관성 부족, (데이터 정제후 -> 로직) 표현 부족*/
+		if (selectedChessmanType == ChessmanType.KING) {
 			King king = ((King) (selectedSquare.getChessman()));
-			king.setIsMoved();
+			king.setMoved();
 			new CastlingHelper().operateCastling(x, y);
-		} else if (selectedSquare.getContainChessmanType() == ChessmanType.ROOK) {
-			Rook rook = ((Rook) (selectedSquare.getChessman()));
-			rook.setIsMoved();
-			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
-		} else if (selectedSquare.getContainChessmanType() == ChessmanType.PAWN) {
-			Pawn pawn = ((Pawn) (selectedSquare.getChessman()));
-
-			/* DataSetting for Pawn EnPassant */
-			if (!pawn.isMoved() && (y == 4 || y == 3)) {
-				pawn.setMovedSquareCount(2);
-				System.out.println(pawn.getMovedSquareCount());
-			} else {
-				pawn.setMovedSquareCount(1);
-				System.out.println(pawn.getMovedSquareCount());
-				if(BOARD_SQUARE[x][y].getBackground() == Color.RED) {
-					new EnPassantHelper().moveEnPassant(x, y);
-				}
-			}
-
-			pawn.setIsMoved();
-			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
 		} else {
+			if (selectedChessmanType == ChessmanType.ROOK) {
+				Rook rook = ((Rook) (selectedSquare.getChessman()));
+				rook.setMoved();
+			}
+			
+			if (selectedChessmanType == ChessmanType.PAWN) {
+				Pawn pawn = ((Pawn) (selectedSquare.getChessman()));
+
+				/* DataSetting for Pawn EnPassant */
+				/*191~203 ^^..... 고치세염 (레알 기능 위주 코딩.. 문제점이 뭔지 분석하고 , 근본적으로 구조를 바꾸려는 노력x )*/
+				EnPassantHelper enPassantHelper = new EnPassantHelper();
+				if(enPassantHelper.isEnPassantMove(x, y)) {
+					enPassantHelper.moveEnPassant(x, y);
+				}
+				
+				pawn.setMovedSquareCount(Math.abs(getSelectedSquareY(x, y) - y));
+				pawn.setMoved();
+			}
+			
 			BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
+			selectedSquare.removeChessmanFromSquare();
 		}
-		
-		beforeMovedSquare = BOARD_SQUARE[x][y];
-		
-		selectedSquare.removeChessmanFromSquare();
+
 		selectedSquare.setSquareOriginalColor();
 		selectedSquare = null;
 
@@ -234,7 +235,23 @@ public class BoardPanel extends FlatPanel implements Layer {
 		} else {
 			isFinish = true;
 		}
-
+	}
+	
+	/* DataSetting for Pawn EnPassant */
+	/*고친 결과물... 문제점 : selectedSquare가 존재하나 BoardSquare 자료형으로써 이동 한 y좌표에대해서 비교 할 수가 없었다.*/
+	// 따라서 해결방안으로 생각한 것이 selectedSquare와 맞는 BOARD_SQUARE를 찾아서 그 y좌표를 구하고 이동한 y좌표에 대해서 비교하자고 생각했다.
+	private int getSelectedSquareY(int x, int y) {
+		int selectedSquareY = 0;
+		
+		for(int findY = 0; findY < 8; findY++) {
+			for(int findX = 0; findX < 8; findX++) {
+				if(selectedSquare == BOARD_SQUARE[findX][findY]) {
+					selectedSquareY = findY;
+				}
+			}
+		}
+		
+		return selectedSquareY;
 	}
 
 	// chessman(King, Queen, Bishop, Knight, Rook, Pawn)을 원하는 좌표값(x,y)의 square에
@@ -342,6 +359,9 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 	}
 
+	/*Helper 의 클래스 캡슐화를 진행 안한듯, 또 기능적으로 Helper가 필요해서 추가한 느낌.
+	이름도 안좋고, 추상클래스 역할도 필요없는데 안고침 --> 클래스 만드는 기본기 부족현상
+	기본기 위주로 코딩 하기를 신경썼으면 함*/
 	private abstract class Helper {
 		abstract void show(Chessman chessman, int x, int y);
 	}
@@ -567,6 +587,23 @@ public class BoardPanel extends FlatPanel implements Layer {
 			}
 		}
 		
+		private boolean isEnPassantMove(int x, int y) {
+			int enPassantY;
+			
+			if(isWhite) {
+				enPassantY = y + 1;
+			} else {
+				enPassantY = y - 1;
+			}
+			
+			if(BOARD_SQUARE[x][enPassantY].isContainChessman()) {
+				return isBoardSquareContainsEnemyPawn(x, enPassantY);
+			} else {
+				return false;
+			}
+			
+		}
+		
 		private void moveEnPassant(int x, int y) {
 			if(isWhite) {
 				BOARD_SQUARE[x][y + 1].removeChessmanFromSquare();
@@ -598,12 +635,12 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 		private void showEnPassantSquare(int x, int y) {
 			if (Coordinate.isValidate(x - 1, y) && BOARD_SQUARE[x - 1][y].isContainChessman()
-					&& isAvailToEnPassent(x - 1, y) && beforeMovedSquare == BOARD_SQUARE[x - 1][y]) {
+					&& isAvailToEnPassent(x - 1, y) && movedSquare == BOARD_SQUARE[x - 1][y]) {
 				showEnPassantSquareByColor(x - 1, y);
 			}
 
 			if (Coordinate.isValidate(x + 1, y) && BOARD_SQUARE[x + 1][y].isContainChessman()
-					&& isAvailToEnPassent(x + 1, y) && beforeMovedSquare == BOARD_SQUARE[x + 1][y]) {
+					&& isAvailToEnPassent(x + 1, y) && movedSquare == BOARD_SQUARE[x + 1][y]) {
 				showEnPassantSquareByColor(x + 1, y);
 			}
 		}
@@ -622,7 +659,9 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 		@Override
 		void show(Chessman chessman, int x, int y) {
-			if (chessman.getChessmanType() == ChessmanType.KING) {
+			ChessmanType chessmanType = chessman.getChessmanType();
+			
+			if (chessmanType == ChessmanType.KING && !((King)chessman).isMoved()) {
 				showCastlingSquare();
 			}
 		}
@@ -683,7 +722,6 @@ public class BoardPanel extends FlatPanel implements Layer {
 		private void operateCastling(int x, int y) {
 			if ((x == 7 && y == 7) || (x == 0 && y == 7) || (x == 7 && y == 0) || (x == 0 && y == 0)) {
 				operateCastlingMove(x, y);
-
 			} else {
 				BOARD_SQUARE[x][y].setChessmanOnSquare(selectedSquare.getChessman());
 				selectedSquare.removeChessmanFromSquare();
@@ -692,8 +730,8 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 		// 캐슬링 움직임을 실행해주는 메서드로써 선택된칸(왕) 그리고 움직임으로써 클릭한 square의 좌표에 대해 캐슬링 움직임을 수행한다.
 		private void operateCastlingMove(int x, int y) {
-			((King) selectedSquare.getChessman()).setIsMoved();
-			((Rook) BOARD_SQUARE[x][y].getChessman()).setIsMoved();
+			((King) selectedSquare.getChessman()).setMoved();
+			((Rook) BOARD_SQUARE[x][y].getChessman()).setMoved();
 
 			if (x == 0) {
 
