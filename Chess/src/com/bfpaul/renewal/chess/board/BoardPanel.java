@@ -58,8 +58,14 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 
 @SuppressWarnings("serial")
 public class BoardPanel extends FlatPanel implements Layer {
-	// 체스 판의 하나하나의 square로써 체스말을 놓아준다던가 체스말을 제외해준다거나 이동가능범위를 표현해줄 최소단위의 칸이다.
+	// BoardPanel은 결론적으로 64개의 Square들을 좌표로 연관지어서 하나의 Board로써 역할 하게끔 하는 클래스이다.
+	// 즉, BoardPanel은 좌표로 연관지은 Square들을 속성으로써 가지고 있을 필요가 있다고 생각했다.
+	// 하지만 애매한 부분이 있다. 어차피 BoardPanel은 Square들을 좌표에 맞게 배치하기위해 GridLayout을 체택하고있는데
+	// 이 GridLayout자체가 좌표의 속성을 가지고있다는 것이다. 즉, getComponent를 통한 좌표의 Square를 가져오는 것이 가능하다는 것이다.
+	// 따라서 이 멤버변수는 멤버변수로 놓아서 얻는 이점이 Square에 대한 접근을 조금 편리하게 해준다는 것 이외에는 존재하지 않는다는 판단이 들었다.
+	// 따라서 이 멤버변수는 필요없다고 생각한다.
 	private final BoardSquare[][] BOARD_SQUARE = new BoardSquare[8][8];
+	
 	private BoardSquare selectedSquare = null;
 	private BoardSquare movedSquare = null;
 	private boolean isWhite = true;
