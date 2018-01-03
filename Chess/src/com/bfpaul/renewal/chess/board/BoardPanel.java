@@ -34,7 +34,9 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 // 따라서 일정 방법을 통해 일정하게 보여주는 View로써의 역할을 하는 목적이라기 보다는
 // 상황에 따라 각각의 보여주는 방법들이 유기적으로 작동해서 보여주는 내용이 상황마다 다른 Panel로써 역할을 하는 것이 목적이고 그렇게 될 수 밖에 없다.
 
-// 이 BoardPanel클래스는
+// BoardPanel클래스는 체스판의 속성을 갖기위해 체스판의 구성 요소인 칸을 표현하는 64개의 BoardSquare들을 가지고 있다.
+// BoardPanel은 특정 칸(BoardSquare)의 위치(좌표)와 가지고 있는 데이터(체스말)을 이용하여
+// 다른 칸들과 연관지어 표현해야 될 상황들을 계산하고 그 결과를 다른 칸들이 표현하도록 제어 할 수 있다.
 
 
 /* 클래스 작성 간 점검요소
@@ -52,14 +54,13 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 
 @SuppressWarnings("serial")
 public class BoardPanel extends FlatPanel implements Layer {
-	// BoardPanel은 결론적으로 64개의 Square들을 좌표로 연관지어서 하나의 Board로써 역할 하게끔 하는 클래스이다.
-	// 즉, BoardPanel은 좌표로 연관지은 Square들을 속성으로써 가지고 있을 필요가 있다고 생각했다.
-	// 하지만 애매한 부분이 있다. 어차피 BoardPanel은 Square들을 좌표에 맞게 배치하기위해 GridLayout을 체택하고있는데
-	// 이 GridLayout자체가 좌표의 속성을 가지고있다는 것이다. 즉, getComponent를 통한 좌표의 Square를 가져오는 것이 가능하다는 것이다.
-	// 따라서 이 멤버변수는 멤버변수로 놓아서 얻는 이점이 Square에 대한 접근을 조금 편리하게 해준다는 것 이외에는 존재하지 않는다는 판단이 들었다.
-	// 따라서 이 멤버변수는 필요없다고 생각한다.
+	// BoardPanel의 BoardSquare들을 가지고 있는 멤버변수로 써 Square의 제어를 위해 선언 했던 멤버변수인데
+	// 멤버변수를 사용하지 않더라도 특정 Square를 알 수 있는 방법이 있고
+	// 보드패널 내에서 사용되는 것 이외에 다른 클래스에서 사용되지 않고
+	// 초기에 생성되면 그 이후에 칸 자체가 없어지거나 아예 바뀌는 것은 아니기 때문에 필요없다고 생각한다.
+	// 통과!! (나중에 지워버리잫...)
 	private final BoardSquare[][] BOARD_SQUARE = new BoardSquare[8][8];
-	
+	// 
 	private BoardSquare selectedSquare = null;
 	private BoardSquare movedSquare = null;
 	private boolean isWhite = true;
@@ -68,7 +69,6 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 	// 8 X 8의 square를 가진 체스판을 만들어준다.
 	public BoardPanel(boolean isWhite) {
-
 		setLayout(new GridLayout(8, 8));
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Theme.BOARD_BORDER_COLOR);
