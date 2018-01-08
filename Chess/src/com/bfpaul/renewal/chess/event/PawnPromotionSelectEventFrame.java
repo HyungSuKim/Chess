@@ -1,6 +1,7 @@
 package com.bfpaul.renewal.chess.event;
 
 import java.awt.Component;
+import java.awt.Container;
 
 import javax.swing.JPanel;
 
@@ -48,32 +49,30 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
  * 10.중복 동일 구조가 반복되지 않는가 : 해당없음
  * */
 public class PawnPromotionSelectEventFrame {
-	
+	public interface OnPromotionSelectedListener {
+		public void onSelected(ChessmanType chessmanType);
+	}
 	private FlatFrame frame = createFrame();
-
-	private OnClickListener callBack = comp -> {};
 	
-	public PawnPromotionSelectEventFrame(BoardSquare boardSquare) {
+	private OnPromotionSelectedListener onPromotionSelectedListener = chessmanType -> {};
+	
+	public PawnPromotionSelectEventFrame(boolean isWhite) {
 		
 		JPanel container = frame.getContainer(); 
 
-		container.add(createImagePanel(boardSquare, ChessmanType.QUEEN), getMatchParentConstraints(1));
-		container.add(createImagePanel(boardSquare, ChessmanType.BISHOP), getMatchParentConstraints(1));
-		container.add(createImagePanel(boardSquare, ChessmanType.KNIGHT), getMatchParentConstraints(1));
-		container.add(createImagePanel(boardSquare, ChessmanType.ROOK), getMatchParentConstraints(1));
+		container.add(createImagePanel(isWhite, ChessmanType.QUEEN), new LinearConstraints(1, LinearSpace.MATCH_PARENT));
+		container.add(createImagePanel(isWhite, ChessmanType.BISHOP), new LinearConstraints(1, LinearSpace.MATCH_PARENT));
+		container.add(createImagePanel(isWhite, ChessmanType.KNIGHT), new LinearConstraints(1, LinearSpace.MATCH_PARENT));
+		container.add(createImagePanel(isWhite, ChessmanType.ROOK), new LinearConstraints(1, LinearSpace.MATCH_PARENT));
 		
 		frame.show();
 	}
 	
-	private LinearConstraints getMatchParentConstraints(int weight) {
-		return new LinearConstraints().setWeight(weight).setLinearSpace(LinearSpace.MATCH_PARENT);
+	public void setOnPromotionSelectedListener(OnPromotionSelectedListener onPromotionSelectedListener) {
+		this.onPromotionSelectedListener = onPromotionSelectedListener;
 	}
 	
-	public void setCallBack(OnClickListener onClickListener) {
-		this.callBack = onClickListener;
-	}
-	
-	private FlatFrame createFrame() {
+	private static FlatFrame createFrame() {
 		FlatFrame frame = new FlatFrame();
 		frame.setTitle("폰 프로모션");
 		frame.setSize(400, 200);
@@ -86,47 +85,22 @@ public class PawnPromotionSelectEventFrame {
 		return frame;
 	}
 	
-	private FlatImagePanel createImagePanel(BoardSquare boardSquare, ChessmanType type) {
+	private FlatImagePanel createImagePanel(boolean isWhite, ChessmanType type) {
 		FlatImagePanel imagePanel
-		= new FlatImagePanel(ChessmanImage.getChessmanImage(boardSquare.getChessman().isWhite(), type)
-				, ImageOption.MATCH_PARENT);
+		= new FlatImagePanel(ChessmanImage.getChessmanImage(isWhite, type), ImageOption.MATCH_PARENT);
 		imagePanel.setBackground(Theme.LIGHT_BLUE_COLOR);
 		imagePanel.setOpaque(true);
-		imagePanel.setOnClickListener(getListenerToPromotion(boardSquare, type));
+		imagePanel.setOnClickListener(comp -> {
+			onPromotionSelectedListener.onSelected(type);
+			
+			new FlatDialog.Builder()
+			.setLocationRelativeTo(frame.getContainer())
+			.setTitle("알림")
+			.setContent(type.name() + "프로모션 성공")
+			.build().show();
+			
+			frame.hide();
+		});
 		return imagePanel;
-	}
-	
-	private OnClickListener getListenerToPromotion(BoardSquare boardSquare, ChessmanType type) {
-		return new OnClickListener() {
-			Chessman promotionChessman;
-			@Override
-			public void onClick(Component component) {
-
-				switch(type) {
-				case QUEEN : promotionChessman = new Queen(boardSquare.getChessman().isWhite());
-				break;
-				case BISHOP : promotionChessman = new Bishop(boardSquare.getChessman().isWhite());
-				break;
-				case KNIGHT : promotionChessman = new Knight(boardSquare.getChessman().isWhite());
-				break;
-				case ROOK : promotionChessman = new Rook(boardSquare.getChessman().isWhite());
-				break;
-				default :
-				}
-				
-				boardSquare.setChessmanOnSquare(promotionChessman);
-				boardSquare.setEnabled(false);
-				
-				callBack.onClick(component);
-				
-				new FlatDialog.Builder()
-				.setLocationRelativeTo(frame.getContainer())
-				.setTitle("알림")
-				.setContent(type.name() + "프로모션 성공")
-				.build().show();
-				
-				frame.hide();
-			}
-		};
 	}
 }
