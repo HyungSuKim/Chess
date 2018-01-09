@@ -61,24 +61,30 @@ public class BoardPanel extends FlatPanel implements Layer {
 	// 초기에 생성되면 그 이후에 칸 자체가 없어지거나 아예 바뀌는 것은 아니기 때문에 필요없다고 생각한다.
 	// 통과!! (나중에 지워버리잫...)
 	// private final BoardSquare[][] BOARD_SQUARE = new BoardSquare[8][8];
-	// BoardPanel은
+	
+	// BoardPanel의 Square에 접근하기 위해서는 x, y좌표가 필요하다.
+	// 각 Square의 OnClickListener는 현재 클릭 된 Square의 x, y 좌표를 제공할 수 있다.
+	// 하지만 과거 클릭 되었던 Square의 x, y좌표가 필요한 경우가 있다.
+	// 따라서 BoardPanel에 과거 선택되었던 x, y좌표를 기억 할 수 있는 공간(변수)가 필요하다.
+	// 이를 메서드 내에 지역변수를 통해서 혹은 메서드의 파라미터를 통해서 제공하는 것은 
+	// OnClickListener가 현재 x, y좌표를 제공하고 호출 될 때 마다 초기화되기 때문에 불가능하다.
 	private BoardSquare selectedSquare = null;
-	// 이 멤버변수는 순수하게 앙파상을 위해서 선언된 변수이다
-	// 따라서 BoardPanel의 멤버변수로써 존재 의미가 없는것 같다.
-	// 또한 위으 selectedSquare와 중복된 개념을 가지고 있다.( 칸을 기억한다는 점에서 )
-	// 따라서 이 멤버변수는 위의 selectedSquare와 통합해서 고민을 해봐야 될 것같다.
+	
+	// 다시 생각해보기
 	private BoardSquare movedSquare = null;
-	// 이 멤버변수는 BoardPanel의 현재 제어 할 수 있는 색상(말)을 표현하기 위한 멤버변수이다.
-	// 이 변수를 처음에 멤버변수로 의의가 있다고 판단했었다.
-	// 이유는 말을 옮기고 그 색을 기억하고있다가 색을 바꾸어서 다른말의 제어를 풀어주는 것이 필요하다고 생각했었기 때문이다.
-	// 하지만 이제 생각해보니 멤버변수로써 의미가 없다고 생각했다.
-	// 이유는 초기에 흰색을 먼저 풀어놓은 다음에 흰색말이 움직이면 그 흰색말의 반대색을 풀어주는 것으로 하면 될것이라는 생각이 들었기 때문이다.
-	// 따라서 이 멤버변수또한 의미가 없다.
+	// 이 isWhite는 사용자가 선택 할 수 있는 체스말의 색상을 나타내기 위한 목적으로 작성되었다.
+	// isWhite는 턴이 종료되는 시점에 값이 변한다. 즉, 턴에 따라 사용자가 선택 할 수 있는 체스말을 제한하기 위해서 필요한 변수다.
+	// 하지만 멤버변수 selectedSquare를 통해서 사용자가 선택한 체스말의 색상을 얻을 수 있다.
+	// 따라서 selectedSquare의 체스말 색상 정보를 이용해서 턴에 따라 사용자가 선택 할 수 있는 제스말을 제한 할 수 있다.
+	// 지금 isWhite는 초기의 목적과 다르게 사용 된 곳도 많다. (적군을 파악한다던가 아군을 파악한다던가)
+	// 이는 멤버변수의 초기 목적과 다르게 사용된 것이다.
+	// 
+	// 따라서 이 멤버변수는 의미가 없고 필요없다고 생각한다.
 	private boolean isWhite = true;
 	// 이 멤버변수는 BoardPanel에서 할 역할이 끝났음을 표현해주는 멤버변수이다.
 	// BoardPanel, Timer, CurrentChessmanView는 정해진 순서로 실행되어야 하는 구조를 가지고있다.
 	// BoardPanel의 수행 직후 BoardPanel의 정보를 얻어야 하는 CurrentChessmanView는
-	// Layer를 통해 BoardPanel의 수행(1턴)이 완료되었음 isFinish 메서드를 통해 이 멤버변수의 데이터를 확인함으로써 수행된다.
+	// Layer를 통해 BoardPanel의 수행(1턴)이 완료되었음 isFinish() 메서드를 통해 이 멤버변수의 데이터를 확인함으로써 수행된다.
 	// 따라서 이 멤버변수는 필요하다고 생각한다.
 	private boolean isFinish;
 
@@ -135,7 +141,6 @@ public class BoardPanel extends FlatPanel implements Layer {
 					selectChessman(x, y);
 				} else {
 					moveSelectedChessmanTo(x, y);
-
 				}
 			}
 		};
