@@ -12,6 +12,14 @@ public class Coordinate {
 		this.x = x;
 		this.y = y;
 	}
+	
+	public static Coordinate createInValidateCoordinate() {
+		return new Coordinate(-1, -1);
+	}
+	
+	public boolean isInValidate() {
+		return (x == -1 && y == -1);
+	}
 
 	public static boolean isValidate(int x, int y) {
 		return (MINIMUM_X <= x && x <= MAXIMUM_X) && (MINIMUM_Y <= y && y <= MAXIMUM_Y);

@@ -69,6 +69,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 	// 이를 메서드 내에 지역변수를 통해서 혹은 메서드의 파라미터를 통해서 제공하는 것은 
 	// OnClickListener가 현재 x, y좌표를 제공하고 호출 될 때 마다 초기화되기 때문에 불가능하다.
 	private BoardSquare selectedSquare = null;
+	private Coordinate selectedCoordinate = Coordinate.createInValidateCoordinate();
 	
 	// 다시 생각해보기
 	private BoardSquare movedSquare = null;
@@ -112,6 +113,10 @@ public class BoardPanel extends FlatPanel implements Layer {
 	public static BoardPanel createBoardPanelAtBlackSide() {
 		return new BoardPanel().setWholeChessmanOnBoard(false);
 	}
+	
+	private BoardSquare getBoardSquare(Coordinate coordinate) {
+		return getBoardSquare(coordinate.getX(), coordinate.getY());
+	}
 
 	private BoardSquare getBoardSquare(int x, int y) {
 		return (BoardSquare) getComponent(x + (y * 8));
@@ -133,7 +138,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 			@Override
 			public void onClick(Component component) {
 				// 로직 재검토 전체 if / else - if / else 관계 다시 고민
-				if (getBoardSquare(x, y).isContainChessman() && selectedSquare == null) {
+				if (getBoardSquare(x, y).isContainChessman() && selectedCoordinate.isInValidate()) {
 					selectChessman(x, y);
 				} else if (selectedSquare == getBoardSquare(x, y)) {
 					deSelectChessman();
@@ -487,6 +492,10 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 		protected BoardSquare getBoardSquare(int x, int y) {
 			return boardPanel.getBoardSquare(x, y);
+		}
+		
+		protected BoardSquare getBoardSquare(Coordinate coordinate) {
+			return boardPanel.getBoardSquare(coordinate);
 		}
 
 		protected void show(Chessman chessman, int x, int y) {}
