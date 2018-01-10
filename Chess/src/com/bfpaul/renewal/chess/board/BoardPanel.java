@@ -94,6 +94,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Theme.BOARD_BORDER_COLOR);
 		setOpaque(true);
+		
 		setSquaresOnBoard();
 		FunctionType.bind(this);
 	}
@@ -137,16 +138,20 @@ public class BoardPanel extends FlatPanel implements Layer {
 		return new OnClickListener() {
 			@Override
 			public void onClick(Component component) {
-				// 로직 재검토 전체 if / else - if / else 관계 다시 고민
+				
+				clearSquaresEventColor();
+				System.out.println(1);
 				if (getBoardSquare(x, y).isContainChessman() && selectedCoordinate.isInValidate()) {
+					selectedCoordinate = new Coordinate(x, y);
 					selectChessman(x, y);
-				} else if (selectedSquare == getBoardSquare(x, y)) {
-					deSelectChessman();
+				} else if (getBoardSquare(selectedCoordinate) == getBoardSquare(x, y)) {
+					selectedCoordinate = Coordinate.createInValidateCoordinate();
 				} else if (isSameColorChessmanClicked(x, y)) {
 					selectChessman(x, y);
 				} else {
 					moveSelectedChessmanTo(x, y);
 				}
+
 			}
 		};
 	}
@@ -155,35 +160,20 @@ public class BoardPanel extends FlatPanel implements Layer {
 	// 표현되어있어서 이상함
 	private boolean isSameColorChessmanClicked(int x, int y) {
 		return getBoardSquare(x, y).isContainChessman()
-				&& selectedSquare.isContainChessmanWhite() == getBoardSquare(x, y).isContainChessmanWhite()
+				&& getBoardSquare(selectedCoordinate).isContainChessmanWhite() == getBoardSquare(x, y).isContainChessmanWhite()
 				&& getBoardSquare(x, y).getBackground() != Color.YELLOW;
 
 	}
 
-	// selectChessman의 주요 목표가 무엇인지, 목표를 잘 표현하고있는지 고민
+	// x, y 좌표에 있는 체스말을 선택 했을 때
+	// x, y 좌표의 체스말이 할 수 있는 모든 경우의 수를 보여준다.
 	private void selectChessman(int x, int y) {
-		clearSquaresEventColor();
-
-		selectedSquare = getBoardSquare(x, y);
+		
+		Chessman selectedChessman = getBoardSquare(x, y).getChessman();
 
 		for (Function helper : FunctionType.getList()) {
-			helper.show(selectedSquare.getChessman(), x, y);
+			helper.show(selectedChessman, x, y);
 		}
-
-		selectedSquare.setSquareMoveableColor(); // 눌린말의 칸은 움직일수있는 색상으로 표시해주고
-
-	}
-
-	// deSelectChessman의 주요 목표가 무엇인지, 목표를 잘 표현하고있는지 고민
-	private void deSelectChessman() {
-		clearSquaresEventColor();
-
-		selectedSquare.setSquareOriginalColor();
-
-		selectedSquare = null;
-
-		enableSquareClickEvent();
-
 	}
 
 	// moveSelectChessmanTo의 주요 목표가 무엇인지, 목표를 잘 표현하고있는지 고민
@@ -278,9 +268,13 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 	// 모든 체스말을 보드위에 셋팅한다.
 	private BoardPanel setWholeChessmanOnBoard(boolean isWhite) {
+		
 		for (ChessmanType type : ChessmanType.values()) {
 			setChessmanOnBoard(isWhite, type);
 		}
+		
+		this.enableSquareClickEvent(true);
+		
 		return this;
 	}
 
@@ -408,7 +402,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 		forEach(square -> square.setEnableClickEvent(false));
 	}
 
-	private void enableSquareClickEvent() {
+	private void enableSquareClickEvent(boolean isWhite) {
 		forEach(square -> {
 			if (square.isContainChessman() && square.isContainChessmanWhite() == isWhite) {
 				square.setEnableClickEvent(true);
@@ -522,6 +516,8 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 		@Override
 		protected void show(Chessman chessman, int x, int y) {
+			getBoardPanel().getBoardSquare(x, y).setSquareMoveableColor();
+			
 			ArrayList<MoveableRoute> moveableRouteList = MoveableRouteCalculator.getChessmanMoveableRouteList(chessman,
 					x, y);
 
@@ -773,7 +769,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 
 		private boolean isBoardSquareContainsEnemyPawn(int x, int y) {
-			return getBoardSquare(x, y).getContainChessmanType() == ChessmanType.PAWN && getBoardPanel().selectedSquare
+			return getBoardSquare(x, y).getContainChessmanType() == ChessmanType.PAWN && getBoardPanel().getBoardSquare(getBoardPanel().selectedCoordinate)
 					.isContainChessmanWhite() != getBoardSquare(x, y).isContainChessmanWhite();
 		}
 
@@ -907,9 +903,9 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 	@Override
 	public void execute(Object[] object) {
-		isWhite = (boolean) object[0];
 		isFinish = false;
-		enableSquareClickEvent();
+		boolean isWhite = getBoardSquare(selectedCoordinate).isContainChessmanWhite();
+		enableSquareClickEvent(!isWhite);
 	}
 
 	/**
