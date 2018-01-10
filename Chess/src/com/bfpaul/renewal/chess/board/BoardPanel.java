@@ -69,6 +69,12 @@ public class BoardPanel extends FlatPanel implements Layer {
 	// 이를 메서드 내에 지역변수를 통해서 혹은 메서드의 파라미터를 통해서 제공하는 것은 
 	// OnClickListener가 현재 x, y좌표를 제공하고 호출 될 때 마다 초기화되기 때문에 불가능하다.
 	private BoardSquare selectedSquare = null;
+	// 추가 : 위의 멤버변수의 개념에 추가해서 selectedSquare에서 selectedCoordinate로 변경하였다.
+	// 이유는 BoardPanel은 좌표를 통해 Square들을 제어한다는 개념을 조금 더 부각하기 위해서이다.
+	// Coordinate를 이용하는 것이 BoardSquare를 이용하는 것 보다 많은 데이터를 제공 	할 수 있다.
+	// BoardSquare의 경우 BoardSquare에 포함된 data들과 Square만 제공하지만
+	// Coordinate의 경우 BoardSquare를 제공하는 것은 물론 좌표 값 x, y까지 제공하여 해당 데이터를 이용한
+	// 추가 논리 작성에 더 수월 할 것이라고 판단했다. 따라서 Square에서 Coordinate로 변경하였다.
 	private Coordinate selectedCoordinate = Coordinate.createInValidateCoordinate();
 	
 	// 다시 생각해보기

@@ -13,10 +13,12 @@ public class Coordinate {
 		this.y = y;
 	}
 	
+	// 의미없는 좌표를 제공하기 위한 메서드로써 null 대신 의미없는 좌표를 표현하고 제공하고자 했다. 
 	public static Coordinate createInValidateCoordinate() {
 		return new Coordinate(-1, -1);
 	}
 	
+	// 의미없는 좌표인지 검증하는 메서드이다.
 	public boolean isInValidate() {
 		return (x == -1 && y == -1);
 	}
