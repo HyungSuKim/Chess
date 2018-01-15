@@ -40,58 +40,39 @@ import com.mommoo.flat.layout.linear.constraints.LinearSpace;
 // 다른 칸들과 연관지어 표현해야 될 상황들을 계산하고 그 결과를 다른 칸들이 표현하도록 제어 할 수 있다.
 // 초기 체스말이 놓여져 있는 보드 자체를 하나의 BoardPanel로써 바라본다.(생각한다)
 
-/* 클래스 작성 간 점검요소
- * 1. 올바른 클래스 이름인가? : 
- * 2. 멤버변수의 존재 여부 : 
- * 3. 클래스의 역할(Data/Controller/View) : 
- * 4. Data 공정과 공통로직의 분리 : 
- * 5. 접근제어자/한정자/자료형 : 
- * 6. inner class / abstract / interface : 
- * 7. 프로그램의 구조 : 
- * 8. class간의 연관관계 및 필요조건 : 
- * 9. 시점 : 
- * 10.중복 동일 구조가 반복되지 않는가 : 
- * */
-
 @SuppressWarnings("serial")
 public class BoardPanel extends FlatPanel implements Layer {
-	// BoardPanel의 BoardSquare들을 가지고 있는 멤버변수로 써 Square의 제어를 위해 선언 했던 멤버변수인데
-	// 멤버변수를 사용하지 않더라도 특정 Square를 알 수 있는 방법이 있고
-	// 보드패널 내에서 사용되는 것 이외에 다른 클래스에서 사용되지 않고
-	// 초기에 생성되면 그 이후에 칸 자체가 없어지거나 아예 바뀌는 것은 아니기 때문에 필요없다고 생각한다.
-	// 통과!! (나중에 지워버리잫...)
-	// private final BoardSquare[][] BOARD_SQUARE = new BoardSquare[8][8];
-	
 	// BoardPanel의 Square에 접근하기 위해서는 x, y좌표가 필요하다.
 	// 각 Square의 OnClickListener는 현재 클릭 된 Square의 x, y 좌표를 제공할 수 있다.
 	// 하지만 과거 클릭 되었던 Square의 x, y좌표가 필요한 경우가 있다.
 	// 따라서 BoardPanel에 과거 선택되었던 x, y좌표를 기억 할 수 있는 공간(변수)가 필요하다.
-	// 이를 메서드 내에 지역변수를 통해서 혹은 메서드의 파라미터를 통해서 제공하는 것은 
+	// 이를 메서드 내에 지역변수를 통해서 혹은 메서드의 파라미터를 통해서 제공하는 것은
 	// OnClickListener가 현재 x, y좌표를 제공하고 호출 될 때 마다 초기화되기 때문에 불가능하다.
 	private BoardSquare selectedSquare = null;
 	// 추가 : 위의 멤버변수의 개념에 추가해서 selectedSquare에서 selectedCoordinate로 변경하였다.
-	// 이유는 BoardPanel은 좌표를 통해 Square들을 제어한다는 개념을 조금 더 부각하기 위해서이다.
-	// Coordinate를 이용하는 것이 BoardSquare를 이용하는 것 보다 많은 데이터를 제공 	할 수 있다.
-	// BoardSquare의 경우 BoardSquare에 포함된 data들과 Square만 제공하지만
-	// Coordinate의 경우 BoardSquare를 제공하는 것은 물론 좌표 값 x, y까지 제공하여 해당 데이터를 이용한
-	// 추가 논리 작성에 더 수월 할 것이라고 판단했다. 따라서 Square에서 Coordinate로 변경하였다.
-	private Coordinate selectedCoordinate = Coordinate.createInValidateCoordinate();
-	
+	// 위에서 언급했던것 처럼 과거 클릭되었던 Square의 x, y좌표가 필요한 경우가 있다. 따라서 이를 기억할 수 있는 공간이 필요하다.
+	// 기존에는 BoardPanel 전역에서 과거에 선택되었던 Square만 제공하면 모든 로직을 처리 할 수 있었다.
+	// 하지만 x, y 좌표의 데이터가 필요한 로직이 발생하였고 이 selectedSquare로는 x, y의 좌표를 제공 할 수 없었다.
+	// 이 x, y가 필요 한 로직은 이전의 x, y좌표에서 현재 이동한 x, y좌표의 y차가 필요한 경우다.
+	// 따라서 Coordinate를 통해 BoardSquare을 기억 할 수 있고 추가 논리를 처리 할 수 있다고 판단했기에 변경하기로했다.
+	private Coordinate controllingCoordinateContainChessman = Coordinate.createInValidateCoordinate();
+
 	// 다시 생각해보기
-	private BoardSquare movedSquare = null;
+	private BoardSquare movedSquare222 = null;
 	// 이 isWhite는 사용자가 선택 할 수 있는 체스말의 색상을 나타내기 위한 목적으로 작성되었다.
 	// isWhite는 턴이 종료되는 시점에 값이 변한다. 즉, 턴에 따라 사용자가 선택 할 수 있는 체스말을 제한하기 위해서 필요한 변수다.
 	// 하지만 멤버변수 selectedSquare를 통해서 사용자가 선택한 체스말의 색상을 얻을 수 있다.
 	// 따라서 selectedSquare의 체스말 색상 정보를 이용해서 턴에 따라 사용자가 선택 할 수 있는 제스말을 제한 할 수 있다.
 	// 지금 isWhite는 초기의 목적과 다르게 사용 된 곳도 많다. (적군을 파악한다던가 아군을 파악한다던가)
 	// 이는 멤버변수의 초기 목적과 다르게 사용된 것이다.
-	// 
+	//
 	// 따라서 이 멤버변수는 의미가 없고 필요없다고 생각한다.
-	private boolean isWhite = true;
+	private boolean controlColor = true;
 	// 이 멤버변수는 BoardPanel에서 할 역할이 끝났음을 표현해주는 멤버변수이다.
 	// BoardPanel, Timer, CurrentChessmanView는 정해진 순서로 실행되어야 하는 구조를 가지고있다.
 	// BoardPanel의 수행 직후 BoardPanel의 정보를 얻어야 하는 CurrentChessmanView는
-	// Layer를 통해 BoardPanel의 수행(1턴)이 완료되었음 isFinish() 메서드를 통해 이 멤버변수의 데이터를 확인함으로써 수행된다.
+	// Layer를 통해 BoardPanel의 수행(1턴)이 완료되었음 isFinish() 메서드를 통해 이 멤버변수의 데이터를 확인함으로써
+	// 수행된다.
 	// 따라서 이 멤버변수는 필요하다고 생각한다.
 	private boolean isFinish;
 
@@ -100,8 +81,9 @@ public class BoardPanel extends FlatPanel implements Layer {
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Theme.BOARD_BORDER_COLOR);
 		setOpaque(true);
-		
+
 		setSquaresOnBoard();
+		
 		FunctionType.bind(this);
 	}
 
@@ -110,237 +92,364 @@ public class BoardPanel extends FlatPanel implements Layer {
 	// 따라서 위의 목표를 표현하는 이름을 가진 메서드를 만들어 목표를 수행하였다.
 	// 이 메서드를 이용해서 BoardPanel을 만들고 체스말을 색상에 맞게(ㅇㅇ말을 기점으로 바라볼지) 배치한다는 것을 메서드 명을 통해 표현
 	// 할 수 있게 되었다.
-	// 위의 목표를 위해 외부에서 BoardPanel의 생성자의 접근을 막고 메서드를 통해서 목표에 맞는 BoardPanel을 내부적으로 생성하고자 했다.
-	// static 사용 이유 : BoardPanel의 인스턴스가 생성되기 전에 BoardPanel의 메서드에 접근하는 것은 불가능하다. 위에서 언급 한 것과 같이 생성자는
-	// private 접근제어자를 통해 막혀있다. 따라서 static을 사용하여 인스턴스가 생성되지 않았음에도 BoardPanel의 메서드를 사용 할 수 있게 하고자 하였다.
-	public static BoardPanel createBoardPanelAtWhiteSide() {
-		return new BoardPanel().setWholeChessmanOnBoard(true);
+	// 위의 목표를 위해 외부에서 BoardPanel의 생성자의 접근을 막고 메서드를 통해서 목표에 맞는 BoardPanel을 내부적으로
+	// 생성하고자 했다.
+	// static 사용 이유 : BoardPanel의 인스턴스가 생성되기 전에 BoardPanel의 메서드에 접근하는 것은 불가능하다. 위에서
+	// 언급 한 것과 같이 생성자는
+	// private 접근제어자를 통해 막혀있다. 따라서 static을 사용하여 인스턴스가 생성되지 않았음에도 BoardPanel의 메서드를 사용
+	// 할 수 있게 하고자 하였다.
+	public static BoardPanel createBoardPanelAtWhiteSideView() {
+		final boolean WHITE = true;
+		return new BoardPanel().placeWholeChessmanByColorSideView(WHITE);
 	}
 
-	public static BoardPanel createBoardPanelAtBlackSide() {
-		return new BoardPanel().setWholeChessmanOnBoard(false);
-	}
-	
-	private BoardSquare getBoardSquare(Coordinate coordinate) {
-		return getBoardSquare(coordinate.getX(), coordinate.getY());
+	public static BoardPanel createBoardPanelAtBalckSideView() {
+		final boolean BLACK = false;
+		return new BoardPanel().placeWholeChessmanByColorSideView(BLACK);
 	}
 
-	private BoardSquare getBoardSquare(int x, int y) {
-		return (BoardSquare) getComponent(x + (y * 8));
+	private BoardSquare getBoardSquareAt(Coordinate atCoordinate) {
+		return getBoardSquareAt(atCoordinate.getX(), atCoordinate.getY());
+	}
+
+	private BoardSquare getBoardSquareAt(int atX, int atY) {
+		return (BoardSquare) getComponent(atX + (atY * 8));
 	}
 
 	private void setSquaresOnBoard() {
-		forEach((x, y) -> add(createBoardSquare(x, y), new LinearConstraints(1, LinearSpace.MATCH_PARENT)));
+		forEach((x, y) -> add(createBoardSquareAt(x, y), new LinearConstraints(1, LinearSpace.MATCH_PARENT)));
 	}
 
-	private BoardSquare createBoardSquare(int x, int y) {
-		BoardSquare boardSquare = new BoardSquare(
-				(x + y) % 2 == 0 ? Theme.BOARD_LIGHT_SQUARE_COLOR : Theme.BOARD_DARK_SQUARE_COLOR);
-		boardSquare.setOnClickListener(getListenerToControlChessman(x, y));
+	private BoardSquare createBoardSquareAt(int atX, int atY) {
+		BoardSquare boardSquare = new BoardSquare(squareOriginalColorByCreateCoordinate(atX, atY));
+		boardSquare.setOnClickListener(toControlChessmanOnSquare(atX, atY));
 		return boardSquare;
 	}
 
-	private OnClickListener getListenerToControlChessman(int x, int y) {
+	/**
+	 * 체스판의 칸은 교차로 밝은칸 어두운칸을 갖고 생성된다. 이 특성을 분석한 결과 생성 될 x, y좌표의 값의 합이 짝수인지 홀수인지에 따라
+	 * 밝은색상 또는 어두운 색상을 갖는 특징이 있다.
+	 * 
+	 * @param atX
+	 *            : 칸이 생성 될 x 좌표
+	 * @param atY
+	 *            : 칸이 생성 될 y 좌표
+	 * @return 짝수일 경우 밝은색상을 홀수일 경우 어두운색상을 반환한다.
+	 */
+	private Color squareOriginalColorByCreateCoordinate(int atX, int atY) {
+		return (atX + atY) % 2 == 0 ? Theme.BOARD_LIGHT_SQUARE_COLOR : Theme.BOARD_DARK_SQUARE_COLOR;
+	}
+	/**
+	 * 1. 제어 할 수 있는 색의 체스말이 있는경우(선택할때)
+	 * 2. 빈칸인 경우(움직일때)
+	 * 3. 제어 할 수 없는 색의 체스말이 있는경우(움직일때)
+	 * @param atX
+	 * @param atY
+	 * @return
+	 */
+	private OnClickListener toControlChessmanOnSquare(int atX, int atY) {
+
 		return new OnClickListener() {
 			@Override
 			public void onClick(Component component) {
+				/**
+				 * 체스말을 제어 할 때의 주요 개념 (1. 제어의 관점)
+				 * 1. 기존에 제어하고 있는 체스말이 존재하지 않는다
+				 * 	1-1. 제어 할 수 있는 체스말이면 해당 체스말을 제어하고 제어하고 있음을 표시한다.
+				 * 	1-2. 제어 할 수 없는 체스말이면 아무것도 하지 않는다.
+				 * 2. 기존에 제어하고 있는 체스말이 존재하는가?
+				 * 	2-1. 기존에 제어하고 있는 체스말과 같은 체스말인가?
+				 * 	2-2. 기존에 제어하고 있는 체스말과 같은 색상의 다른 체스말인가?
+				 * 	2-3. 빈칸(움직일 수 있는 경로)인가?			ㅇ같은기능으로부터 파생ㅇ
+				 *  2-4. 제어 할 수 없는 색상의 체스말이 있는 칸인가?	ㅇ간은기능으로부터 파생ㅇ
+				 *  
+				 * 체스말을 제어 할 때의 주요 개념 (2. 칸에 체스말이 있는지 관점)
+				 * 1. 제어 할 수 있는 색의 체스말이다.
+				 * 	1-1. 제어하고 있음을 표시한다.
+				 *  1-2. 제어하고 있는 체스말이 이미 존재하면 선택된 체스말을 제어하고 있음으로 변경한다.
+				 *  1-3. 제어하고 있는 체스말과 동일하면 제어하고 있지 않음으로 변경한다.
+				 * 2. 빈칸(움직 일 수 있는경로) 혹은 제어 할 수 없는 체스말이 있는 경로이다.
+				 * 
+				 * 주요개념 -> BoardPanel은 사용자의 선택에 따라 한번에 하나의 체스말(이 들어있는 좌표의 Square)을 제어의 대상으로 한다. 
+				 */
 				
-				clearSquaresEventColor();
-				System.out.println(1);
-				if (getBoardSquare(x, y).isContainChessman() && selectedCoordinate.isInValidate()) {
-					selectedCoordinate = new Coordinate(x, y);
-					selectChessman(x, y);
-				} else if (getBoardSquare(selectedCoordinate) == getBoardSquare(x, y)) {
-					selectedCoordinate = Coordinate.createInValidateCoordinate();
-				} else if (isSameColorChessmanClicked(x, y)) {
-					selectChessman(x, y);
+				// 현재 제어중인 체스말이 있느냐?
+				clearRoute();
+				
+				if(getBoardSquareAt(atX, atY).isContainChessman() 
+						&& getBoardSquareAt(atX, atY).isContainWhiteChessman() == controlColor) {
+					
+					if(isAlreadyControllingChessman(atX, atY)) {
+						controllingCoordinateContainChessman = Coordinate.createInValidateCoordinate();
+					} else {
+						controllingCoordinateContainChessman = new Coordinate(atX, atY);
+						showChessmanRoute(atX, atY);
+					}
+					
 				} else {
-					moveSelectedChessmanTo(x, y);
+					moveSelectedCoordinateChessmanTo(atX, atY);
+					afterChessmanMoved(atX, atY);
+					controllingCoordinateContainChessman = Coordinate.createInValidateCoordinate();
 				}
-
+				
+//				if(isControllingChessmanExist()) {
+//					clearRoute();
+//					
+//					if(!getBoardSquareAt(atX, atY).isContainChessman() || !isControlAvailColorChessman(atX, atY)) {
+//						moveSelectedCoordinateChessmanTo(atX, atY);
+//						afterChessmanMoved(atX, atY);
+//						controllingCoordinateContainChessman = Coordinate.createInValidateCoordinate();
+//						return;
+//					}
+//					
+//					if(isControlAvailColorChessman(atX, atY)) {
+//						if(isAlreadyControllingChessman(atX, atY)) {
+//							controllingCoordinateContainChessman = Coordinate.createInValidateCoordinate();
+//						} else {
+//							controllingCoordinateContainChessman = new Coordinate(atX, atY);
+//							showChessmanRoute(atX, atY);
+//						}
+//					}
+//					
+//				} else { // 현재 제어중인 체스말이 없다면
+//					// 제어 할 수 있는 체스말인지 확인해라
+//					if(isControlAvailColorChessman(atX, atY)) {
+//						controllingCoordinateContainChessman = new Coordinate(atX, atY);
+//						showChessmanRoute(atX, atY);
+//					}
+//				}
+				
+				
+//				if(isControllingChessmanExist()) {
+//					clearRoute();
+//					
+//					if(!getBoardSquareAt(atX, atY).isContainChessman() || !isControlAvailColorChessman(atX, atY)) {
+//						moveSelectedCoordinateChessmanTo(atX, atY);
+//						afterChessmanMoved(atX, atY);
+//						controllingCoordinateContainChessman = Coordinate.createInValidateCoordinate();
+//						return;
+//					}
+//					
+//					if(isControlAvailColorChessman(atX, atY)) {
+//						if(isAlreadyControllingChessman(atX, atY)) {
+//							controllingCoordinateContainChessman = Coordinate.createInValidateCoordinate();
+//						} else {
+//							controllingCoordinateContainChessman = new Coordinate(atX, atY);
+//							showChessmanRoute(atX, atY);
+//						}
+//					}
+//					
+//				} else { // 현재 제어중인 체스말이 없다면
+//					// 제어 할 수 있는 체스말인지 확인해라
+//					if(isControlAvailColorChessman(atX, atY)) {
+//						controllingCoordinateContainChessman = new Coordinate(atX, atY);
+//						showChessmanRoute(atX, atY);
+//					}
+//				}
+			
+				/**
+				 * 로직 설명.
+				 * 체스말을 컨트롤 하기 위한 클릭은 크게 2가지로 나뉜다.
+				 * 1. 체스말을 고른다. -> selectedCoordinate가 셋팅된다.
+				 * 		1-1. 체스말을 고른다. -> 경로를 보여준다.
+				 * 		1-2. 같은 체스말을 고르면 -> 고른 체스말을 취소한다.
+				 * 		1-3. 체스말을 고른상태에서 다른 체스말을 고른다 -> 기존의 경로를 취소하고 새로운 경로를 보여준다.
+				 * 		
+				 * 2. 고른 체스말을 경로상의 옮길 수 있는 위치로 옮긴다. -> 1.이 선행되어야 가능하다.
+				 * 
+				 * 고민내용 : 메서드 명이 x, y좌표의 칸 위의 체스말을 컨트롤 하기위한 리스너임을 밝히고 있다.
+				 * 그렇다면 조건을 가정할 때
+				 */
 			}
 		};
+	}
+	
+	private boolean isAlreadyControllingChessman(int atX, int atY) {
+		int controllingX = controllingCoordinateContainChessman.getX();
+		int controllingY = controllingCoordinateContainChessman.getY();
+		
+		return (controllingX == atX) && (controllingY == atY);
+	}
+	
+	private boolean isControllingChessmanExist() {
+		return !controllingCoordinateContainChessman.isInValidate();
+	}
+	
+	
+	private boolean isControlAvailColorChessman(int atX, int atY) {
+		return getBoardSquareAt(atX, atY).isContainWhiteChessman() == controlColor;
 	}
 
 	// getBoardSquare(x, y).getBackground() != Color.YELLOW; 한번에 두개의 관심사(목표)가 같이
 	// 표현되어있어서 이상함
-	private boolean isSameColorChessmanClicked(int x, int y) {
-		return getBoardSquare(x, y).isContainChessman()
-				&& getBoardSquare(selectedCoordinate).isContainChessmanWhite() == getBoardSquare(x, y).isContainChessmanWhite()
-				&& getBoardSquare(x, y).getBackground() != Color.YELLOW;
+	private boolean isSameColorChessmanClickedAt(int atX, int atY) {
+		return getBoardSquareAt(controllingCoordinateContainChessman).isContainWhiteChessman() == getBoardSquareAt(atX, atY)
+				.isContainWhiteChessman();
 
 	}
 
-	// x, y 좌표에 있는 체스말을 선택 했을 때
-	// x, y 좌표의 체스말이 할 수 있는 모든 경우의 수를 보여준다.
-	private void selectChessman(int x, int y) {
-		
-		Chessman selectedChessman = getBoardSquare(x, y).getChessman();
+	private boolean isCastlingChessmanClickedAt(int atX, int atY) {
+		// 다른 방법 모색 필요
+		return getBoardSquareAt(atX, atY).getBackground() == Color.YELLOW;
+	}
 
-		for (Function helper : FunctionType.getList()) {
-			helper.show(selectedChessman, x, y);
+	/**
+	 * 
+	 */
+	private void showChessmanRoute(int atX, int atY) {
+
+		controllingCoordinateContainChessman = new Coordinate(atX, atY);
+
+		for (Function route : FunctionType.getList()) {
+			route.show(atX, atY);
 		}
 	}
 
-	// moveSelectChessmanTo의 주요 목표가 무엇인지, 목표를 잘 표현하고있는지 고민
-	private void moveSelectedChessmanTo(int x, int y) {
-		/* 210 ~ 212 이전에 움직인 칸을 넣는 코드 위치, 표현 이상함 '표현' 에 신경안쓰고, '기능'에 집중한듯 */
-		// 움직였던 칸 으로써의 정보를 저장하는 것이므로 movedSelectedChessman의 메서드가 호출되는 시점에 이미 움직였다고 가정하는
-		// 것이 맞다고 생각했다.
-		// 따라서 메서드의 시작부에서 데이터를 저장한다.
-		movedSquare = getBoardSquare(x, y);
+	private boolean isSelectedCoordinate(int atX, int atY) {
+		int selectedX = controllingCoordinateContainChessman.getX();
+		int selectedY = controllingCoordinateContainChessman.getY();
 
-		ChessmanType selectedChessmanType = selectedSquare.getContainChessmanType();
-		/*
-		 * if ~ else-if ~ else 각기 로직의 일관성 부족, (데이터 정제후 -> 로직) 표현 부족 밑으로 다 구림
-		 */
-		if (selectedChessmanType == ChessmanType.KING) {
-			King king = ((King) (selectedSquare.getChessman()));
+		return selectedX == atX && selectedY == atY;
+	}
+
+	//
+	private void moveSelectedCoordinateChessmanTo(int toX, int toY) {
+		movedSquare222 = getBoardSquareAt(toX, toY); // 고민대상 // 지울 예정
+
+		BoardSquare selectedSquare = getBoardSquareAt(controllingCoordinateContainChessman);
+		BoardSquare toSquare = getBoardSquareAt(toX, toY);
+		toSquare.setChessmanOnSquare(selectedSquare.getChessman());
+
+		selectedSquare.removeChessmanFromSquare();
+
+		BoardSquare movedSquare = getBoardSquareAt(toX, toY);
+		ChessmanType movedChessmanType = movedSquare.getContainChessmanType();
+
+		if (movedChessmanType == ChessmanType.KING) {
+			King king = ((King) (movedSquare.getChessman()));
 			king.setMoved();
-			((Castling) FunctionType.CASTLING.get()).operateCastling(x, y);
-		} else {
-			if (selectedChessmanType == ChessmanType.ROOK) {
-				Rook rook = ((Rook) (selectedSquare.getChessman()));
-				rook.setMoved();
+		} else if (movedChessmanType == ChessmanType.ROOK) {
+			Rook rook = ((Rook) (movedSquare.getChessman()));
+			rook.setMoved();
+		} else if (movedChessmanType == ChessmanType.PAWN) {
+			Pawn pawn = ((Pawn) (movedSquare.getChessman()));
+			pawn.setMoved();
+			pawn.setMovedSquareCount(Math.abs(controllingCoordinateContainChessman.getY() - toY));
+
+			EnPassant enPassantHelper = ((EnPassant) FunctionType.ENPASSANT.get());
+			if (enPassantHelper.isEnPassantMove(toX, toY)) {
+				enPassantHelper.moveEnPassant(toX, toY);
 			}
-
-			if (selectedChessmanType == ChessmanType.PAWN) {
-				Pawn pawn = ((Pawn) (selectedSquare.getChessman()));
-				pawn.setMoved();
-				pawn.setMovedSquareCount(Math.abs(getSelectedSquareY(x, y) - y));
-
-				/* DataSetting for Pawn EnPassant */
-				EnPassant enPassantHelper = ((EnPassant) FunctionType.ENPASSANT.get());
-				if (enPassantHelper.isEnPassantMove(x, y)) {
-					enPassantHelper.moveEnPassant(x, y);
-				}
-			}
-
-			getBoardSquare(x, y).setChessmanOnSquare(selectedSquare.getChessman());
-			selectedSquare.removeChessmanFromSquare();
 		}
+	}
 
-		selectedSquare.setSquareOriginalColor();
-		selectedSquare = null;
-
-		clearSquaresEventColor();
-
+	private void afterChessmanMoved(int x, int y) {
 		((Mate) FunctionType.MATE.get()).checkMateRoute();
 
 		disableSquareClickEvent();
 
 		/* 애매한부분 */
-		boolean isPromotion = getBoardSquare(x, y).isContainChessman()
-				&& getBoardSquare(x, y).getContainChessmanType() == ChessmanType.PAWN && (y == 0 || y == 7);
+		boolean isPromotion = getBoardSquareAt(x, y).isContainChessman()
+				&& getBoardSquareAt(x, y).getContainChessmanType() == ChessmanType.PAWN && (y == 0 || y == 7);
 
 		if (isPromotion) {
-			new PawnPromotionSelectEventFrame(isWhite).setOnPromotionSelectedListener(chessmanType -> {
+			new PawnPromotionSelectEventFrame(controlColor).setOnPromotionSelectedListener(chessmanType -> {
 				isFinish = true;
-				setChessmanOnSquare(chessmanType.createChessman(isWhite), x, y);
+				setChessmanOnSquare(chessmanType.createChessman(controlColor), x, y);
 			});
 		} else {
 			isFinish = true;
 		}
-
-	}
-
-	/* DataSetting for Pawn EnPassant */
-	/*
-	 * 고친 결과물... 문제점 : selectedSquare가 존재하나 BoardSquare 자료형으로써 이동 한 y좌표에대해서 비교 할 수가
-	 * 없었다.
-	 */
-	// 따라서 해결방안으로 생각한 것이 selectedSquare와 맞는 BoardSquare를 찾아서 그 y좌표를 구하고 이동한 y좌표에 대해서
-	// 비교하자고 생각했다.
-	private int getSelectedSquareY(int x, int y) {
-		int selectedSquareY = 0;
-
-		for (int findY = 0; findY < 8; findY++) {
-			for (int findX = 0; findX < 8; findX++) {
-				if (selectedSquare == getBoardSquare(findX, findY)) {
-					selectedSquareY = findY;
-				}
-			}
-		}
-
-		return selectedSquareY;
 	}
 
 	// chessman(King, Queen, Bishop, Knight, Rook, Pawn)을 원하는 좌표값(x,y)의 square에
 	// 올려준다.
 	// 올려주는 역할을 BoardSquare class의 메서드를 이용해서 하는데 이를통해 원하는 로직을 따라서 체스말이 추가된다.
 	private void setChessmanOnSquare(Chessman chessman, int x, int y) {
-		getBoardSquare(x, y).setChessmanOnSquare(chessman);
+		getBoardSquareAt(x, y).setChessmanOnSquare(chessman);
 	}
 
 	// 모든 체스말을 보드위에 셋팅한다.
-	private BoardPanel setWholeChessmanOnBoard(boolean isWhite) {
-		
-		for (ChessmanType type : ChessmanType.values()) {
-			setChessmanOnBoard(isWhite, type);
+	private BoardPanel placeWholeChessmanByColorSideView(boolean isWhite) {
+
+		ChessmanType[] wholeChessmanType = ChessmanType.values();
+
+		for (ChessmanType chessmanType : wholeChessmanType) {
+			switch (chessmanType) {
+			case KING:
+				placeSingleChessmanByColorSideView(isWhite, ChessmanType.KING);
+				break;
+			case QUEEN:
+				placeSingleChessmanByColorSideView(isWhite, ChessmanType.QUEEN);
+				break;
+			case BISHOP:
+				placePairChessmanByColorSideView(isWhite, ChessmanType.BISHOP);
+				break;
+			case KNIGHT:
+				placePairChessmanByColorSideView(isWhite, ChessmanType.KNIGHT);
+				break;
+			case ROOK:
+				placePairChessmanByColorSideView(isWhite, ChessmanType.ROOK);
+				break;
+			case PAWN:
+				placePawnOnBoardByColorSideView(isWhite, ChessmanType.PAWN);
+				break;
+			default:
+			}
 		}
-		
-		this.enableSquareClickEvent(true);
-		
+
 		return this;
 	}
 
-	// 체스말의 타입별로 보드의 초기위치에 설정해주기위한 메서드인데 각 타입에 따라 보드위 초기위치에 설정해준다.
-	private void setChessmanOnBoard(boolean isWhite, ChessmanType type) {
-		switch (type) {
-		case KING:
-			setSingleChessmanOnBoard(isWhite, ChessmanType.KING);
-			break;
-		case QUEEN:
-			setSingleChessmanOnBoard(isWhite, ChessmanType.QUEEN);
-			break;
-		case BISHOP:
-			setPairChessmanOnBoard(isWhite, ChessmanType.BISHOP);
-			break;
-		case KNIGHT:
-			setPairChessmanOnBoard(isWhite, ChessmanType.KNIGHT);
-			break;
-		case ROOK:
-			setPairChessmanOnBoard(isWhite, ChessmanType.ROOK);
-			break;
-		case PAWN:
-			setPawnOnBoard(isWhite, ChessmanType.PAWN);
-			break;
-		default:
+	private int whiteYCoordinateByColorSideView(boolean isWhite) {
+		if (isWhite) {
+			return 7;
+		} else {
+			return 0;
+		}
+
+	}
+
+	private int blackYCoordinateByColorSideView(boolean isWhite) {
+		if (isWhite) {
+			return 0;
+		} else {
+			return 7;
 		}
 	}
 
-	private int getWhiteYCoordinateByColor(boolean isWhite) {
-		return isWhite ? 7 : 0;
+	private int kingsXCoordinateByColorSide(boolean isWhite) {
+		return isWhite ? 4 : 3;
 	}
 
-	private int getBlackYCoordinateByColor(boolean isWhite) {
-		return isWhite ? 0 : 7;
+	private int queenXCoordinateByColorSide(boolean isWhite) {
+		return isWhite ? 3 : 4;
 	}
 
 	// 초기 갯수가 1개인 말(킹, 퀸) 의 경우 enum의 ordinal이 0, 1인데 여기서 3을 더한 값이 실제 말이 놓일 x로써 의미를
 	// 갖게 된다는 것을 알고
 	// 이러한 규칙을 이용해서 초기 갯수가 1개인 말을 한꺼번에 처리해서 Square에 올려주게되었다.
-	private void setSingleChessmanOnBoard(boolean isWhite, ChessmanType type) {
+	private void placeSingleChessmanByColorSideView(boolean isWhite, ChessmanType type) {
 
 		int xCoordinate;
 
 		if (type == ChessmanType.KING) {
-			xCoordinate = type.ordinal() + 4;
+			xCoordinate = kingsXCoordinateByColorSide(isWhite);
 		} else {
-			xCoordinate = type.ordinal() + 2;
+			xCoordinate = queenXCoordinateByColorSide(isWhite);
 		}
 
-		setChessmanOnSquare(type.createChessman(true), xCoordinate, getWhiteYCoordinateByColor(isWhite));
-		setChessmanOnSquare(type.createChessman(false), xCoordinate, getBlackYCoordinateByColor(isWhite));
+		setChessmanOnSquare(type.createChessman(true), xCoordinate, whiteYCoordinateByColorSideView(isWhite));
+		setChessmanOnSquare(type.createChessman(false), xCoordinate, blackYCoordinateByColorSideView(isWhite));
 	}
 
 	// 초기 갯수가 2개인 말(비숍, 나이트, 룩) 의 경우 enum의 ordinal이 2, 3, 4인데 여기서 3을 더한 값과 7에서 이 값을
 	// 뺀 값이
 	// 실제 말이 놓일 x로써 의미를 갖게 된다는 것을 알고 이러한 규칙을 이용해서 초기 갯수가 2개인 말을 한꺼번에 처리해서 Square에
 	// 올려주게되었다.
-	private void setPairChessmanOnBoard(boolean isWhite, ChessmanType type) {
-		int whiteY = getWhiteYCoordinateByColor(isWhite);
-		int blackY = getBlackYCoordinateByColor(isWhite);
+	private void placePairChessmanByColorSideView(boolean color, ChessmanType type) {
+		int whiteY = whiteYCoordinateByColorSideView(color);
+		int blackY = blackYCoordinateByColorSideView(color);
 
 		setChessmanOnSquare(type.createChessman(true), (7 - (type.ordinal() + 3)), whiteY);
 		setChessmanOnSquare(type.createChessman(true), (type.ordinal() + 3), whiteY);
@@ -350,10 +459,10 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 	// 폰들을 보드위 정해진(초기) 위치에 셋팅해주기위해서 작성하였다. 폰의 경우 초기 갯수만큼 반복해서 생성해서 Square위에 올려주는데
 	// 흰색과 검정색이 대칭으로 갯수가 똑같음을 이용했다.
-	private void setPawnOnBoard(boolean isWhite, ChessmanType type) {
+	private void placePawnOnBoardByColorSideView(boolean byColorSideView, ChessmanType type) {
 		int initCount = type.getInitCount();
-		int whiteY = getWhiteYCoordinateByColor(isWhite);
-		int blackY = getBlackYCoordinateByColor(isWhite);
+		int whiteY = whiteYCoordinateByColorSideView(byColorSideView);
+		int blackY = blackYCoordinateByColorSideView(byColorSideView);
 
 		if (whiteY == 7 && blackY == 0) {
 			whiteY = 6;
@@ -381,9 +490,10 @@ public class BoardPanel extends FlatPanel implements Layer {
 	// (for문이 어떻게 돌아가는지 까지 신경써야되고 깊이도 늘어나니까)
 	// 따라서 이 중첩된 for문을 대신 수행해주는 forEach를 통해 로직의 목표가 무엇인지 표현하고 집중하는데 도움을 주고자 했다.
 	// CallBack 개념 : A라는 인스턴스의 a라는 메서드는 B라는 인스턴스의 b라는 메서드를 통해 수행 될 수 있다고 가정한다.
-	// A는 자기자신의 인스턴스를 B의 b메서드에 전달하여 b는  A의 a메서드를 수행해주는데 A의 입장에서 봤을때는 b의 메서드를 call했는데
-	// b의 메서드는 A자기자신의 a를 수행시켜주므로 back이다. 따라서 이러한 동작을 하는 것을 CallBack 구조라 한다. 
-	// 메서드를 수행하려면 결국은 인스턴스를 넘겨주어야 하는데 이를 인터페이스를 익명클래스로 구현함으로써 구현된 메서드를 CallBack 하는 것이다.
+	// A는 자기자신의 인스턴스를 B의 b메서드에 전달하여 b는 A의 a메서드를 수행해주는데 A의 입장에서 봤을때는 b의 메서드를 call했는데
+	// b의 메서드는 A자기자신의 a를 수행시켜주므로 back이다. 따라서 이러한 동작을 하는 것을 CallBack 구조라 한다.
+	// 메서드를 수행하려면 결국은 인스턴스를 넘겨주어야 하는데 이를 인터페이스를 익명클래스로 구현함으로써 구현된 메서드를 CallBack 하는
+	// 것이다.
 	private interface OnSelectedSquareListener {
 		public void onSelected(BoardSquare square);
 	}
@@ -401,36 +511,37 @@ public class BoardPanel extends FlatPanel implements Layer {
 	}
 
 	private void forEach(OnSelectedSquareListener onSelectedSquareListener) {
-		forEach((x, y) -> onSelectedSquareListener.onSelected(getBoardSquare(x, y)));
+		forEach((x, y) -> onSelectedSquareListener.onSelected(getBoardSquareAt(x, y)));
 	}
 
 	private void disableSquareClickEvent() {
 		forEach(square -> square.setEnableClickEvent(false));
 	}
 
-	private void enableSquareClickEvent(boolean isWhite) {
+	private void enableSquareClickEventByControlColor(boolean controlColor) {
 		forEach(square -> {
-			if (square.isContainChessman() && square.isContainChessmanWhite() == isWhite) {
-				square.setEnableClickEvent(true);
-			} else {
-				square.setEnableClickEvent(false);
-			}
-		});
+ 			if (square.isContainChessman() && square.isContainWhiteChessman() == controlColor) {
+ 				square.setEnableClickEvent(true);
+ 			} else {
+ 				square.setEnableClickEvent(false);
+ 			}
+ 		});
 	}
 
-	private void clearSquaresEventColor() {
+	private void clearRoute() {
 		forEach(square -> square.setSquareOriginalColor());
+		BoardPanel.this.repaint();
 	}
 
 	/**
-	 * ㅇㅇㅇㅇType(이름 아직 미정) 은 BoardPanel에 정의 되어있는 ㅇㅇㅇㅇ들을 사용자측에서 쉽게 알 수 있도록 도와주고
-	 * 위 정보를 이용하여 이 ㅇㅇㅇㅇ들을 받아서 사용하기 위해서 작성된 열거형 클래스이다.
+	 * ㅇㅇㅇㅇType(이름 아직 미정) 은 BoardPanel에 정의 되어있는 ㅇㅇㅇㅇ들을 사용자측에서 쉽게 알 수 있도록 도와주고 위 정보를
+	 * 이용하여 이 ㅇㅇㅇㅇ들을 받아서 사용하기 위해서 작성된 열거형 클래스이다.
 	 * 
 	 * 따라서 ㅇㅇㅇㅇType은 사용자측에서 사용 할 수 있는 ㅇㅇㅇㅇ들을 List로 갖는다.
 	 * 
-	 * 이 열거형클래스의 List를 사용하기위해서는 선행 조건으로 BoardPanel의 인스턴스가 생성되고
-	 * 각 기능들이 BoardPanel의 인스턴스를 이용해서 생성되어야 한다는 전제조건이 있다.(각 기능들은 BoardPanel의 인스턴스를 사용한 작업을 수행하기 때문)
-	 * 따라서 이 선행조건을 수행하는 bind(boardPanel) 메서드의 호출이 BoardPanel의 생성자에서 선행되어야 한다.
+	 * 이 열거형클래스의 List를 사용하기위해서는 선행 조건으로 BoardPanel의 인스턴스가 생성되고 각 기능들이 BoardPanel의
+	 * 인스턴스를 이용해서 생성되어야 한다는 전제조건이 있다.(각 기능들은 BoardPanel의 인스턴스를 사용한 작업을 수행하기 때문) 따라서
+	 * 이 선행조건을 수행하는 bind(boardPanel) 메서드의 호출이 BoardPanel의 생성자에서 선행되어야 한다.
 	 */
 	private static enum FunctionType {
 		MOVE(0), PAWN_ATTACK(1), CASTLING(2), ENPASSANT(3), MATE(4);
@@ -441,7 +552,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 		private FunctionType(int index) {
 			INDEX = index;
 		}
-		
+
 		private static List<Function> createFunctionList(BoardPanel boardPanel) {
 			List<Function> functionList = new ArrayList<Function>();
 			functionList.add(new Move(boardPanel));
@@ -491,14 +602,15 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 
 		protected BoardSquare getBoardSquare(int x, int y) {
-			return boardPanel.getBoardSquare(x, y);
-		}
-		
-		protected BoardSquare getBoardSquare(Coordinate coordinate) {
-			return boardPanel.getBoardSquare(coordinate);
+			return boardPanel.getBoardSquareAt(x, y);
 		}
 
-		protected void show(Chessman chessman, int x, int y) {}
+		protected BoardSquare getBoardSquare(Coordinate coordinate) {
+			return boardPanel.getBoardSquareAt(coordinate);
+		}
+
+		protected void show(int x, int y) {
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -521,9 +633,12 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 
 		@Override
-		protected void show(Chessman chessman, int x, int y) {
-			getBoardPanel().getBoardSquare(x, y).setSquareMoveableColor();
-			
+		protected void show(int x, int y) {
+			BoardSquare boardSquare = getBoardPanel().getBoardSquareAt(x, y);
+			boardSquare.setSquareMoveableColor();
+
+			Chessman chessman = boardSquare.getChessman();
+
 			ArrayList<MoveableRoute> moveableRouteList = MoveableRouteCalculator.getChessmanMoveableRouteList(chessman,
 					x, y);
 
@@ -549,13 +664,17 @@ public class BoardPanel extends FlatPanel implements Layer {
 				} else {
 					getBoardSquare(x, y).setSquareMoveableColor();
 				}
+				
+				getBoardSquare(x, y).setEnableClickEvent(true);
 			}
 		}
 
 		// 해당 좌표에 있는 말이 적군인지 검사하는 메서드
 		private boolean isEnemy(int x, int y) {
-			return getBoardPanel().selectedSquare.getChessman().isWhite() != getBoardPanel().getBoardSquare(x, y)
-					.getChessman().isWhite();
+			BoardPanel boardPanel = getBoardPanel();
+			BoardSquare selectedSquare = boardPanel.getBoardSquareAt(boardPanel.controllingCoordinateContainChessman);
+
+			return selectedSquare.getChessman().isWhite() != boardPanel.getBoardSquareAt(x, y).getChessman().isWhite();
 		}
 	}
 
@@ -577,9 +696,12 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 
 		@Override
-		protected void show(Chessman chessman, int x, int y) {
+		protected void show(int x, int y) {
+			BoardSquare boardSquare = getBoardPanel().getBoardSquareAt(x, y);
+			Chessman chessman = boardSquare.getChessman();
+
 			if (chessman.getChessmanType() == ChessmanType.PAWN) {
-				if (getBoardPanel().isWhite) {
+				if (boardSquare.isContainWhiteChessman()) {
 					showAvailablePawnAttackableRoute(x, y - 1);
 
 				} else {
@@ -591,7 +713,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 		// 적인지 아닌지
 		private boolean isEnemy(int x, int y) {
 			return getBoardSquare(x, y).isContainChessman()
-					&& (getBoardSquare(x, y).isContainChessmanWhite() != getBoardPanel().isWhite);
+					&& (getBoardSquare(x, y).isContainWhiteChessman() != getBoardPanel().controlColor);
 		}
 
 		/**
@@ -636,18 +758,18 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 
 		@Override
-		protected void show(Chessman chessman, int x, int y) {
+		protected void show(int x, int y) {
 			showMateRoute();
 		}
 
 		private boolean isNotCurrentColorChessman(int x, int y) {
 			return getBoardSquare(x, y).isContainChessman()
-					&& getBoardSquare(x, y).isContainChessmanWhite() != getBoardPanel().isWhite;
+					&& getBoardSquare(x, y).isContainWhiteChessman() != getBoardPanel().controlColor;
 		}
 
 		private boolean isCurrentColorChessman(int x, int y) {
 			return getBoardSquare(x, y).isContainChessman()
-					&& getBoardSquare(x, y).isContainChessmanWhite() == getBoardPanel().isWhite;
+					&& getBoardSquare(x, y).isContainWhiteChessman() == getBoardPanel().controlColor;
 		}
 
 		private boolean isCurrentColorKing(int x, int y) {
@@ -735,7 +857,9 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 
 		@Override
-		protected void show(Chessman chessman, int x, int y) {
+		protected void show(int x, int y) {
+			Chessman chessman = getBoardPanel().getBoardSquareAt(x, y).getChessman();
+
 			if (chessman.getChessmanType() == ChessmanType.PAWN) {
 				showEnPassantSquare(x, y);
 			}
@@ -744,7 +868,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 		private boolean isEnPassantMove(int x, int y) {
 			int enPassantY;
 
-			if (getBoardPanel().isWhite) {
+			if (getBoardPanel().controlColor) {
 				enPassantY = y + 1;
 			} else {
 				enPassantY = y - 1;
@@ -759,7 +883,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 
 		private void moveEnPassant(int x, int y) {
-			if (getBoardPanel().isWhite) {
+			if (getBoardPanel().controlColor) {
 				getBoardSquare(x, y + 1).removeChessmanFromSquare();
 			} else {
 				getBoardSquare(x, y - 1).removeChessmanFromSquare();
@@ -767,7 +891,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 
 		private void showEnPassantSquareByColor(int x, int y) {
-			if (getBoardPanel().isWhite) {
+			if (getBoardPanel().controlColor) {
 				getBoardSquare(x, y - 1).setSquareAttackableColor();
 			} else {
 				getBoardSquare(x, y + 1).setSquareAttackableColor();
@@ -775,8 +899,9 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 
 		private boolean isBoardSquareContainsEnemyPawn(int x, int y) {
-			return getBoardSquare(x, y).getContainChessmanType() == ChessmanType.PAWN && getBoardPanel().getBoardSquare(getBoardPanel().selectedCoordinate)
-					.isContainChessmanWhite() != getBoardSquare(x, y).isContainChessmanWhite();
+			return getBoardSquare(x, y).getContainChessmanType() == ChessmanType.PAWN
+					&& getBoardPanel().getBoardSquareAt(getBoardPanel().controllingCoordinateContainChessman)
+							.isContainWhiteChessman() != getBoardSquare(x, y).isContainWhiteChessman();
 		}
 
 		private boolean isEnemyPawnMovedTwoSquare(int x, int y) {
@@ -789,12 +914,12 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 		private void showEnPassantSquare(int x, int y) {
 			if (Coordinate.isValidate(x - 1, y) && getBoardSquare(x - 1, y).isContainChessman()
-					&& isAvailToEnPassent(x - 1, y) && getBoardPanel().movedSquare == getBoardSquare(x - 1, y)) {
+					&& isAvailToEnPassent(x - 1, y) && getBoardPanel().movedSquare222 == getBoardSquare(x - 1, y)) {
 				showEnPassantSquareByColor(x - 1, y);
 			}
 
 			if (Coordinate.isValidate(x + 1, y) && getBoardSquare(x + 1, y).isContainChessman()
-					&& isAvailToEnPassent(x + 1, y) && getBoardPanel().movedSquare == getBoardSquare(x + 1, y)) {
+					&& isAvailToEnPassent(x + 1, y) && getBoardPanel().movedSquare222 == getBoardSquare(x + 1, y)) {
 				showEnPassantSquareByColor(x + 1, y);
 			}
 		}
@@ -816,7 +941,8 @@ public class BoardPanel extends FlatPanel implements Layer {
 		}
 
 		@Override
-		protected void show(Chessman chessman, int x, int y) {
+		protected void show(int x, int y) {
+			Chessman chessman = getBoardPanel().getBoardSquareAt(x, y).getChessman();
 			ChessmanType chessmanType = chessman.getChessmanType();
 
 			if (chessmanType == ChessmanType.KING && !((King) chessman).isMoved()) {
@@ -827,7 +953,7 @@ public class BoardPanel extends FlatPanel implements Layer {
 		// 캐슬링에 적합한 검증과정(1.킹과 룩 사이에 말들이 없고 2.룩이 움직인적이없어야 한다)을 거치고 검증과정에 맞으면 캐슬링 스퀘어에
 		// 추가한다.
 		private void showCastlingSquare() {
-			if (getBoardPanel().isWhite) {
+			if (getBoardPanel().controlColor) {
 
 				if (isXAndUpperSquareEmpty(5, 7) && isSquareContainRook(7, 7)) {
 					showCastlingSquareIfRookNotMoved(7, 7);
@@ -880,9 +1006,6 @@ public class BoardPanel extends FlatPanel implements Layer {
 		private void operateCastling(int x, int y) {
 			if ((x == 7 && y == 7) || (x == 0 && y == 7) || (x == 7 && y == 0) || (x == 0 && y == 0)) {
 				operateCastlingMove(x, y);
-			} else {
-				getBoardSquare(x, y).setChessmanOnSquare(getBoardPanel().selectedSquare.getChessman());
-				getBoardPanel().selectedSquare.removeChessmanFromSquare();
 			}
 		}
 
@@ -910,8 +1033,8 @@ public class BoardPanel extends FlatPanel implements Layer {
 	@Override
 	public void execute(Object[] object) {
 		isFinish = false;
-		boolean isWhite = getBoardSquare(selectedCoordinate).isContainChessmanWhite();
-		enableSquareClickEvent(!isWhite);
+		controlColor = (Boolean) object[0];
+		enableSquareClickEventByControlColor(controlColor);
 	}
 
 	/**
@@ -940,7 +1063,6 @@ public class BoardPanel extends FlatPanel implements Layer {
 
 			}
 		});
-
 		return new Object[] { chessmanCountMap };
 	}
 
