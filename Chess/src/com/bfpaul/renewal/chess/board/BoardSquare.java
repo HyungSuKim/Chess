@@ -27,7 +27,6 @@ import com.mommoo.flat.layout.linear.LinearLayout;
 public class BoardSquare extends FlatImagePanel {
 	private final Color ORIGINAL_COLOR;
 	private Chessman chessman;
-	private boolean isContain;
 
 	BoardSquare(Color originalColor) {
 		ORIGINAL_COLOR = originalColor;
@@ -36,30 +35,19 @@ public class BoardSquare extends FlatImagePanel {
 		setBackground(ORIGINAL_COLOR);
 		setOpaque(true);
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-		setEnableClickEvent(false);
 	}
 
 	// 체스말을 네모칸위에 올려준다.
 	public void setChessmanOnSquare(Chessman chessman) {
 		this.chessman = chessman;
-		isContain = true;
-		setEnableClickEvent(true);
 		setImage(chessman.getChessmanImage(), ImageOption.MATCH_PARENT);
 	}
 
 	// 칸의 색을 원래대로 돌려주는데 말이 없는 곳은 클릭이 되면 안된다고 생각했기 때문에 말이 있으면 클릭 가능하게하고 아니면 불가능하게 하도록
 	// 했다.
 	void setSquareOriginalColor() {
-		
 		setBackground(ORIGINAL_COLOR);
 		setAlpha(1.0f);
-		
-		if (isContain) {
-			setEnableClickEvent(true);
-		} else {
-			setEnableClickEvent(false);
-		}
 	}
 
 	// 해당 칸이 단순 이동이 가능한 칸이라고 표현해준다.
@@ -67,50 +55,45 @@ public class BoardSquare extends FlatImagePanel {
 	// 체크메이트 경로와 겹칠경우 체크메이트 경로 위로 이동하여 경로를 차단하는 것을 생각했기 때문이다.
 	void setSquareMoveableColor() {
 		setBackgroundColorWithAlpha(Theme.LIGHT_BLUE_COLOR);
-		setEnableClickEvent(true);
 	}
 
 	// 해당 칸이 공격이 가능하다고 표현해준다
 	void setSquareAttackableColor() {
 		setBackground(Color.RED);
-		setEnableClickEvent(true);
 	}
 
 	// 해당 칸이 체크메이트 경로임을 표현해준다.
 	void setSquareCheckColor() {
 		setBackgroundColorWithAlpha(Color.GREEN);
-		setEnableClickEvent(false);
 	}
 	
 	// 해당 칸이 움직일 수 있는 체크메이트 칸임을 표현해준다.
 	void setSquareMoveableCheckColor() {
 		setBackgroundColorWithAlpha(Color.GREEN);
-		setEnableClickEvent(true);
 	}
 
 	// 해당 칸이 캐슬링이 가능하다고 표현해준다
 	void setSquareCastlingColor() {
 		setBackgroundColorWithAlpha(Color.YELLOW);
-		setEnableClickEvent(true);
 	}
 
 	// 체스말을 가지고있으면 체스말을 네모칸위에서 제거한다.
 	void removeChessmanFromSquare() {
 		chessman = null;
-		isContain = false;
 		setImage(null);
 	}
-
-	// 칸 위에 체스말이 있는지 없는지를 반환한다.
-	boolean isContainChessman() {
-		return isContain;
+	
+	BoardSquareType getType() {
+		if(chessman == null) return BoardSquareType.EMPTY;
+		
+		if(chessman.isWhite()) {
+			return BoardSquareType.CONTAIN_CHESSMAN_WHITE;
+		} else {
+			return BoardSquareType.CONTAIN_CHESSMAN_BLACK;
+		}
 	}
 	
-	boolean isContainChessmanWhite() {
-		return chessman.isWhite();
-	}
-	
-	ChessmanType getContainChessmanType() {
+	ChessmanType getChessmanType() {
 		return chessman.getChessmanType();
 	}
 
@@ -126,9 +109,11 @@ public class BoardSquare extends FlatImagePanel {
 		return chessman;
 	}
 	
-	
+	// TODO : repaint 설명
 	private void setBackgroundColorWithAlpha(Color color) {
-		setBackground(color);
-		setAlpha(0.6f);
+		int red = (color.getRed() + ORIGINAL_COLOR.getRed()) / 2;
+		int green = (color.getGreen() + ORIGINAL_COLOR.getGreen()) / 2;
+		int blue = (color.getBlue() + ORIGINAL_COLOR.getBlue()) / 2;
+		setBackground(new Color(red, green, blue));
 	}
 }
