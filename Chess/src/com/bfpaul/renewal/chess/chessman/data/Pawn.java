@@ -9,9 +9,13 @@ import com.bfpaul.renewal.chess.route.Direction;
  * 
  * isMoved : Pawn은 첫 움직임이 있기전 2칸을 움직일 수 있다는 것을 표현하기위한 변수
  */
-public class Pawn extends Chessman {
+public class Pawn extends Chessman implements SpecialChessmanMovedIndicator {
+	// 폰의 색상정보를 나타내는 데이터로써 필요한 멤버변수, 이는 모든 chessman에 동일하게 적용된다.
 	private final boolean IS_WHITE;
-	private boolean isMoved;
+	
+	// 폰이 움직인 칸수를 나타내는 데이터로써 필요한 멤버변수, 폰은 자기 자신이 움직인 칸수를 기억해야 될 필요성이 있다.
+	// 다른 말들과 다르게 폰은 2칸을 움직였을때 발생하는 이벤트가 있는데 이는 위에서 언급한 isMoved멤버변수 만으로는 표현 할 수 없다고 판단했다.
+	// 그 이유는 특별한 움직임(2칸을 움직일 수 있는 상황)에서 1칸을 움직이는 경우도 존재하기 때문이다.
 	private int movedSquareCount;
 	
 	public Pawn(boolean isWhite) {
@@ -39,31 +43,33 @@ public class Pawn extends Chessman {
 
 	@Override
 	public int getMoveableSquareCount() {
-		if(!isMoved) {
+		if(movedSquareCount == 0) {
 			return 2;
 		} else {
 			return 1;
 		}
 	}
-	
-	public boolean isMoved() {
-		return isMoved;
+
+	@Override
+	public ChessmanType getChessmanType() {
+		return ChessmanType.PAWN;
 	}
-	
-	public void setIsMoved() {
-		isMoved = true;
+
+	@Override
+	public void setMovedSquareCount(int squareCount) {
+		movedSquareCount = squareCount;
 	}
-	
-	public void setMovedSquareCount(int count) {
-		movedSquareCount = count;
-	}
-	
+
 	public int getMovedSquareCount() {
 		return movedSquareCount;
 	}
 
 	@Override
-	public ChessmanType getChessmanType() {
-		return ChessmanType.PAWN;
+	public boolean isMoved() {
+		if(movedSquareCount == 0) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 }

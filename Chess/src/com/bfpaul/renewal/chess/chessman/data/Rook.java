@@ -9,7 +9,7 @@ import com.bfpaul.renewal.chess.route.Direction;
  * 
  * isMoved 추후 king과 rook의 캐슬링을 구현하기 위한 속성
  */
-public class Rook extends Chessman {
+public class Rook extends Chessman implements SpecialChessmanMovedIndicator {
 
 	private final boolean IS_WHITE;
 	private boolean isMoved;
@@ -38,16 +38,22 @@ public class Rook extends Chessman {
 		return ChessmanImage.getChessmanImage(IS_WHITE, ChessmanType.ROOK);
 	}
 	
-	public void setIsMoved() {
+	public void setMoved() {
 		isMoved = true;
-	}
-	
-	public boolean isMoved() {
-		return isMoved;
 	}
 
 	@Override
 	public ChessmanType getChessmanType() {
 		return ChessmanType.ROOK;
+	}
+
+	@Override
+	public void setMovedSquareCount(int squareCount) {
+		setMoved();
+	}
+
+	@Override
+	public boolean isMoved() {
+		return isMoved;
 	}
 }
