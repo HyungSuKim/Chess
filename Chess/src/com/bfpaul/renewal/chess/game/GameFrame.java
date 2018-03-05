@@ -9,7 +9,6 @@ import com.bfpaul.renewal.chess.Images;
 import com.bfpaul.renewal.chess.Theme;
 import com.bfpaul.renewal.chess.board.BoardPanel;
 import com.bfpaul.renewal.chess.chessman.CurrentChessmanView;
-import com.bfpaul.renewal.chess.event.BoardEventInfoView;
 import com.bfpaul.renewal.chess.layer.LayerHandler;
 import com.bfpaul.renewal.chess.timer.GameTimerView;
 import com.mommoo.flat.button.FlatButton;
@@ -29,7 +28,7 @@ public class GameFrame {
 	private GameTimerView gameTimerView = new GameTimerView();
 	
 	public GameFrame(boolean isWhite) {
-		BoardPanel boardPanel = new BoardPanel(isWhite);
+		BoardPanel boardPanel = isWhite ? BoardPanel.createBoardPanelAtWhiteSideView() : BoardPanel.createBoardPanelAtBalckSideView();
 		
 		frame.getContainer().add(createRelatedInfoPanel(), createCommonConstraints(2));
 		frame.getContainer().add(boardPanel, createCommonConstraints(10));
@@ -41,22 +40,15 @@ public class GameFrame {
 		.addLayer(gameTimerView)
 		.execute();
 		
+		System.out.println("gameframe excuteLayerHandler");
+		
 		if(isWhite) {
 			frame.setLocation(0, 0);
 		} else {
 			frame.setLocation(950, 0);
 		}
-		
-		System.out.println(frame.getContainer().getSize().toString());
-		System.out.println(frame.getContainer().getLocation().toString());
-		System.out.println(frame.getContainer().getBounds().toString());
 
 		frame.show();
-
-		System.out.println(frame.getContainer().getSize().toString());
-		System.out.println(frame.getContainer().getLocation().toString());
-		System.out.println(frame.getContainer().getBounds().toString());
-
 	}
 	
 

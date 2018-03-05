@@ -18,6 +18,7 @@ public class LayerHandler {
 					while(!layerList.get(0).isFinish()) {
 						Thread.sleep(100);
 					}
+					
 					layerList.get(1).execute(layerList.get(0).getDatas());
 					
 					layerList.get(2).execute(layerList.get(1).getDatas());

@@ -120,8 +120,10 @@ public class CurrentChessmanView extends FlatPanel implements Layer{
 		return (FlatLabel) getChessmanViewByColor(isWhite).getComponent(componentIndex);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Object[] object) {
+		
 		HashMap<Boolean, HashMap<ChessmanType, Integer>> chessmanCountMap
 			= (HashMap<Boolean, HashMap<ChessmanType, Integer>>)object[0];
 		

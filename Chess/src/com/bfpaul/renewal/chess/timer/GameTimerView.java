@@ -70,10 +70,10 @@ public class GameTimerView extends FlatPanel implements Layer {
 				((TimerView) getComponent(1)).timerOperateSwitch();
 				isWhite = !isWhite;
 				isFinish = true;
-				// gameHelper.changePhaseOnBoardPanel();
 			}
 
 		});
+		
 		return phaseEndButton;
 	}
 
